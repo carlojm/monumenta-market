@@ -35,3 +35,20 @@
     padding: 0.65rem 0.5rem;
   }
 }
+
+.plot-table__match {
+  font-size: 0.8rem;
+  color: #555;
+  max-width: 220px;
+}
+
+.plot-table__match-field {
+  font-weight: 600;
+  color: #333;
+}
+
+.plot-table mark {
+  background-color: #ffe082;
+  color: inherit;
+  padding: 0 1px;
+}

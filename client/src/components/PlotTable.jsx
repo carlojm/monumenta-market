@@ -15,26 +15,41 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
     <table className="plot-table">
       <thead>
         <tr>
-          <th>Shop</th>
           <th>Owner</th>
           <th>Zone</th>
           <th>Status</th>
+          {searchResults && <th>Match</th>}
         </tr>
       </thead>
       <tbody>
         {rows.map((plot) => {
           const key = `${plot.x}_${plot.z}`;
           const isMatch = searchResults ? searchResults.matchedKeys.has(key) : true;
+          const snippet = searchResults?.snippets[key];
+
           return (
             <tr
               key={key}
               onClick={() => onSelectPlot(plot)}
               className={searchResults && !isMatch ? 'plot-table__row--dimmed' : ''}
             >
-              <td>{plot.shop_name || '—'}</td>
               <td>{plot.owner || '—'}</td>
               <td>{plot.zone || '—'}</td>
               <td>{plot.status}</td>
+              {searchResults && (
+                <td className="plot-table__match">
+                  {snippet ? (
+                    <>
+                      <span className="plot-table__match-field">{snippet.field}: </span>
+                      {snippet.before}
+                      <mark>{snippet.highlight}</mark>
+                      {snippet.after}
+                    </>
+                  ) : (
+                    '—'
+                  )}
+                </td>
+              )}
             </tr>
           );
         })}
