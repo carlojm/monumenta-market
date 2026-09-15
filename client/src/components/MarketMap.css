@@ -3,6 +3,9 @@
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .market-map__image {
@@ -15,12 +18,12 @@
 .market-map__plot {
   position: absolute;
   transform: translate(-50%, -50%);
-  border: 1px solid #222;
+  border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 2px;
   cursor: pointer;
   padding: 0;
 }
 
 .market-map__plot:hover {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--text);
 }

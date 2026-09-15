@@ -8,12 +8,13 @@
 .plot-table td {
   text-align: left;
   padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border);
 }
 
 .plot-table th {
   font-weight: 600;
-  border-bottom: 2px solid #888;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
 }
 
 .plot-table tbody tr {
@@ -21,34 +22,34 @@
 }
 
 .plot-table tbody tr:hover {
-  background-color: #eee;
+  background-color: var(--code-bg);
 }
 
 .plot-table__row--dimmed {
   opacity: 0.4;
 }
 
-/* Slightly larger tap targets on mobile */
-@media (max-width: 480px) {
-  .plot-table th,
-  .plot-table td {
-    padding: 0.65rem 0.5rem;
-  }
-}
-
 .plot-table__match {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-muted);
   max-width: 220px;
 }
 
 .plot-table__match-field {
   font-weight: 600;
-  color: #333;
+  color: var(--text);
 }
 
 .plot-table mark {
-  background-color: #ffe082;
-  color: inherit;
+  background-color: var(--accent);
+  color: var(--accent-contrast);
   padding: 0 1px;
+  border-radius: 2px;
+}
+
+@media (max-width: 480px) {
+  .plot-table th,
+  .plot-table td {
+    padding: 0.65rem 0.5rem;
+  }
 }
