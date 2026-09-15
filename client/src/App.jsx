@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import MarketMap from './components/MarketMap';
 import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
-import { filterPlots } from './lib/search';
+import { getSearchResults } from './lib/search';
 
 function App() {
   const [plots, setPlots] = useState([]);
@@ -16,7 +16,7 @@ function App() {
       .catch((err) => setError(err.message));
   }, []);
 
-  const filtered = useMemo(() => filterPlots(plots, query), [plots, query]);
+  const searchResults = useMemo(() => getSearchResults(plots, query), [plots, query]);
 
   const handleSelectPlot = (plot) => {
     console.log('Selected plot:', plot);
@@ -26,10 +26,9 @@ function App() {
     <div>
       <h1>Market Directory</h1>
       {error && <p>Error: {error}</p>}
-      <MarketMap plots={filtered} onSelectPlot={handleSelectPlot} />
+      <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={handleSelectPlot} />
       <SearchBar value={query} onChange={setQuery} />
-      <PlotTable plots={filtered} onSelectPlot={handleSelectPlot} />
-      
+      <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={handleSelectPlot} />
     </div>
   );
 }

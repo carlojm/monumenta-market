@@ -21,7 +21,14 @@ app.use(express.json());
 // --- API routes ---
 
 app.get('/api/plots', (req, res) => {
-  const plots = db.prepare('SELECT * FROM plots').all();
+  const plots = db.prepare(`
+    SELECT p.*,
+      (SELECT GROUP_CONCAT(body, ' ')
+       FROM comments c
+       WHERE c.plot_x = p.x AND c.plot_z = p.z AND c.status = 'approved'
+      ) AS comment_text
+    FROM plots p
+  `).all();
   res.json(plots);
 });
 

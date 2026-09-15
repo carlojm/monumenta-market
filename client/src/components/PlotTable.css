@@ -1,0 +1,37 @@
+.plot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.plot-table th,
+.plot-table td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.plot-table th {
+  font-weight: 600;
+  border-bottom: 2px solid #888;
+}
+
+.plot-table tbody tr {
+  cursor: pointer;
+}
+
+.plot-table tbody tr:hover {
+  background-color: #eee;
+}
+
+.plot-table__row--dimmed {
+  opacity: 0.4;
+}
+
+/* Slightly larger tap targets on mobile */
+@media (max-width: 480px) {
+  .plot-table th,
+  .plot-table td {
+    padding: 0.65rem 0.5rem;
+  }
+}
