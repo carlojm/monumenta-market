@@ -24,9 +24,14 @@ app.get('/api/plots', (req, res) => {
   const plots = db.prepare(`
     SELECT p.*,
       (SELECT GROUP_CONCAT(body, ' ')
-       FROM comments c
-       WHERE c.plot_x = p.x AND c.plot_z = p.z AND c.status = 'approved'
-      ) AS comment_text
+       FROM comments c WHERE c.plot_x = p.x AND c.plot_z = p.z AND c.status = 'approved'
+      ) AS comment_text,
+      (SELECT report_type FROM reports r
+       WHERE r.plot_x = p.x AND r.plot_z = p.z ORDER BY r.created_at DESC LIMIT 1
+      ) AS latest_report_type,
+      (SELECT created_at FROM reports r
+       WHERE r.plot_x = p.x AND r.plot_z = p.z ORDER BY r.created_at DESC LIMIT 1
+      ) AS latest_report_at
     FROM plots p
   `).all();
   res.json(plots);
@@ -45,7 +50,11 @@ app.get('/api/plots/:x/:z', (req, res) => {
     'SELECT * FROM images WHERE plot_x = ? AND plot_z = ? ORDER BY sort_order'
   ).all(x, z);
 
-  res.json({ ...plot, comments, images });
+  const latestReport = db.prepare(
+    'SELECT report_type, created_at FROM reports WHERE plot_x = ? AND plot_z = ? ORDER BY created_at DESC LIMIT 1'
+  ).get(x, z);
+
+  res.json({ ...plot, comments, images, latestReport: latestReport || null });
 });
 
 app.post('/api/plots/:x/:z/comments', (req, res) => {
@@ -58,6 +67,21 @@ app.post('/api/plots/:x/:z/comments', (req, res) => {
   ).run(x, z, author || null, body.trim());
 
   res.status(201).json({ id: result.lastInsertRowid, status: 'pending' });
+});
+
+app.post('/api/plots/:x/:z/report', (req, res) => {
+  const { x, z } = req.params;
+  const { report_type } = req.body;
+
+  if (!['open', 'closed'].includes(report_type)) {
+    return res.status(400).json({ error: 'report_type must be "open" or "closed"' });
+  }
+
+  db.prepare(
+    'INSERT INTO reports (plot_x, plot_z, report_type) VALUES (?, ?, ?)'
+  ).run(x, z, report_type);
+
+  res.status(201).json({ recorded: true });
 });
 
 // --- Admin: update plot (upsert + diff-based activity log) ---
@@ -171,6 +195,8 @@ app.post('/api/admin/comments/:id/reject', adminAuth, (req, res) => {
   db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
   res.json({ rejected: true });
 });
+
+
 
 // --- Serve React build in production ---
 if (process.env.NODE_ENV === 'production') {

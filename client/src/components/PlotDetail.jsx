@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './PlotDetail.css';
+import { canReport, recordReport, cooldownRemainingMinutes, timeAgo } from '../lib/reports';
 
 function PlotDetail({ plot, onClose }) {
   const [detail, setDetail] = useState(null);
@@ -10,13 +11,32 @@ function PlotDetail({ plot, onClose }) {
   const [submitting, setSubmitting] = useState(false);
   const [optimisticComments, setOptimisticComments] = useState([]);
 
+  const [latestReport, setLatestReport] = useState(null);
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+
+  const [pendingVote, setPendingVote] = useState(null); // 'open' | 'closed' | null
+  const requestVote = (type) => {
+    setPendingVote(type);
+  };
+  const confirmVote = async () => {
+    const type = pendingVote;
+    setPendingVote(null);
+    await handleReport(type);
+  };
+  const cancelVote = () => {
+    setPendingVote(null);
+  };
+
   useEffect(() => {
     if (!plot) return;
     setImageIndex(0);
     setOptimisticComments([]);
     fetch(`/api/plots/${plot.x}/${plot.z}`)
       .then((res) => res.json())
-      .then(setDetail)
+      .then((data) => {
+        setDetail(data);
+        setLatestReport(data.latestReport);
+      })
       .catch((err) => setError(err.message));
   }, [plot]);
 
@@ -57,6 +77,26 @@ function PlotDetail({ plot, onClose }) {
       setSubmitting(false);
     }
   };
+
+  const handleReport = async (reportType) => {
+    setReportSubmitting(true);
+    try {
+      await fetch(`/api/plots/${plot.x}/${plot.z}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report_type: reportType }),
+      });
+      recordReport(plot.x, plot.z);
+      setLatestReport({ report_type: reportType, created_at: new Date().toISOString() });
+    } catch (err) {
+      setError('Could not submit report: ' + err.message);
+    } finally {
+      setReportSubmitting(false);
+    }
+  };
+
+  const canReportNow = plot && canReport(plot.x, plot.z);
+  const cooldownMins = plot ? cooldownRemainingMinutes(plot.x, plot.z) : 0;
 
   return (
     <div className="plot-detail__overlay" onClick={onClose}>
@@ -102,7 +142,46 @@ function PlotDetail({ plot, onClose }) {
           <dt>Zone</dt>
           <dd>{plot.zone || '—'}</dd>
           <dt>Status</dt>
-          <dd>{plot.status}</dd>
+          <dd className="plot-detail__status">
+            <div className="plot-detail__status-line">
+              {/* <span>{plot.status}</span> */}
+              <span className="plot-detail__status-report">
+                {latestReport
+                  ? `last reported ${latestReport.report_type} ${timeAgo(latestReport.created_at)}`
+                  : 'no reports yet'}
+              </span>
+            </div>
+
+            {pendingVote ? (
+              <div className="plot-detail__status-confirm">
+                <span>Mark this shop as currently {pendingVote}?</span>
+                <div className="plot-detail__status-confirm-actions">
+                  <button onClick={confirmVote} disabled={reportSubmitting}>Confirm</button>
+                  <button onClick={cancelVote} disabled={reportSubmitting}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div className="plot-detail__status-actions">
+                <button
+                  className="plot-detail__vote-btn"
+                  disabled={!canReportNow}
+                  onClick={() => requestVote('open')}
+                  aria-label="Report open"
+                >
+                  It's open
+                </button>
+                <button
+                  className="plot-detail__vote-btn"
+                  disabled={!canReportNow}
+                  onClick={() => requestVote('closed')}
+                  aria-label="Report closed"
+                >
+                  It's closed
+                </button>
+                {!canReportNow && <span className="plot-detail__status-cooldown">again in {cooldownMins}m</span>}
+              </div>
+            )}
+          </dd>
         </dl>
 
         {plot.description && <p className="plot-detail__description">{plot.description}</p>}

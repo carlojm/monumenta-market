@@ -168,3 +168,54 @@
     max-height: 80vh;
   }
 }
+
+
+.plot-detail__status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.plot-detail__status-line {
+  font-size: 0.95rem;
+}
+
+.plot-detail__status-report {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.plot-detail__status-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.plot-detail__vote-btn {
+  /* padding: 0.15rem 0.4rem; */
+  font-size: 0.9rem;
+  line-height: 1;
+  margin-left: -2px;
+}
+
+.plot-detail__status-cooldown {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.plot-detail__status-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  max-width: fit-content;
+}
+
+.plot-detail__status-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+}

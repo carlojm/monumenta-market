@@ -42,6 +42,15 @@ db.exec(`
     sort_order INTEGER DEFAULT 0,
     FOREIGN KEY (plot_x, plot_z) REFERENCES plots(x, z)
   );
+
+  CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    plot_x INTEGER NOT NULL,
+    plot_z INTEGER NOT NULL,
+    report_type TEXT NOT NULL, -- 'open' or 'closed'
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plot_x, plot_z) REFERENCES plots(x, z)
+  );
 `);
 
 export default db;
