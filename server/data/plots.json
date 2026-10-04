@@ -2,83 +2,126 @@
   {
     "id": "lime-1",
     "zone": "Lime",
-    "x": -660,
-    "z": 960,
+    "x": -662,
+    "z": 961,
     "is_guild": false,
     "shop": {
-      "owner": "Holy__Cat",
-      "shop_name": "CAT",
+      "owner": "meouo",
+      "shop_name": null,
       "guild_name": null,
-      "description": "R3 rare charm stonks, repair anvil stonks. R3 Rares buy/sell.",
+      "description": "Free carriers of blocks and free voidfilled vial quest item",
       "stock": null,
-      "palette": "Quartz",
+      "palette": "Amethyst and tinted glass",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-08"
+        "activity": "unclear",
+        "lock": "unlocked",
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-10-04",
-          "body": "Still here but locked right now."
-        },
-        {
-          "date": "2025-11-08",
-          "body": "Locked."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Holy__Cat",
+        "shop_name": "CAT",
+        "guild_name": null,
+        "description": "R3 rare charm stonks, repair anvil stonks. R3 Rares buy/sell",
+        "stock": null,
+        "palette": "Quartz",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": null,
+          "lock": "locked",
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still here but locked right now"
+          },
+          {
+            "date": "2025-11-08",
+            "body": "Locked"
+          }
+        ],
+        "closed": "2026-10-04"
+      }
+    ]
   },
   {
     "id": "lime-2",
     "zone": "Lime",
-    "x": -650,
-    "z": 960,
+    "x": -652,
+    "z": 961,
     "is_guild": false,
     "shop": {
-      "owner": "_FoxArctic_",
+      "owner": "qlsj",
       "shop_name": null,
       "guild_name": null,
-      "description": "R3 Stonks: legendary charm, epic charm, rare charms, colossal cognac, terrestrial sinew uamiel mat, experience stash, consuming elixir, greater experience stash. Potion carrier stonks: carrier of Lucky Starbrew, carrier of Wolfswood's Fury. New stonks: Bag of tricks, circus tickets. Rush of dissonance tenebrist rental set. Free chorus fruit.",
+      "description": "Selling Aurora Tile map pieces for 1 HAR",
       "stock": null,
-      "palette": "Oak and glass",
+      "palette": "Stone brick",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-08"
+        "date": "2026-10-04"
       },
       "comments": [
         {
-          "date": "2025-10-04",
-          "body": "Still here but locked right now."
-        },
-        {
-          "date": "2025-11-08",
-          "body": "No longer locked, a few new offerings."
+          "date": "2026-10-04",
+          "body": "Fun fact i used to own this shop for the very first iteration of this project. It was called the Yellow Pages and let players index their shop. It was built out of sandstone and back then you could use pistons to replace the blocks around the border of the shop, which is why there is still sandstone here today"
         }
       ]
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "_FoxArctic_",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R3 Stonks: legendary charm, epic charm, rare charms, colossal cognac, terrestrial sinew uamiel mat, experience stash, consuming elixir, greater experience stash. Potion carrier stonks: carrier of Lucky Starbrew, carrier of Wolfswood's Fury. New stonks: Bag of tricks, circus tickets. Rush of dissonance tenebrist rental set. Free chorus fruit.",
+        "stock": null,
+        "palette": "Oak and glass",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": "active",
+          "lock": "unlocked",
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still here but locked right now."
+          },
+          {
+            "date": "2025-11-08",
+            "body": "No longer locked, a few new offerings."
+          }
+        ],
+        "closed": "2026-10-04"
+      }
+    ]
   },
   {
     "id": "lime-3",
     "zone": "Lime",
-    "x": -640,
-    "z": 960,
+    "x": -642,
+    "z": 961,
     "is_guild": false,
     "shop": {
       "owner": "HuiyingZz",
       "shop_name": null,
       "guild_name": null,
-      "description": "Mainly a CZ Charm set rental shop, also has gear for rent: Hrimnir's Frosted Eye (hoped by weekendtech), Bouquet of Gold (hoped by Fracture_Yen), Myrahg's Pestilence (hoped by Moe_Muyo). Pickaxe rentals (all infused): Pureshard Adze 4*, Gem-Tipped Boilerdrill 4*, The Overclocker 4*, Supernova Mattock 4*. Gearset rentals: R3 proj set, R3 caster set.",
-      "stock": null,
+      "description": "R1 Rare Stonks and Rare Swaps. Also some patron items, misc items, and R2 rares for sale. VR and EC exchanges in basement. Buying season pass artis for 20HXP",
+      "stock": "White Rares Orange Rares Magenta Rares Light Blue Rares Yellow Rares, Valley Overworld Rares, Valley Explorer Rares, Isle Overworld Rares, Isle Explorer Rares, patron items for sale: Frodian Doors, Frodian Saving Grace, Voodoo Brew, Entropic Razor, Grasses, Frodian Keyblade, Verdant Remnants key exchange, Ephemeral Corridors disc exchange, Ephemeral Corridors potion exchange, Free-to-use Aesir's Embrace and Artelus' Benediction. Also selling /stonks for repair anvils, arrows, magic fish. Buying wtb season pass artifacts",
       "palette": "Blackstone",
       "guild_color": null,
       "primary_color": null,
@@ -86,72 +129,102 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-08"
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-10-04",
-          "body": "Still here, same offerings."
-        },
-        {
-          "date": "2025-11-08",
-          "body": "Still here, updated entry to be more detailed."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "HuiyingZz",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Mainly a CZ Charm set rental shop, also has gear for rent: Hrimnir's Frosted Eye (hoped by weekendtech), Bouquet of Gold (hoped by Fracture_Yen), Myrahg's Pestilence (hoped by Moe_Muyo). Pickaxe rentals (all infused): Pureshard Adze 4*, Gem-Tipped Boilerdrill 4*, The Overclocker 4*, Supernova Mattock 4*. Gearset rentals: R3 proj set, R3 caster set.",
+        "stock": null,
+        "palette": "Blackstone",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": "active",
+          "lock": "unlocked",
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still here, same offerings."
+          },
+          {
+            "date": "2025-11-08",
+            "body": "Still here, updated entry to be more detailed."
+          }
+        ],
+        "closed": "2026-10-04"
+      }
+    ]
   },
   {
     "id": "lime-4",
     "zone": "Lime",
-    "x": -660,
-    "z": 970,
+    "x": -662,
+    "z": 971,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "67tungsahurbq67",
+      "shop_name": "FISHE",
+      "guild_name": null,
+      "description": "Seems like a R3 fishing shop but currently closed. Shop Manager: Dahwia",
+      "stock": "R3 Fishing",
+      "palette": "Spruce wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "WIP",
+        "lock": "locked",
+        "date": "2026-10-04"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "lime-5",
     "zone": "Lime",
-    "x": -640,
-    "z": 970,
+    "x": -642,
+    "z": 971,
     "is_guild": false,
     "shop": {
-      "owner": "Hibikies",
+      "owner": "altephcomputer2",
       "shop_name": null,
       "guild_name": null,
-      "description": "Buying R1 and R2 wool trophies. Stone bricks with black concrete basement.",
-      "stock": null,
+      "description": "altephcomputer is doing something strange probably and paying anyone 8ar to write an entry in this book and quill. a sign reads \"Shop closes in 2 weeks.\"",
+      "stock": "event, seasonal",
       "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-08"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-11-08",
-          "body": "NEW! But currently locked."
-        }
-      ]
+      "comments": []
     },
     "past_shops": []
   },
   {
     "id": "lime-6",
     "zone": "Lime",
-    "x": -660,
-    "z": 980,
+    "x": -662,
+    "z": 981,
     "is_guild": false,
     "shop": {
       "owner": "HKGamerNoob",
       "shop_name": null,
       "guild_name": null,
-      "description": "Season pass artifact trades, currently has: steel apparatus, chillwind overcoat, ishnir's moon. Various rares/artis from each region, WTT for equal value based on NPC price. R1: corrupted water robe, petrified runeplate, aphelion's gift. R2: seeker's pursuit, k'x'aehdd (darkest depths arti). R3: circuit breaker, roots of influence, shooting star, death's gaze. Selling liferoot sapling. SKR lore book library.",
-      "stock": null,
+      "description": "Season pass artifact trades. Various rares/artis from each region, WTT for equal value based on NPC price. Selling liferoot sapling. SKR lore book library in the basement.",
+      "stock": "Season pass artis for trade: chillwind overcoat, ishnir's moon. Various rares/artis from each region, WTT for equal value based on NPC price. R1: corrupted water robe, petrified runeplate, soulvenom dagger. R2: phlogiston fissure, k'x'aehdd (darkest depths arti), bastion of isharist. R3: circuit breaker, mycelic skin, trichiliocosm, looming demise, pyroclastic emesis. also trading wolfswood's reach and chains of legacy in rare swap barrel. SKR lore book library.",
       "palette": "Spruce wood and quartz",
       "guild_color": null,
       "primary_color": null,
@@ -159,9 +232,13 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-08"
+        "date": "2026-10-04"
       },
       "comments": [
+        {
+          "date": "2026-10-04",
+          "body": "still running!"
+        },
         {
           "date": "2025-10-04",
           "body": "Still here, same offerings."
@@ -177,45 +254,80 @@
   {
     "id": "lime-7",
     "zone": "Lime",
-    "x": -650,
-    "z": 980,
-    "is_guild": false,
-    "shop": null,
-    "past_shops": []
-  },
-  {
-    "id": "lime-8",
-    "zone": "Lime",
-    "x": -640,
-    "z": 980,
+    "x": -652,
+    "z": 981,
     "is_guild": false,
     "shop": {
-      "owner": "Eyjafjala",
+      "owner": "llouis0910",
       "shop_name": null,
       "guild_name": null,
-      "description": "\"Eyjafjala charm pickup.\" Quartz structure with a dragon egg in the middle.",
-      "stock": null,
-      "palette": null,
+      "description": "Selling sanguine hall mats but possibly inactive right now",
+      "stock": "sanguine hall mats, torn canvas",
+      "palette": "stone brick",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-08"
+        "lock": "locked",
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-10-04",
-          "body": "Still nothing here besides the build."
-        },
-        {
-          "date": "2025-11-08",
-          "body": "Still sittin here."
-        }
-      ]
+      "comments": []
     },
     "past_shops": []
+  },
+  {
+    "id": "lime-8",
+    "zone": "Lime",
+    "x": -642,
+    "z": 981,
+    "is_guild": false,
+    "shop": {
+      "owner": "4Dayly",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling Ephemeral Enhancement artifacts, Ephemeral Corridors potions, Ephemeral Corridors artifacts",
+      "stock": "enhancements: firestorm robe, plunderer's charm, breaking wave. potions: essence of arachnid, essence of frost. artifacts: robes of the core, nostalgic perfume",
+      "palette": "stone brick",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
+      },
+      "comments": [
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "Eyjafjala",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "\"Eyjafjala charm pickup.\" Quartz structure with a dragon egg in the middle.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": "unclear",
+          "lock": null,
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still nothing here besides the build."
+          },
+          {
+            "date": "2025-11-08",
+            "body": "Still sittin here."
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "magenta-1",
