@@ -1044,7 +1044,7 @@ const plots = [
     ],
   },
   {
-    x: -630, z: 1060, owner: '[TCL] Stonkco', shop_name: null, zone: 'Eastern Guild Plots', status: 'active', is_guild: 1,
+    x: -630, z: 1060, owner: '[TCL] The Collectionists', shop_name: null, zone: 'Eastern Guild Plots', status: 'active', is_guild: 1,
     description: 'Stonkco',
     comments: [
       { date: d('2025-10-06'), body: 'Still stonkin.' },

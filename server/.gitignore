@@ -25,3 +25,8 @@ dist-ssr
 
 # Secrets
 .env
+
+# Local database (production DB lives on the Fly volume)
+market.db
+market.db-shm
+market.db-wal
