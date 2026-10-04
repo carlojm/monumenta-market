@@ -1,0 +1,5049 @@
+[
+  {
+    "id": "lime-1",
+    "zone": "Lime",
+    "x": -660,
+    "z": 960,
+    "is_guild": false,
+    "shop": {
+      "owner": "Holy__Cat",
+      "shop_name": "CAT",
+      "guild_name": null,
+      "description": "R3 rare charm stonks, repair anvil stonks. R3 Rares buy/sell.",
+      "stock": null,
+      "palette": "Quartz",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still here but locked right now."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lime-2",
+    "zone": "Lime",
+    "x": -650,
+    "z": 960,
+    "is_guild": false,
+    "shop": {
+      "owner": "_FoxArctic_",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R3 Stonks: legendary charm, epic charm, rare charms, colossal cognac, terrestrial sinew uamiel mat, experience stash, consuming elixir, greater experience stash. Potion carrier stonks: carrier of Lucky Starbrew, carrier of Wolfswood's Fury. New stonks: Bag of tricks, circus tickets. Rush of dissonance tenebrist rental set. Free chorus fruit.",
+      "stock": null,
+      "palette": "Oak and glass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still here but locked right now."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "No longer locked, a few new offerings."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lime-3",
+    "zone": "Lime",
+    "x": -640,
+    "z": 960,
+    "is_guild": false,
+    "shop": {
+      "owner": "HuiyingZz",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Mainly a CZ Charm set rental shop, also has gear for rent: Hrimnir's Frosted Eye (hoped by weekendtech), Bouquet of Gold (hoped by Fracture_Yen), Myrahg's Pestilence (hoped by Moe_Muyo). Pickaxe rentals (all infused): Pureshard Adze 4*, Gem-Tipped Boilerdrill 4*, The Overclocker 4*, Supernova Mattock 4*. Gearset rentals: R3 proj set, R3 caster set.",
+      "stock": null,
+      "palette": "Blackstone",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still here, same offerings."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Still here, updated entry to be more detailed."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lime-4",
+    "zone": "Lime",
+    "x": -660,
+    "z": 970,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "lime-5",
+    "zone": "Lime",
+    "x": -640,
+    "z": 970,
+    "is_guild": false,
+    "shop": {
+      "owner": "Hibikies",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Buying R1 and R2 wool trophies. Stone bricks with black concrete basement.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-11-08",
+          "body": "NEW! But currently locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lime-6",
+    "zone": "Lime",
+    "x": -660,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "HKGamerNoob",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Season pass artifact trades, currently has: steel apparatus, chillwind overcoat, ishnir's moon. Various rares/artis from each region, WTT for equal value based on NPC price. R1: corrupted water robe, petrified runeplate, aphelion's gift. R2: seeker's pursuit, k'x'aehdd (darkest depths arti). R3: circuit breaker, roots of influence, shooting star, death's gaze. Selling liferoot sapling. SKR lore book library.",
+      "stock": null,
+      "palette": "Spruce wood and quartz",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still here, same offerings."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Same offerings, updated entry to include item names."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lime-7",
+    "zone": "Lime",
+    "x": -650,
+    "z": 980,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "lime-8",
+    "zone": "Lime",
+    "x": -640,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "Eyjafjala",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "\"Eyjafjala charm pickup.\" Quartz structure with a dragon egg in the middle.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still nothing here besides the build."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Still sittin here."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-1",
+    "zone": "Magenta",
+    "x": -660,
+    "z": 1000,
+    "is_guild": false,
+    "shop": {
+      "owner": "Palae",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "A hole. Black concrete.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still a hole. Now has a \"WTB gladiolus\" sign."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Currently locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-2",
+    "zone": "Magenta",
+    "x": -650,
+    "z": 1000,
+    "is_guild": false,
+    "shop": {
+      "owner": "KH2Roxas",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1, R2, R3 rares. R1, R2, R3 mats. Locked as of 9/7.",
+      "stock": null,
+      "palette": "Copper and deep slate",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "No longer locked!"
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Same offerings, currently locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-3",
+    "zone": "Magenta",
+    "x": -640,
+    "z": 1000,
+    "is_guild": false,
+    "shop": {
+      "owner": "sNigth",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Currently not buying/selling. According to sNigth, just storage for 99's shop across from it.",
+      "stock": null,
+      "palette": "Mud, brick, spruce",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still not selling."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Still here."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-4",
+    "zone": "Magenta",
+    "x": -660,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "CallMe_Chocolate",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Currently locked, seems to have some charms. Empty plot with barrels.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Unlocked, WIP charm rental shop?"
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-5",
+    "zone": "Magenta",
+    "x": -640,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "Cocoa_B",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Just about every R1, R2 rare for rent, currently free rental. Lesser charms for sale. Some misc. barrels like charms and zenith rares for sale.",
+      "stock": null,
+      "palette": "Quartz and blue glass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still has a great rare rental inventory. NEW: lesser charm taxless stonk market in basement."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "Still great."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-6",
+    "zone": "Magenta",
+    "x": -660,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "HermitMonk",
+      "shop_name": "HermitMonk's Market Directory",
+      "guild_name": null,
+      "description": "The original in-game market directory that this site is based on.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still so freaking awesome. Unfortunately the two guilds in front of us have finally built shops and we no longer have clear line of sight to the middle of the island."
+        },
+        {
+          "date": "2025-11-08",
+          "body": "The best! Have we updated the signs to reflect October changes? No... but might really update them for the November changelog."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "magenta-7",
+    "zone": "Magenta",
+    "x": -650,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "Alaethor",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling silver knight's remnants (SKR) rares, multiple of each rare for sale. Buying SKR scroll remnant scrolls for 5.5har.",
+      "stock": null,
+      "palette": "Stone bricks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-11-08",
+          "body": "NEW!"
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "Magic58994",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-08",
+            "body": "Magic58994 closed, replaced by Alaethor."
+          }
+        ],
+        "closed": "2025-11-08"
+      }
+    ]
+  },
+  {
+    "id": "magenta-8",
+    "zone": "Magenta",
+    "x": -640,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "JackStrongBr",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling potion carriers, dreadful damassine, infernal izarra, twisted tepache.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-08"
+      },
+      "comments": [
+        {
+          "date": "2025-11-08",
+          "body": "NEW! But currently locked."
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "TonyStar123",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-08",
+            "body": "TonyStar123 closed, replaced by JackStrongBr."
+          }
+        ],
+        "closed": "2025-11-08"
+      }
+    ]
+  },
+  {
+    "id": "corridors-1",
+    "zone": "Ephemeral Corridors",
+    "x": -690,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "skelajon",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Slime shop for slimey needs.",
+      "stock": null,
+      "palette": "Dark oak and green",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still open."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still open but currently sold out. Everyone ping skelajon."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "corridors-2",
+    "zone": "Ephemeral Corridors",
+    "x": -680,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "skelematt",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Everything EC related: artis, discs, and requests.",
+      "stock": null,
+      "palette": "Nether brick and mangrove",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still open."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still open and stocked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "corridors-3",
+    "zone": "Ephemeral Corridors",
+    "x": -670,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "Lucilite",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Potions in bulk. R1 rares for sale.",
+      "stock": null,
+      "palette": "Moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Currently locked, seemingly same inventory."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Currently locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "corridors-4",
+    "zone": "Ephemeral Corridors",
+    "x": -690,
+    "z": 990,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "corridors-5",
+    "zone": "Ephemeral Corridors",
+    "x": -670,
+    "z": 990,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "TrueCon",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "misc barrels, an \"awesome review wall\".",
+        "stock": null,
+        "palette": "Calcite and warped wood",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Gone."
+          }
+        ],
+        "closed": "2025-10-04"
+      }
+    ]
+  },
+  {
+    "id": "corridors-6",
+    "zone": "Ephemeral Corridors",
+    "x": -690,
+    "z": 1000,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "corridors-7",
+    "zone": "Ephemeral Corridors",
+    "x": -680,
+    "z": 1000,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "corridors-8",
+    "zone": "Ephemeral Corridors",
+    "x": -670,
+    "z": 1000,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "purple-1",
+    "zone": "Purple",
+    "x": -630,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "UltimateDude16",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Also known as UltimateMooo (owner name changed at some point).",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "NEW! But locked. WIP."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "There's water here now, also owner name changed, but still not selling anything."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-2",
+    "zone": "Purple",
+    "x": -620,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "Rain_stxrm",
+      "shop_name": "Also b2b",
+      "guild_name": null,
+      "description": "Also a bare plot, extension of the B2B group.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still empty."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still empty."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-3",
+    "zone": "Purple",
+    "x": -610,
+    "z": 980,
+    "is_guild": false,
+    "shop": {
+      "owner": "CookieFace7",
+      "shop_name": "B2B",
+      "guild_name": null,
+      "description": "Brought to you by [EN]. Lesser charms for sale. Misc stonks, PDIA, ADE. \"Portable cornifer.\" \"Portable boons.\" Darkest depths disc sets. Bare plot, just barrels and oak signs.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "New R3 overworld rare/frag stonk."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Now has darkest depths disc sets."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-4",
+    "zone": "Purple",
+    "x": -630,
+    "z": 990,
+    "is_guild": false,
+    "shop": {
+      "owner": "wokif",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Also known/listed as 9tynine_. Rare charms for sale: indigo, blue, brown, SKT, wolfswood, starpoint, pelias. Many rental sets: R1 armor rogue, R1 agility rogue, R2 speed lootrun set, R2 rogue, R2 tank lootrun set, R2 warlock. Many epics for rent, some free some paid. Delve dummy eggs for sale in B1. R1/R2 rares and artis for sale. CZ rares \"buy for 80% npc price.\"",
+      "stock": null,
+      "palette": "Oak, mud, pink",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still running, still great stock."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still runnin, entry updated to be more detailed. Was this shop always owned by wokif? It still says 99 on the signage."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-5",
+    "zone": "Purple",
+    "x": -610,
+    "z": 990,
+    "is_guild": false,
+    "shop": {
+      "owner": "Th3_Traveller",
+      "shop_name": "Also b2b",
+      "guild_name": null,
+      "description": "Also a bare plot, extension of the B2B group.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Fezzic's plot now, but still an empty b2b extension."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still empty."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-6",
+    "zone": "Purple",
+    "x": -630,
+    "z": 1000,
+    "is_guild": false,
+    "shop": {
+      "owner": "JimmyAurum",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "WIP.",
+      "stock": null,
+      "palette": "Blackstone and barrels",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still WIP."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still WIP."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "purple-7",
+    "zone": "Purple",
+    "x": -620,
+    "z": 1000,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "purple-8",
+    "zone": "Purple",
+    "x": -610,
+    "z": 1000,
+    "is_guild": false,
+    "shop": {
+      "owner": "Alecaboo",
+      "shop_name": "Alecastore",
+      "guild_name": null,
+      "description": "Some rental sets, currently locked.",
+      "stock": null,
+      "palette": "Calcite and moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-10"
+      },
+      "comments": [
+        {
+          "date": "2025-10-04",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-10",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "pink-1",
+    "zone": "Pink",
+    "x": -720,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "dorky_",
+      "shop_name": "Teensy Tiny Tavern",
+      "guild_name": null,
+      "description": "\"All profit is turned into chips\" based. R3 casino item stonks: potions, food, arrows.",
+      "stock": null,
+      "palette": "Spruce wood and cyan/gray terracotta",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "New!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Now has consumable stonks in the basement."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "pink-2",
+    "zone": "Pink",
+    "x": -710,
+    "z": 1030,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "pink-3",
+    "zone": "Pink",
+    "x": -700,
+    "z": 1030,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "APliterature",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "WIP, currently locked; dummy, disc, mat, charm exchange.",
+        "stock": null,
+        "palette": "Oak, acacia, green",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Gone."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "pink-4",
+    "zone": "Pink",
+    "x": -720,
+    "z": 1040,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "pink-5",
+    "zone": "Pink",
+    "x": -700,
+    "z": 1040,
+    "is_guild": false,
+    "shop": {
+      "owner": "miraclemachine",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Zenith Charms. BIN and auction and WTB and WTS.",
+      "stock": null,
+      "palette": "Blue/white warped wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-09-22",
+          "body": "Has a shop now!"
+        },
+        {
+          "date": "2025-10-04",
+          "body": "See above update."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "pink-6",
+    "zone": "Pink",
+    "x": -720,
+    "z": 1050,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "pink-7",
+    "zone": "Pink",
+    "x": -710,
+    "z": 1050,
+    "is_guild": false,
+    "shop": {
+      "owner": "cartsinabag",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "WIP and locked.",
+      "stock": null,
+      "palette": "End city",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "pink-8",
+    "zone": "Pink",
+    "x": -700,
+    "z": 1050,
+    "is_guild": false,
+    "shop": {
+      "owner": "Gonzelk",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R123 general gear store, rares, artis. Currently locked. \"Penguin.\"",
+      "stock": null,
+      "palette": "Spruce, moss, and wheat",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "labs-1",
+    "zone": "Labs",
+    "x": -690,
+    "z": 1010,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "labs-2",
+    "zone": "Labs",
+    "x": -680,
+    "z": 1010,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "labs-3",
+    "zone": "Labs",
+    "x": -670,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "TKTOM7",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Fishy deals. Cool plot that lets you buy carriers of blocks when the lights are on, but hasn't been seen stocked.",
+      "stock": null,
+      "palette": "Ocean monument, water, and grass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still empty."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Lights still off."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "labs-4",
+    "zone": "Labs",
+    "x": -690,
+    "z": 1020,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "labs-5",
+    "zone": "Labs",
+    "x": -670,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "KitSwift",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "General store.",
+      "stock": null,
+      "palette": "Black and gray concrete, and purple",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Open now! Selling assorted R1/R2 artis and rares, R3 rares."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still stocked and runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "labs-6",
+    "zone": "Labs",
+    "x": -690,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "HelylookMeltan",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1 and R3 rare frag stonks. R2 WIP.",
+      "stock": null,
+      "palette": "Stone brick and barrels",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still partially WIP but stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still partially WIP but stocked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "labs-7",
+    "zone": "Labs",
+    "x": -680,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "Arokv",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R3 taxless rare exchange. Arrows and blocks.",
+      "stock": null,
+      "palette": "Warped wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running and stocked!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still stocked and runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "labs-8",
+    "zone": "Labs",
+    "x": -670,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "Enderchen2580",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Zenith rares, charms, and niche R2 stonks. Free food barrel. Block carriers and R2/R3 rares for sale.",
+      "stock": null,
+      "palette": "End stone and purpur",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running and stocked!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still stocked and runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-1",
+    "zone": "White",
+    "x": -630,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "ToyBoxes",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Hexfall encounter rush set, free rental. Just stone bricks and barrels.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Stock changed, now there's a rental set."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-2",
+    "zone": "White",
+    "x": -620,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "minerdwarf222",
+      "shop_name": "Mini Stonkco",
+      "guild_name": null,
+      "description": "WIP.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still WIP, \"PawnCo\" coming soon."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still WIP, locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-3",
+    "zone": "White",
+    "x": -610,
+    "z": 1010,
+    "is_guild": false,
+    "shop": {
+      "owner": "Shining_Cat",
+      "shop_name": "Mini Stonkco",
+      "guild_name": null,
+      "description": "WIP.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still WIP."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "There is a single furnace smelting a barrel full of carriers full of sand. Good luck to this poor furnace."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-4",
+    "zone": "White",
+    "x": -630,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "VenKleftis",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "\"A locked tomb... beware of ghosts.\"",
+      "stock": null,
+      "palette": "Stone bricks, gravel, dirt, moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still haunted."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Haunted."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-5",
+    "zone": "White",
+    "x": -610,
+    "z": 1020,
+    "is_guild": false,
+    "shop": {
+      "owner": "needmoney91",
+      "shop_name": "Mini Stonkco 4",
+      "guild_name": null,
+      "description": "True North stonks.",
+      "stock": null,
+      "palette": "Stonkco blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open and stonked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-6",
+    "zone": "White",
+    "x": -630,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "Peli",
+      "shop_name": "TONK",
+      "guild_name": null,
+      "description": "Charm stonks by each tier on F1. Niche stonks on F2: XP Stash, Shulker Frag, EC Key Frag, godspore mats (Tainted Spores, Toxin, Roots).",
+      "stock": null,
+      "palette": "Mossy",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open and stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still open and stocked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-7",
+    "zone": "White",
+    "x": -620,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "_Harshi",
+      "shop_name": "TOST",
+      "guild_name": null,
+      "description": "R2 currency and niche stonks: Ethereal Rib, Flittering Sparks, Dormant Halloween Spirit, Abyssal Amulet, Permafrost Denarius, Eternity Gem, Downfall, Cols. Core, Heart of Dread.",
+      "stock": null,
+      "palette": "Mossy",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open and stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still open and stocked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "white-8",
+    "zone": "White",
+    "x": -610,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "weekendtech",
+      "shop_name": "Mini Stonkco 2",
+      "guild_name": null,
+      "description": "Lesser charm stonks. WIP.",
+      "stock": null,
+      "palette": "Stonkco blocks (quartz, emerald)",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still WIP but has some stonks available."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still WIP with some stock. WTB lacerating charms."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-1",
+    "zone": "Light Gray",
+    "x": -600,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "fishy3927",
+      "shop_name": "Mini StonkCo 5",
+      "guild_name": null,
+      "description": "WIP. WTB 5* fish.",
+      "stock": null,
+      "palette": "Stonkco blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked and WIP."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Currently locked and WIP."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-2",
+    "zone": "Light Gray",
+    "x": -590,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "Akuser1reta",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Empty plot.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "NEW! But empty."
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "labierl",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NEW! But WIP and empty, big hole full of water."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Labierl's old plot replaced with Akuser1reta."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "lightgray-3",
+    "zone": "Light Gray",
+    "x": -580,
+    "z": 1030,
+    "is_guild": false,
+    "shop": {
+      "owner": "sleepyemmaline",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Kitten's Instant Epic Infusion service — take fully infused true norths, refund the infusion, then use that on your item. Water and prismarine shop shaped like an exp bottle.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": []
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-4",
+    "zone": "Light Gray",
+    "x": -600,
+    "z": 1040,
+    "is_guild": false,
+    "shop": {
+      "owner": "Ryakuu",
+      "shop_name": "kitty kats shop",
+      "guild_name": null,
+      "description": "Zenith charm stonks. Zenith and R3 overworld rental sets in basement.",
+      "stock": null,
+      "palette": "Cherry wood, all pink",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running and stocked!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Stock expanding, \"we have all sets and charms done but dawn\" -Ryakuu."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-5",
+    "zone": "Light Gray",
+    "x": -580,
+    "z": 1040,
+    "is_guild": false,
+    "shop": {
+      "owner": "niirvus",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Just a bunch of random blocks placed on the plot.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW! And also empty!!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still WIP, Ryakuu told me what this is going to be and I forgot. CZ rares or something."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-6",
+    "zone": "Light Gray",
+    "x": -600,
+    "z": 1050,
+    "is_guild": false,
+    "shop": {
+      "owner": "marcywawa",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Really cool banner art, worth standing here for ten minutes and just looking at it.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "NEW!"
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "Ian1KV",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "MOVED! T5 exchange now next door in the [VEIL] guild shop."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Ian1KV's old plot replaced with marcywawa."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "lightgray-7",
+    "zone": "Light Gray",
+    "x": -590,
+    "z": 1050,
+    "is_guild": false,
+    "shop": {
+      "owner": "Reeba",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Big hole, not full of water.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW! But also WIP and empty."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still empty."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightgray-8",
+    "zone": "Light Gray",
+    "x": -580,
+    "z": 1050,
+    "is_guild": false,
+    "shop": {
+      "owner": "carasouels",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Kitten Patron item shop. Stock: Eclipse Splitter, Lamb Chop, Big Hat, Vivace, Jeans of the Fire Eagle, Embers of Thori'dal, Gas Mask, Heaven's Lullaby, Peripatetic Sandals. Also (no own barrels): Baxeico, Heiress' Rapier, Crown of the Depths, Doomsday Clock, Failnaught. Other items: Shadebound Shackles, Godtree Greaves, Razorleaf Breeches, Silver Heart, Morphic Breaker, The Overclocker, Toxic-Cursed Bind, Across the Ocean, Short Circuit, Loci's Hunger.",
+      "stock": null,
+      "palette": "Black and lime concrete, lime glass, pride flags",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "New but WIP."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "NEW!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "willows-1",
+    "zone": "Willows",
+    "x": -720,
+    "z": 1060,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "willows-2",
+    "zone": "Willows",
+    "x": -710,
+    "z": 1060,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "willows-3",
+    "zone": "Willows",
+    "x": -700,
+    "z": 1060,
+    "is_guild": false,
+    "shop": {
+      "owner": "juicyradish",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "GPT potion rental. Buying heal potions. Big potion build on top.",
+      "stock": null,
+      "palette": "Warped and deep slate",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open, might need some restocking."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still open and stocked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "willows-4",
+    "zone": "Willows",
+    "x": -720,
+    "z": 1070,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "willows-5",
+    "zone": "Willows",
+    "x": -700,
+    "z": 1070,
+    "is_guild": false,
+    "shop": {
+      "owner": "Geek1001",
+      "shop_name": "COMEX",
+      "guild_name": null,
+      "description": "Giveaways. Free pride flags.",
+      "stock": null,
+      "palette": "Emerald blocks, lime, gold, grass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Locked, no giveaway active currently."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Unlocked but nothin going on right now."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "willows-6",
+    "zone": "Willows",
+    "x": -720,
+    "z": 1080,
+    "is_guild": false,
+    "shop": {
+      "owner": "Moe_block",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Also a Christmas plot. Snowman.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still dormant."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Is it time yet?"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "willows-7",
+    "zone": "Willows",
+    "x": -710,
+    "z": 1080,
+    "is_guild": false,
+    "shop": {
+      "owner": "TemberCasa",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Christmas plot. Big Christmas tree. Unclear purpose, maybe a secret Santa thing.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still dormant."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Thawing soon?"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "willows-8",
+    "zone": "Willows",
+    "x": -700,
+    "z": 1080,
+    "is_guild": false,
+    "shop": {
+      "owner": "TheLegend001B",
+      "shop_name": "Depths Inc",
+      "guild_name": null,
+      "description": "Depths shop, currently locked.",
+      "stock": null,
+      "palette": "Deep slate and cyan",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-1",
+    "zone": "Cyan",
+    "x": -720,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "JAY_zixuan",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Another Christmas plot. Big present.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still dormant."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "..."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-2",
+    "zone": "Cyan",
+    "x": -710,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "Firestorm256",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1/R2 rares stonks.",
+      "stock": null,
+      "palette": "Dark oak, oak",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open and stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-3",
+    "zone": "Cyan",
+    "x": -700,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "Shireee",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Maple syrup stonk, Creeper delight stonk, ADE stonk, SKT rare frag stonk. Selling food, lapis, R2 rares. Rush of dissonance set for rental. Offering intruder carry service.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "NEW! Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-4",
+    "zone": "Cyan",
+    "x": -720,
+    "z": 1100,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "cyan-5",
+    "zone": "Cyan",
+    "x": -700,
+    "z": 1100,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "cyan-6",
+    "zone": "Cyan",
+    "x": -720,
+    "z": 1110,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "cyan-7",
+    "zone": "Cyan",
+    "x": -710,
+    "z": 1110,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "cyan-8",
+    "zone": "Cyan",
+    "x": -700,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "Col7",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R3 rares, potions, lesser charms, augments. Free food barrel.",
+      "stock": null,
+      "palette": "Copper, deep slate",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open, selling R3 potion carriers, block carriers (stone, copper, misc.), misc. items (Rocket Boots, Crown of the Lost Beyond, Duskborn Graft), as well as stuff listed above."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-1",
+    "zone": "Light Blue",
+    "x": -690,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "Dumplingsushi",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Buying all lesser charms, 4 AR per.",
+      "stock": null,
+      "palette": "Quartz and light blue glass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "NEW!"
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "ssusus",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Build here but the shop is empty and locked. Block palette: Spruce wood, cyan banners."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Ssusus's old plot replaced by Dumplingsushi."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "lightblue-2",
+    "zone": "Light Blue",
+    "x": -680,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "Pandamonium",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "The last vestige of \"enemy shop,\" so sad. Hope service. Block carriers.",
+      "stock": null,
+      "palette": "Orange, red, and cyan/green",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-3",
+    "zone": "Light Blue",
+    "x": -670,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "TimTaroo",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "EC discs, DD discs, EC artis for sale. Free pottery sherds for borrowing. Now also selling CZ rares.",
+      "stock": null,
+      "palette": "Sick elevator, black concrete",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Now selling CZ rares, elevator still awesome."
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "pPlys",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Gone! Now TimTaroo's plot."
+          }
+        ],
+        "closed": "2025-10-06"
+      }
+    ]
+  },
+  {
+    "id": "lightblue-4",
+    "zone": "Light Blue",
+    "x": -690,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "White_Ouhhang",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Personal general shop, locked.",
+      "stock": null,
+      "palette": "Quartz with red and gray, like a pokeball",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-5",
+    "zone": "Light Blue",
+    "x": -670,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "dearboy",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Hexfall and zenith free rental sets. R2 glass DPS rental set.",
+      "stock": null,
+      "palette": "Dark oak with blue crystal above, mud, moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open and stocked with rental sets."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "New acumen rental set."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-6",
+    "zone": "Light Blue",
+    "x": -690,
+    "z": 1130,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-7",
+    "zone": "Light Blue",
+    "x": -680,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "Curtis_uwu",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling TNT. Built of TNT and fire, very scary.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "No longer locked and has stock! Still scary."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin, still scary."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "lightblue-8",
+    "zone": "Light Blue",
+    "x": -670,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "greenfroge",
+      "shop_name": "The Advancement Store",
+      "guild_name": null,
+      "description": "Free rental items for completing advancements. Also offers a gear rental set for \"Trio Mage Sirius,\" dungeon race key rentals, cornifer summoning crystal borrows, \"Bring Him Baaack\" item set rentals, borrowable replica rose wool (most have fees; ground floor advancement items are free to use).",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Unlocked! Not sure if this is new or not."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Currently locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "orange-1",
+    "zone": "Orange",
+    "x": -690,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "zBaconn",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Personal shop, locked.",
+      "stock": null,
+      "palette": "Blackstone and black concrete",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "orange-2",
+    "zone": "Orange",
+    "x": -680,
+    "z": 1140,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "orange-3",
+    "zone": "Orange",
+    "x": -670,
+    "z": 1140,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "Mirnixer1",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R1 rares buy/sell, currently locked.",
+        "stock": null,
+        "palette": "Spruce",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Gone."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "orange-4",
+    "zone": "Orange",
+    "x": -690,
+    "z": 1150,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "orange-5",
+    "zone": "Orange",
+    "x": -670,
+    "z": 1150,
+    "is_guild": false,
+    "shop": {
+      "owner": "carlo_m",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "My shop! Does your inventory fill up with explosion carriers? Instead of tossing them, bring them here and I'll buy them from you!",
+      "stock": null,
+      "palette": "Yellow terracotta, yellow candles",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still buying carriers! Feed me! Throw your trash into the black hole of my building collection!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "orange-6",
+    "zone": "Orange",
+    "x": -690,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "Num_12345678901",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "CZ rental sets. Mostly bare plot except for a red sandstone pillar.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running and stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running, free steak barrel."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "orange-7",
+    "zone": "Orange",
+    "x": -680,
+    "z": 1160,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "orange-8",
+    "zone": "Orange",
+    "x": -670,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "autumntheace",
+      "shop_name": "Autumn & Deepa's Patreon Item Emporium (+Library) (WIP)",
+      "guild_name": null,
+      "description": "",
+      "stock": null,
+      "palette": "Moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Currently selling lesser warlock charms, lesser mage charms, Mermaid's Touch. New mossy build."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-1",
+    "zone": "Shifting",
+    "x": -660,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "RBT_Fireball",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Trophy plot for the server's first bouquet of gold.",
+      "stock": null,
+      "palette": "Warped, oak, birch, nether brick, mud, gold",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still here, still aura farming."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Aura."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-2",
+    "zone": "Shifting",
+    "x": -650,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "B_G_YG",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Lesser and rare charms on sale. R3 potion stonks. Zenith pot stonks and delve pot stonks.",
+      "stock": null,
+      "palette": "Quartz, spruce, stone brick",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running and stocked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-3",
+    "zone": "Shifting",
+    "x": -640,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "Vicella",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Market stall build, WIP. Buying 1, 2, 3-star fish, buying sand stickers.",
+      "stock": null,
+      "palette": "Oak, red, white",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW! Buying 1, 2, 3-star fish, buying sand stickers."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still buying fish."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-4",
+    "zone": "Shifting",
+    "x": -660,
+    "z": 1170,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "shifting-5",
+    "zone": "Shifting",
+    "x": -640,
+    "z": 1170,
+    "is_guild": false,
+    "shop": {
+      "owner": "NetrixC1",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Police call box. A couple of barrels, all sold out. Personal shop, possibly WIP.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-6",
+    "zone": "Shifting",
+    "x": -660,
+    "z": 1180,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "shifting-7",
+    "zone": "Shifting",
+    "x": -650,
+    "z": 1180,
+    "is_guild": false,
+    "shop": {
+      "owner": "ramiue",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Bag of hoarding, hope skinning.",
+      "stock": null,
+      "palette": "Sand and pink umbrella",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "NEW!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-8",
+    "zone": "Shifting",
+    "x": -640,
+    "z": 1180,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-1",
+    "zone": "Sanctum",
+    "x": -660,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "Jerry_Na",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Garden. Come smell the extremely rare roses.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still aura farming."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Aura."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-2",
+    "zone": "Sanctum",
+    "x": -650,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "Moe_Muyo",
+      "shop_name": "HAT",
+      "guild_name": null,
+      "description": "Free dyed fedoras. Personal general store.",
+      "stock": null,
+      "palette": "Warped and mangrove",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still got fedoras."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Nothin but fedoras."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-3",
+    "zone": "Sanctum",
+    "x": -640,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "_wu_feng_",
+      "shop_name": "UWUWU",
+      "guild_name": null,
+      "description": "Lots of stonks: R3 rares, season pass artis, shifting artis, frost giants crown, R2/R3 currencies, R3 casino pots. Free zenith charm set rentals. Also has legacies in basement 2. Top Floor: seasonal pass artifacts, tormented fragment, deathly piece of eight, torn canvas, combat scroll, puzzle scroll, diamenean hunt mats, remnant scroll fragment, indigo blighdust, shard of remorse, ticket wheel. Ground Floor: blue/brown/indigo hexfall SKT frags/rares, frost giant's crown, star point pelias' keep wolfswood rares/frags. Basement: sand dollar, R3 casino pots and food, grand prize ticket, zenith charms.",
+      "stock": null,
+      "palette": "Black concrete and marble",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open, full stonk list added."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still uwuwuing."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-4",
+    "zone": "Sanctum",
+    "x": -660,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "TheJinzou",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Individual charm rental service. Lesser charms for sale.",
+      "stock": null,
+      "palette": "Jungle wood, yellow, black wool",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running and dressed up for Halloween. Nobody else decorated for Halloween! Good job TheJinzou!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-5",
+    "zone": "Sanctum",
+    "x": -640,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "NuLL_Inf",
+      "shop_name": "VOID",
+      "guild_name": null,
+      "description": "R1/R2 rare stonks, locked.",
+      "stock": null,
+      "palette": "Ice, snow, marble, blue",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "The build has changed, there's an obelisk with maybe a Chinese proverb etched into it. \"What do you see in the mirror?\""
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-6",
+    "zone": "Sanctum",
+    "x": -660,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "qwqqwqqwqqwqw",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Personal general shop.",
+      "stock": null,
+      "palette": "Stone brick, sea lanterns",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Open but kinda vacant."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still kinda empty."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-7",
+    "zone": "Sanctum",
+    "x": -650,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "Shark_YE",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Christmas tree. Signs say 2023/24 gift exchange.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still dormant."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Thawing I presume."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "sanctum-8",
+    "zone": "Sanctum",
+    "x": -640,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "Dinolamaous",
+      "shop_name": "WOOF",
+      "guild_name": null,
+      "description": "R3 rares and epics, locked.",
+      "stock": null,
+      "palette": "Stone brick, calcite, brown",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-1",
+    "zone": "Teal",
+    "x": -600,
+    "z": 1060,
+    "is_guild": false,
+    "shop": {
+      "owner": "Hanjizen",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Charm rental. Closed on purpose — locked, with a sign that says closed.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still closed."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still closed."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-2",
+    "zone": "Teal",
+    "x": -590,
+    "z": 1060,
+    "is_guild": false,
+    "shop": {
+      "owner": "TrainerEevee",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Instant Infusion XP Service. R3 rare exchange.",
+      "stock": null,
+      "palette": "Dark oak, spruce, green",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Defunct? Services are gone!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-3",
+    "zone": "Teal",
+    "x": -580,
+    "z": 1060,
+    "is_guild": false,
+    "shop": {
+      "owner": "Heleith",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "\"Modify this shop plot however you'd like!\" Right now it's a black concrete box with amethyst on top.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still just a big concrete box."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Someone rigged redstone to shoot an arrow at a nearby bell when you press a nearby button. Really clever, kudos to whoever built it."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-4",
+    "zone": "Teal",
+    "x": -600,
+    "z": 1070,
+    "is_guild": false,
+    "shop": {
+      "owner": "gasp97",
+      "shop_name": "Vanity Shop",
+      "guild_name": null,
+      "description": "Large gear collection for vanity sets.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-5",
+    "zone": "Teal",
+    "x": -580,
+    "z": 1070,
+    "is_guild": false,
+    "shop": {
+      "owner": "CS_Aristotle",
+      "shop_name": "Library of Arisandria",
+      "guild_name": null,
+      "description": "Lore book library.",
+      "stock": null,
+      "palette": "Quartz and bookshelves",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still open."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-6",
+    "zone": "Teal",
+    "x": -600,
+    "z": 1080,
+    "is_guild": false,
+    "shop": {
+      "owner": "michthemoo",
+      "shop_name": "NYAA",
+      "guild_name": null,
+      "description": "\"Everything in R3\" gear rental shop, by the piece not by the set.",
+      "stock": null,
+      "palette": "Crimson wood, deep slate, pink, gray",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "teal-7",
+    "zone": "Teal",
+    "x": -590,
+    "z": 1080,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "teal-8",
+    "zone": "Teal",
+    "x": -580,
+    "z": 1080,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "yellow-1",
+    "zone": "Yellow",
+    "x": -600,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "Sw_Fox",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1, R2 rare stonks. WTS sea daffodils.",
+      "stock": null,
+      "palette": "White glass and snow",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-2",
+    "zone": "Yellow",
+    "x": -590,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "Leolu666",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling R2 rares, R3 rares, Pulsing Orb, Quickening Mycosis, Forum Mats Binah Leaf. Narsen's Will for rent.",
+      "stock": null,
+      "palette": "White glass, barrels, and a very nice doorbell",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Doorbell is even more intricate."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-3",
+    "zone": "Yellow",
+    "x": -580,
+    "z": 1090,
+    "is_guild": false,
+    "shop": {
+      "owner": "excellentbear",
+      "shop_name": "IRS Infusion Service",
+      "guild_name": null,
+      "description": "Defunct? Moved to guild shop.",
+      "stock": null,
+      "palette": "Gold and lapis blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still defunct."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still defunct."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-4",
+    "zone": "Yellow",
+    "x": -600,
+    "z": 1100,
+    "is_guild": false,
+    "shop": {
+      "owner": "Laapsap",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Patron items for sale and rent.",
+      "stock": null,
+      "palette": "Pink and yellow stained clay",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still open."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Inventory running out, but patron items still for sale: Colored Fire, Skyfeller, Bramble Blaster, Tome of the Pretsell, Pragmatism, B.O.N.K. Rental basement has almost all R1/R2 patron items."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-5",
+    "zone": "Yellow",
+    "x": -580,
+    "z": 1100,
+    "is_guild": false,
+    "shop": {
+      "owner": "MCJAWang2007",
+      "shop_name": "IRS Rare Exchange",
+      "guild_name": null,
+      "description": "WIP or defunct, not sure.",
+      "stock": null,
+      "palette": "Gold and lapis blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still defunct."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still defunct."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-6",
+    "zone": "Yellow",
+    "x": -600,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "fumoa",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Plot for Harry_Cake's \"3rd unofficial architect's ring anniversary giveaway,\" final entry date 10/28/2025.",
+      "stock": null,
+      "palette": "Spruce and jungle leaves",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Dormant now."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-7",
+    "zone": "Yellow",
+    "x": -590,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "Lemon1011",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Mail and auction services. Infusion service.",
+      "stock": null,
+      "palette": "Spruce wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "yellow-8",
+    "zone": "Yellow",
+    "x": -580,
+    "z": 1110,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "reverie-1",
+    "zone": "Reverie",
+    "x": -630,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "ztw0_0",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Great collection of R1 and R2 items for rent, cheap. Some R2 teal rares for sale too.",
+      "stock": null,
+      "palette": "Barrels, stone bricks, sandstone",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running, huge collection, great for vanity."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-2",
+    "zone": "Reverie",
+    "x": -620,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "CheesePusheen",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Personal general shop, mostly WIP.",
+      "stock": null,
+      "palette": "Just barrels and stone bricks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently has p-gold and p-emerald stonks."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Empty except for a vanity chest, not sure if it's rental or has other rules."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-3",
+    "zone": "Reverie",
+    "x": -610,
+    "z": 1110,
+    "is_guild": false,
+    "shop": {
+      "owner": "Mine_Hinata",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Some misc stonks, mostly WIP.",
+      "stock": null,
+      "palette": "Dark oak, blackstone, spruce, leaves",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Taxless anvil, shulker, and lockbox stonks in basement."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Same few stonks, mostly WIP."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-4",
+    "zone": "Reverie",
+    "x": -630,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "Honeypint",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "WTB strike trophies.",
+      "stock": null,
+      "palette": "Stonkco blocks, stone bricks, oak",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still buying strike trophies."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-5",
+    "zone": "Reverie",
+    "x": -610,
+    "z": 1120,
+    "is_guild": false,
+    "shop": {
+      "owner": "Harry_Cake",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R123 rares and arti trader services. Free cakes. Same aesthetic as AirFloat nearby.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running. Per HuiyingZz: \"cake shop is for NPC trader service, in case anyone wants an item whose buy doesn't have the trade unlocked or is difficult to access.\""
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-6",
+    "zone": "Reverie",
+    "x": -630,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "Pontosaurus",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Empty plot.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-11-12",
+          "body": "Empty plot."
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "TrueZoomer",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Zenith charm stonks, all blackstone/black glass build. Locked, under renovation?"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "TrueZoomer's old plot replaced with Pontosaurus."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "reverie-7",
+    "zone": "Reverie",
+    "x": -620,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "StupefiedSteve",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "5* fish exchange, free. Portable cornifer trades. Some other fish trades. Some zenith rares for sale.",
+      "stock": null,
+      "palette": "Quartz basement, mostly bare on top",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still here."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still here with lots of zenith rares."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "reverie-8",
+    "zone": "Reverie",
+    "x": -610,
+    "z": 1130,
+    "is_guild": false,
+    "shop": {
+      "owner": "AirFloat",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Charm shop. Remnants of a giveaway. Managed by Harry_Cake, same aesthetic as that shop. Per HuiyingZz: for lesser charm upgrading.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "gray-1",
+    "zone": "Gray",
+    "x": -630,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "altephcomputer2",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Moved here from -610, 1150. R123 rares stonks (WIP after the move). Epics and utility items for rent, free. R1 lootrun set for rent, free. Arrows, various artis, azacor uncommons for sale in basement.",
+      "stock": null,
+      "palette": "Bare stone brick and barrel",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "Vocracity",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Personal shop with various items of the week and rotating stock. Selling phasing chestplate, earthbound talisman, crest of the tundra, tormented fragment, fish bait. \"Go to OPM shop, I have moved the best stonks there.\""
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Vocracity's old plot replaced by altephcomputer2, who moved over from -610, 1150. Maybe some new epics in here."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "gray-2",
+    "zone": "Gray",
+    "x": -620,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "TKW256",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1 rental set. Arrows by the stack. Dye, beds.",
+      "stock": null,
+      "palette": "Pink wool, pink glass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Stock is a little low, currently have arrows stocked and a few R3 items: Stargazer's Revelation, Treads of the Hungerer, Effulgent Fragment, Crimson Tithe."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "gray-3",
+    "zone": "Gray",
+    "x": -610,
+    "z": 1140,
+    "is_guild": false,
+    "shop": {
+      "owner": "Velis_Bluedron",
+      "shop_name": "Heavenly Area",
+      "guild_name": null,
+      "description": "EC artis and discs. Locked, so hard to tell what else is here.",
+      "stock": null,
+      "palette": "Quartz and magma blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still locked."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "gray-4",
+    "zone": "Gray",
+    "x": -630,
+    "z": 1150,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "gray-5",
+    "zone": "Gray",
+    "x": -610,
+    "z": 1150,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "altephcomputer2",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Previously altephcomputer2's shop (R123 rares stonks, epic/utility rentals). Owner moved to -630, 1140 as of the November 2025 update.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running, renting out chains of entropy, mountain's dew, mouth of the mimic, chimera's grace, doorway from eternity, primordial flames, malakut's scorn, free epic rentals."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Altephcomputer2 moved to a slightly better plot at -630, 1140."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "gray-6",
+    "zone": "Gray",
+    "x": -630,
+    "z": 1160,
+    "is_guild": false,
+    "shop": {
+      "owner": "Abtruse",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R1/R2 patron item ordering service. Catalog with prices for each item.",
+      "stock": null,
+      "palette": "Quartz and white glass",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "No longer locked, runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "gray-7",
+    "zone": "Gray",
+    "x": -620,
+    "z": 1160,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": []
+  },
+  {
+    "id": "gray-8",
+    "zone": "Gray",
+    "x": -610,
+    "z": 1160,
+    "is_guild": false,
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "Shadowstep130_",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R1/R2 gear, food, potions for sale; WTB health potions and R1/R2 rares.",
+        "stock": null,
+        "palette": "Quartz, black and red concrete",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Currently locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Closed."
+          }
+        ],
+        "closed": "2025-11-12"
+      }
+    ]
+  },
+  {
+    "id": "northguild-1",
+    "zone": "Northern Guild Plots",
+    "x": -660,
+    "z": 1030,
+    "is_guild": true,
+    "shop": {
+      "owner": "NDH",
+      "shop_name": null,
+      "guild_name": "No Drags Here",
+      "description": "Spruce, deepslate, dark purple tag. Vanity shop, not yet open.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "dark purple",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NEW! Vanity shop, not yet open."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Not yet open, locked."
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "FPF",
+        "shop_name": null,
+        "guild_name": "Fish Release Friday",
+        "description": "",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Gone! Plot given to NDH."
+          }
+        ],
+        "closed": "2025-10-06"
+      }
+    ]
+  },
+  {
+    "id": "northguild-2",
+    "zone": "Northern Guild Plots",
+    "x": -640,
+    "z": 1030,
+    "is_guild": true,
+    "shop": {
+      "owner": "Smoke",
+      "shop_name": null,
+      "guild_name": "big smoke 100",
+      "description": "R3 mat stonks. Guild member bazaar.",
+      "stock": null,
+      "palette": "Quartz, amethyst, moss, orange guild tag",
+      "guild_color": "orange",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin, stocked with mats."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "northguild-3",
+    "zone": "Northern Guild Plots",
+    "x": -660,
+    "z": 1050,
+    "is_guild": true,
+    "shop": {
+      "owner": "WOOL",
+      "shop_name": null,
+      "guild_name": "Woolbearers",
+      "description": "Sandstone, dark gray tag. WIP.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "dark gray",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still WIP but there's a nice build here now."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still not ready to open."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "northguild-4",
+    "zone": "Northern Guild Plots",
+    "x": -640,
+    "z": 1050,
+    "is_guild": true,
+    "shop": {
+      "owner": "Rend",
+      "shop_name": null,
+      "guild_name": "Renegades",
+      "description": "Gray/brown/green text, lime green tag. \"NEW Syrup Exchange.\" R1/R2 rares and artis for sale in basement. Piano out front.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "lime green",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Currently locked."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Unlocked, still got syrup!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "southguild-1",
+    "zone": "Southern Guild Plots",
+    "x": -660,
+    "z": 1090,
+    "is_guild": true,
+    "shop": {
+      "owner": "LxT",
+      "shop_name": null,
+      "guild_name": "Solis Crudelia",
+      "description": "Purple nametag, deep slate and warped signs. Lesser charms WTS. CZ rares WTS. Delve epics for 80% NPC price. Auction wall. 5* fish exchange with 24ar fee. R3 rate exchange with 12ar fee.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "purple",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still running."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "southguild-2",
+    "zone": "Southern Guild Plots",
+    "x": -640,
+    "z": 1090,
+    "is_guild": true,
+    "shop": {
+      "owner": "MAID",
+      "shop_name": null,
+      "guild_name": "Maids of Monumenta",
+      "description": "Light gray nametag, purple/white/black build aesthetic. Buy/sell R1/R2 rares. 5* fish exchange. Lesser charms for sale. Guild member bazaar.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light gray",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "First floor has been gutted, but everything listed above is still in service."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "southguild-3",
+    "zone": "Southern Guild Plots",
+    "x": -660,
+    "z": 1110,
+    "is_guild": true,
+    "shop": {
+      "owner": "ZR",
+      "shop_name": null,
+      "guild_name": "Zenkor Reborn",
+      "description": "Pink/magenta nametag, Squidnee (blue terracotta). Hexed item collection for vanity skins. R3 rares, 2har each. Lesser charms for sale. Various R3 exchanges. Free food barrel. Hexfall loadouts for rent (gear, charms, even yellow tess for skill loadout). New and endgame items for rent.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "pink/magenta",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin, now has the new R3 POI rares for rent."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "New season pass arti (Sheol), rush artis (Mask of Cacophony, Rose Touch, Scarlet Shift, Void Heart), and spirit archery artis (Lacrimosa, Wanderer's Wick, The Kindling Steps, Speaker's Ward) available for rental."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "southguild-4",
+    "zone": "Southern Guild Plots",
+    "x": -640,
+    "z": 1110,
+    "is_guild": true,
+    "shop": {
+      "owner": "HVN",
+      "shop_name": null,
+      "guild_name": "Haven",
+      "description": "Elusive blue nametag, stone structure with pond around it. Blocks, fishing bait, gold and iron ingots for sale. Free food barrels. \"Charm Evaluation Emporium\" service.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "blue",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-1",
+    "zone": "Eastern Guild Plots",
+    "x": -630,
+    "z": 1040,
+    "is_guild": true,
+    "shop": {
+      "owner": "FISH",
+      "shop_name": null,
+      "guild_name": "The Aquarium",
+      "description": "Blue tag. Blocks of all kinds.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "blue",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "New, WTB iron ore and emerald blocks."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Refurbished! Brand new build! Blocks restocked! Now buying certain rare blocks on the top floor."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-2",
+    "zone": "Eastern Guild Plots",
+    "x": -610,
+    "z": 1040,
+    "is_guild": true,
+    "shop": {
+      "owner": "VEIL",
+      "shop_name": null,
+      "guild_name": "Scholars of the Veil",
+      "description": "Light pink tag, deep slate. Member barrel bazaar. T5 fish exchange, 1 per person per day. T4 fish for sale. R2 rares, various shifting city items in basement.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "NOW OPEN! NEW!"
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-3",
+    "zone": "Eastern Guild Plots",
+    "x": -630,
+    "z": 1060,
+    "is_guild": true,
+    "shop": {
+      "owner": "TCL",
+      "shop_name": null,
+      "guild_name": "The Collectionists",
+      "description": "Stonkco",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still stonkin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still stonkin!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-4",
+    "zone": "Eastern Guild Plots",
+    "x": -610,
+    "z": 1060,
+    "is_guild": true,
+    "shop": {
+      "owner": "AEUGH",
+      "shop_name": null,
+      "guild_name": "Pufferfish",
+      "description": "Yellow tag, yellow and blue blocks. Lesser charms. Misc stonks.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "yellow",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "No longer locked! Also a new WTB diamenean hunt boss mats barrel."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-5",
+    "zone": "Eastern Guild Plots",
+    "x": -630,
+    "z": 1080,
+    "is_guild": true,
+    "shop": {
+      "owner": "FORCE",
+      "shop_name": null,
+      "guild_name": "Dark Force Rising",
+      "description": "Rouge/dark pinkish tag, dark oak, andesite, nether brick. Member barrel bazaar. R2/R3 pot stonks. R3 rare stonks. Other niche utility stonks like VR keys, GPT, lockboxes.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "rouge/dark pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin (one of the big guild shops that sells everything)."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Yeah, still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-6",
+    "zone": "Eastern Guild Plots",
+    "x": -610,
+    "z": 1080,
+    "is_guild": true,
+    "shop": {
+      "owner": "NYAA",
+      "shop_name": null,
+      "guild_name": "Little Nyas",
+      "description": "Light pink tag, spruce build. Utility items like anvils, torches, food, arrows, potions (stock is mostly empty). R1/R2 rares in basement. Portable keloch, jean bay, infusion master in basement.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Kinda cleaned out, but basement still has some stock."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-7",
+    "zone": "Eastern Guild Plots",
+    "x": -630,
+    "z": 1100,
+    "is_guild": true,
+    "shop": {
+      "owner": "EDE",
+      "shop_name": null,
+      "guild_name": "Grand",
+      "description": "Super light pink tag, snow blocks. Member barrel bazaar. Various R123 rares. R2 rogue set rental.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "super light pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "eastguild-8",
+    "zone": "Eastern Guild Plots",
+    "x": -610,
+    "z": 1100,
+    "is_guild": true,
+    "shop": {
+      "owner": "PIG",
+      "shop_name": null,
+      "guild_name": "GG Bond",
+      "description": "Light pink tag, cherry pink build. R3 rares and currencies stonks. R3 set rentals. R3 pot stonk. R2/R1 utility stonks. R123 mats stonks and rare frag stonks, more stonks than can fit on a sign.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still stonkin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Maybe even more rental sets now, some stonks have moved around."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-1",
+    "zone": "Western Guild Plots",
+    "x": -690,
+    "z": 1040,
+    "is_guild": true,
+    "shop": {
+      "owner": "IRS",
+      "shop_name": null,
+      "guild_name": "Incredible Raccoon Squadron",
+      "description": "Blue tag. Seemingly WIP.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "blue",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": null,
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still closed."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still defunct."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-2",
+    "zone": "Western Guild Plots",
+    "x": -670,
+    "z": 1040,
+    "is_guild": true,
+    "shop": {
+      "owner": "Skadi",
+      "shop_name": null,
+      "guild_name": "Aegir",
+      "description": "Light blue tag. R3 rental sets. Charms.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light blue",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Nothing's changed, still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-3",
+    "zone": "Western Guild Plots",
+    "x": -690,
+    "z": 1060,
+    "is_guild": true,
+    "shop": {
+      "owner": "DAY",
+      "shop_name": null,
+      "guild_name": "Daybreak",
+      "description": "Dark purple tag. Potions and blocks for sale. Speedrun set and other sets for rent. Free food barrel.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "dark purple",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still running, selling TNT and blocks in the basement, might be new."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-4",
+    "zone": "Western Guild Plots",
+    "x": -670,
+    "z": 1060,
+    "is_guild": true,
+    "shop": {
+      "owner": "VH",
+      "shop_name": null,
+      "guild_name": "Vault Hunter",
+      "description": "Black tag. Food, arrows, anvils, shulkers, potions, blocks. R123 rares and tiered gear for sale; possibly the only shop in the whole market that sells tiered gear.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "black",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin, and yes, this seems to be the only shop with tiered gear."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-5",
+    "zone": "Western Guild Plots",
+    "x": -690,
+    "z": 1080,
+    "is_guild": true,
+    "shop": {
+      "owner": "HTT",
+      "shop_name": null,
+      "guild_name": "HOKAGO TEA TIME",
+      "description": "Light pink tag. 5* fish sell/trade. R23 rares and charms. Carnival wheels. EC pots and artis.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light pink",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "No longer locked! Selling R2 rares."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Locked!"
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-6",
+    "zone": "Western Guild Plots",
+    "x": -670,
+    "z": 1080,
+    "is_guild": true,
+    "shop": {
+      "owner": "Miku",
+      "shop_name": null,
+      "guild_name": "Miku Fan Club",
+      "description": "Cyan/light blue tag. Lesser charms. R123 rental sets and rental charms.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "cyan/light blue",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin, some new rentals maybe."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin, some WIP barrels on ground floor."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-7",
+    "zone": "Western Guild Plots",
+    "x": -690,
+    "z": 1100,
+    "is_guild": true,
+    "shop": {
+      "owner": "-w-zZ",
+      "shop_name": null,
+      "guild_name": "No Gamble No Life",
+      "description": "Dark magenta tag. 5* fish exchange. Member bazaar barrels. Sand sticker and shattered gem stonks. Also selling zenith, hexfall, godspore, portal, marina noir, masquerades ruin, sanguine halls, and R3 transmogrifier rares in basement level 1.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "dark magenta",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "Still runnin, now selling the expanded rare list."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Still runnin."
+        }
+      ]
+    },
+    "past_shops": []
+  },
+  {
+    "id": "westguild-8",
+    "zone": "Western Guild Plots",
+    "x": -670,
+    "z": 1100,
+    "is_guild": true,
+    "shop": {
+      "owner": "OpM",
+      "shop_name": null,
+      "guild_name": "Opus Maximus",
+      "description": "Light purple tag. Plot building service. Gear rentals. Member barrel bazaar.",
+      "stock": null,
+      "palette": null,
+      "guild_color": "light purple",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": null,
+        "lock": "locked",
+        "date": "2025-11-12"
+      },
+      "comments": [
+        {
+          "date": "2025-10-06",
+          "body": "New free pottery rental barrel on ground floor."
+        },
+        {
+          "date": "2025-11-12",
+          "body": "Locked!"
+        }
+      ]
+    },
+    "past_shops": []
+  }
+]
