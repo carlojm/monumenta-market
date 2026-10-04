@@ -332,32 +332,36 @@
   {
     "id": "magenta-1",
     "zone": "Magenta",
-    "x": -660,
-    "z": 1000,
+    "x": -662,
+    "z": 993,
     "is_guild": false,
     "shop": {
-      "owner": "Palae",
+      "owner": "Palae_",
       "shop_name": null,
       "guild_name": null,
-      "description": "A hole. Black concrete.",
+      "description": "A circle build thing and nothing else",
       "stock": null,
-      "palette": null,
+      "palette": "red and black blocks",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "inactive",
         "lock": "locked",
-        "date": "2025-11-08"
+        "date": "2026-10-04"
       },
       "comments": [
         {
+          "date": "2026-10-04",
+          "body": "Hey! not just a hole anymore! But still nothing here"
+        },
+        {
           "date": "2025-10-04",
-          "body": "Still a hole. Now has a \"WTB gladiolus\" sign."
+          "body": "Still a hole. Now has a \"WTB gladiolus\" sign"
         },
         {
           "date": "2025-11-08",
-          "body": "Currently locked."
+          "body": "Currently locked"
         }
       ]
     },
@@ -366,23 +370,23 @@
   {
     "id": "magenta-2",
     "zone": "Magenta",
-    "x": -650,
-    "z": 1000,
+    "x": -652,
+    "z": 993,
     "is_guild": false,
     "shop": {
       "owner": "KH2Roxas",
       "shop_name": null,
       "guild_name": null,
-      "description": "R1, R2, R3 rares. R1, R2, R3 mats. Locked as of 9/7.",
-      "stock": null,
+      "description": "Selling rares, artis, and epics from R1, R2, and R3. Delve mats in basement",
+      "stock": "White Orange Magenta Light Blue Yellow Rares, Willow Rares, Overworld Rares, Casino Rares, King's Greaves, C'Axtal's Decayed Mask, Lime Pink Gray Light Gray Cyan Purple Teal Forum Shifting Rares, Frost Giant's Crown, artifacts: Firecoral Lance, Marauder's Haze, Eomen's Robes, Flame of Fallen Grace, Treasured Rapier, Auric Tiara, Eomen's Robes, Ghost Captain's Visage, Hrimnir's Incisor. Blue Brown Godspore Zenith Silver Knight's Tomb Rares. Star Point, Pelias' Keep, Wolfswood Rares. R1 and R2 Delve materials for sale in basement",
       "palette": "Copper and deep slate",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-08"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
       },
       "comments": [
         {
@@ -391,7 +395,11 @@
         },
         {
           "date": "2025-11-08",
-          "body": "Same offerings, currently locked."
+          "body": "Same offerings, currently locked"
+        },
+        {
+          "date": "2026-10-04",
+          "body": "Stocked with lots of stuff, stock list updated above"
         }
       ]
     },
@@ -400,8 +408,8 @@
   {
     "id": "magenta-3",
     "zone": "Magenta",
-    "x": -640,
-    "z": 1000,
+    "x": -643,
+    "z": 993,
     "is_guild": false,
     "shop": {
       "owner": "sNigth",
@@ -414,18 +422,22 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-08"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-04"
       },
       "comments": [
         {
           "date": "2025-10-04",
-          "body": "Still not selling."
+          "body": "Still not selling"
         },
         {
           "date": "2025-11-08",
-          "body": "Still here."
+          "body": "Still here"
+        },
+        {
+          "date": "2026-10-04",
+          "body": "Still storage for 9tynine_'s shop"
         }
       ]
     },
@@ -434,8 +446,8 @@
   {
     "id": "magenta-4",
     "zone": "Magenta",
-    "x": -660,
-    "z": 1010,
+    "x": -662,
+    "z": 1003,
     "is_guild": false,
     "shop": {
       "owner": "CallMe_Chocolate",
@@ -468,8 +480,8 @@
   {
     "id": "magenta-5",
     "zone": "Magenta",
-    "x": -640,
-    "z": 1010,
+    "x": -642,
+    "z": 1003,
     "is_guild": false,
     "shop": {
       "owner": "Cocoa_B",
@@ -502,12 +514,12 @@
   {
     "id": "magenta-6",
     "zone": "Magenta",
-    "x": -660,
-    "z": 1020,
+    "x": -662,
+    "z": 1013,
     "is_guild": false,
     "shop": {
       "owner": "HermitMonk",
-      "shop_name": "HermitMonk's Market Directory",
+      "shop_name": "The Market Directory",
       "guild_name": null,
       "description": "The original in-game market directory that this site is based on.",
       "stock": null,
@@ -518,16 +530,20 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-08"
+        "date": "2026-10-04"
       },
       "comments": [
         {
           "date": "2025-10-04",
-          "body": "Still so freaking awesome. Unfortunately the two guilds in front of us have finally built shops and we no longer have clear line of sight to the middle of the island."
+          "body": "Still so freaking awesome. Unfortunately the two guilds in front of us have finally built shops and we no longer have clear line of sight to the middle of the island"
         },
         {
           "date": "2025-11-08",
-          "body": "The best! Have we updated the signs to reflect October changes? No... but might really update them for the November changelog."
+          "body": "The best! Have we updated the signs to reflect October changes? No... but might really update them for the November changelog"
+        },
+        {
+          "date": "2026-10-04",
+          "body": "Well it's a year outdated now but like some of it is still accurate I guess"
         }
       ]
     },
@@ -536,15 +552,15 @@
   {
     "id": "magenta-7",
     "zone": "Magenta",
-    "x": -650,
-    "z": 1020,
+    "x": -652,
+    "z": 1013,
     "is_guild": false,
     "shop": {
-      "owner": "Alaethor",
-      "shop_name": null,
+      "owner": "Ice2LingYu",
+      "shop_name": "Monu Mart",
       "guild_name": null,
-      "description": "Selling silver knight's remnants (SKR) rares, multiple of each rare for sale. Buying SKR scroll remnant scrolls for 5.5har.",
-      "stock": null,
+      "description": "A convenience store with an awesome choo choo train on the roof",
+      "stock": "Selling glistering starblood, essence of the above, godtree carving, repair anvil, mungfish, condensed experience, torn canvas, vengeful vodka. Free blocks.",
       "palette": "Stone bricks",
       "guild_color": null,
       "primary_color": null,
@@ -555,13 +571,32 @@
         "date": "2025-11-08"
       },
       "comments": [
-        {
-          "date": "2025-11-08",
-          "body": "NEW!"
-        }
       ]
     },
     "past_shops": [
+      {
+        "owner": "Alaethor",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Selling silver knight's remnants (SKR) rares, multiple of each rare for sale. Buying SKR scroll remnant scrolls for 5.5har.",
+        "stock": null,
+        "palette": "Stone bricks",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": "active",
+          "lock": "unlocked",
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-11-08",
+            "body": "NEW!"
+          }
+        ],
+        "closed": "2026-10-04"
+      },
       {
         "owner": "Magic58994",
         "shop_name": null,
@@ -589,30 +624,25 @@
   {
     "id": "magenta-8",
     "zone": "Magenta",
-    "x": -640,
-    "z": 1020,
+    "x": -642,
+    "z": 1013,
     "is_guild": false,
     "shop": {
-      "owner": "JackStrongBr",
+      "owner": "Alaethor",
       "shop_name": null,
       "guild_name": null,
-      "description": "Selling potion carriers, dreadful damassine, infernal izarra, twisted tepache.",
-      "stock": null,
-      "palette": null,
+      "description": "Hey didn't Alaethor's shop used to be one plot over? I guess it is here now and selling SKR Rares and pulsating shards.",
+      "stock": "Silver Knight's Remnants rares, Pulsating shards",
+      "palette": "there is a nailong here it is a yellow creature",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-08"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-11-08",
-          "body": "NEW! But currently locked."
-        }
-      ]
+      "comments": []
     },
     "past_shops": [
       {
@@ -636,6 +666,29 @@
           }
         ],
         "closed": "2025-11-08"
+      },
+      {
+        "owner": "JackStrongBr",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Selling potion carriers, dreadful damassine, infernal izarra, twisted tepache.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": null,
+          "lock": "locked",
+          "date": "2025-11-08"
+        },
+        "comments": [
+          {
+            "date": "2025-11-08",
+            "body": "NEW! But currently locked."
+          }
+        ],
+        "closed": "2026-10-04"
       }
     ]
   },
