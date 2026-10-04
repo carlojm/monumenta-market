@@ -20,7 +20,7 @@ function MarketMap({ plots, searchResults, onSelectPlot }) {
           : gameToPercent(plot.x, plot.z);
         const size = plot.is_guild ? '5%' : '3.5%';
 
-        let opacity = 0.5;
+        let opacity = 0.9;
         if (searchResults) {
             opacity = searchResults.matchedKeys.has(key) ? 1 : 0.15;
         }

@@ -20,8 +20,17 @@ export function cooldownRemainingMinutes(x, z) {
   return Math.max(0, Math.ceil(remaining / 60000));
 }
 
+function parseUtc(dateString) {
+  // SQLite's CURRENT_TIMESTAMP is "YYYY-MM-DD HH:MM:SS" with no timezone,
+  // but it's UTC. Normalize to ISO so Date parses it as UTC, not local time.
+  if (dateString.includes('T') || dateString.endsWith('Z')) {
+    return new Date(dateString);
+  }
+  return new Date(dateString.replace(' ', 'T') + 'Z');
+}
+
 export function timeAgo(dateString) {
-  const diffMs = Date.now() - new Date(dateString).getTime();
+  const diffMs = Date.now() - parseUtc(dateString).getTime();
   const mins = Math.floor(diffMs / 60000);
   if (mins < 1) return 'just now';
   if (mins < 60) return `${mins}m ago`;

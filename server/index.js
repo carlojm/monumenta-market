@@ -90,7 +90,12 @@ const TRACKED_FIELDS = ['owner', 'shop_name', 'zone', 'status', 'description'];
 
 app.put('/api/plots/:x/:z', adminAuth, (req, res) => {
   const { x, z } = req.params;
-  const updates = req.body;
+  const updates = { ...req.body };
+
+  // Treat blank strings from the form the same as "not set"
+  for (const field of ['owner', 'shop_name', 'zone', 'description']) {
+    if (updates[field] === '') updates[field] = null;
+  }
 
   const existing = db.prepare('SELECT * FROM plots WHERE x = ? AND z = ?').get(x, z);
   const now = new Date().toISOString();
@@ -112,7 +117,7 @@ app.put('/api/plots/:x/:z', adminAuth, (req, res) => {
     return res.status(201).json({ created: true });
   }
 
-  // Build diff for tracked fields, insert a system comment per change
+  const TRACKED_FIELDS = ['owner', 'shop_name', 'zone', 'status', 'description'];
   const insertSystemComment = db.prepare(`
     INSERT INTO comments (plot_x, plot_z, author, body, is_system, status)
     VALUES (?, ?, NULL, ?, 1, 'approved')
@@ -126,18 +131,23 @@ app.put('/api/plots/:x/:z', adminAuth, (req, res) => {
     }
   }
 
+  // Use "in" rather than ?? — a field explicitly sent as null (cleared by
+  // the user) must overwrite the existing value, not fall back to it.
+  const merged = {
+    owner: 'owner' in updates ? updates.owner : existing.owner,
+    shop_name: 'shop_name' in updates ? updates.shop_name : existing.shop_name,
+    zone: 'zone' in updates ? updates.zone : existing.zone,
+    status: 'status' in updates ? updates.status : existing.status,
+    description: 'description' in updates ? updates.description : existing.description,
+    is_guild: 'is_guild' in updates ? (updates.is_guild ? 1 : 0) : existing.is_guild,
+  };
+
   db.prepare(`
     UPDATE plots SET owner = ?, shop_name = ?, zone = ?, status = ?, description = ?, is_guild = ?, updated_at = ?
     WHERE x = ? AND z = ?
   `).run(
-    updates.owner ?? existing.owner,
-    updates.shop_name ?? existing.shop_name,
-    updates.zone ?? existing.zone,
-    updates.status ?? existing.status,
-    updates.description ?? existing.description,
-    updates.is_guild !== undefined ? (updates.is_guild ? 1 : 0) : existing.is_guild,
-    now,
-    x, z
+    merged.owner, merged.shop_name, merged.zone, merged.status, merged.description, merged.is_guild,
+    now, x, z
   );
 
   res.json({ updated: true });

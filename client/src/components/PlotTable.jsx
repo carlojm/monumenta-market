@@ -1,3 +1,4 @@
+import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
 
 function PlotTable({ plots, searchResults, onSelectPlot }) {
@@ -35,7 +36,11 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
             >
               <td>{plot.owner || '—'}</td>
               <td>{plot.zone || '—'}</td>
-              <td>{plot.status}</td>
+              <td>
+                {plot.latest_report_type
+                  ? `${plot.latest_report_type} ${timeAgo(plot.latest_report_at)}`
+                  : '—'}
+              </td>
               {searchResults && (
                 <td className="plot-table__match">
                   {snippet ? (
