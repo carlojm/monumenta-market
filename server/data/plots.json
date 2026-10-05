@@ -695,8 +695,8 @@
   {
     "id": "corridors-1",
     "zone": "Ephemeral Corridors",
-    "x": -690,
-    "z": 980,
+    "x": -694,
+    "z": 977,
     "is_guild": false,
     "shop": {
       "owner": "skelajon",
@@ -711,7 +711,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-10"
+        "date": "2026-10-04"
       },
       "comments": [
         {
@@ -720,8 +720,12 @@
         },
         {
           "date": "2025-11-10",
-          "body": "Still open but currently sold out. Everyone ping skelajon."
-        }
+          "body": "Still open but currently sold out. Everyone ping skelajon"
+        },
+        {
+          "date": "2026-10-04",
+          "body": "Open and stocked"
+        },
       ]
     },
     "past_shops": []
@@ -729,8 +733,8 @@
   {
     "id": "corridors-2",
     "zone": "Ephemeral Corridors",
-    "x": -680,
-    "z": 980,
+    "x": -684,
+    "z": 977,
     "is_guild": false,
     "shop": {
       "owner": "skelematt",
@@ -745,7 +749,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-10"
+        "date": "2026-10-04"
       },
       "comments": [
         {
@@ -763,42 +767,61 @@
   {
     "id": "corridors-3",
     "zone": "Ephemeral Corridors",
-    "x": -670,
-    "z": 980,
+    "x": -674,
+    "z": 977,
     "is_guild": false,
     "shop": {
-      "owner": "Lucilite",
+      "owner": "SunDraKi",
       "shop_name": null,
       "guild_name": null,
-      "description": "Potions in bulk. R1 rares for sale.",
+      "description": "Blank stall",
       "stock": null,
-      "palette": "Moss",
+      "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "inactive",
         "lock": "locked",
-        "date": "2025-11-10"
+        "date": "2026-10-04"
       },
-      "comments": [
-        {
-          "date": "2025-10-04",
-          "body": "Currently locked, seemingly same inventory."
-        },
-        {
-          "date": "2025-11-10",
-          "body": "Currently locked."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Lucilite",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Potions in bulk. R1 rares for sale.",
+        "stock": null,
+        "palette": "Moss",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "report": {
+          "activity": null,
+          "lock": "locked",
+          "date": "2025-11-10"
+        },
+        "comments": [
+          {
+            "date": "2025-10-04",
+            "body": "Currently locked, seemingly same inventory."
+          },
+          {
+            "date": "2025-11-10",
+            "body": "Currently locked."
+          }
+        ],
+        "closed":"2026-10-04"
+      }
+    ]
   },
   {
     "id": "corridors-4",
     "zone": "Ephemeral Corridors",
-    "x": -690,
-    "z": 990,
+    "x": -694,
+    "z": 987,
     "is_guild": false,
     "shop": null,
     "past_shops": []
@@ -806,8 +829,8 @@
   {
     "id": "corridors-5",
     "zone": "Ephemeral Corridors",
-    "x": -670,
-    "z": 990,
+    "x": -674,
+    "z": 987,
     "is_guild": false,
     "shop": null,
     "past_shops": [
@@ -834,28 +857,76 @@
   {
     "id": "corridors-6",
     "zone": "Ephemeral Corridors",
-    "x": -690,
-    "z": 1000,
+    "x": -694,
+    "z": 997,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Llg286",
+      "shop_name": "BB2 of 3",
+      "guild_name": null,
+      "description": "Stonks for R2 Isles rare fragments and epic mats. Part of a set of three shops near each other labelled BB.",
+      "stock": null,
+      "palette": "oak wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "corridors-7",
     "zone": "Ephemeral Corridors",
-    "x": -680,
-    "z": 1000,
+    "x": -684,
+    "z": 997,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "_nyariel",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "quote from weekendtech: \"this shop only exists to hold cats.\"",
+      "stock": null,
+      "palette": "dark oak and terracotta",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-04"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "corridors-8",
     "zone": "Ephemeral Corridors",
-    "x": -670,
-    "z": 1000,
+    "x": -674,
+    "z": 997,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Wrong_Note",
+      "shop_name": "",
+      "guild_name": null,
+      "description": "Stonks for R1 R2 R3 daily bounty mats. R1 mats on second floor, Misc. R1 items on third floor. Basement has R2 mats and R2 misc as well as R3 mats at the very bottom.",
+      "stock": null,
+      "palette": "spruce and bone blocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-04"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
