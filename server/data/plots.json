@@ -2104,64 +2104,73 @@
   {
     "id": "lightgray-1",
     "zone": "Light Gray",
-    "x": -600,
-    "z": 1030,
+    "x": -598,
+    "z": 1025,
     "is_guild": false,
     "shop": {
-      "owner": "fishy3927",
-      "shop_name": "Mini StonkCo 5",
+      "owner": "Toqwen",
+      "shop_name": "[kitten] marketplace",
       "guild_name": null,
-      "description": "WIP. WTB 5* fish.",
-      "stock": null,
-      "palette": "Stonkco blocks",
+      "description": "Stonks/trade barrels in all currencies for all seasonal pass artifacts, wheel core fragments, twisted pomes",
+      "stock": "seasonal pass artifacts sp artis",
+      "palette": "red mushroom blocks and amethyst",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Currently locked and WIP."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Currently locked and WIP."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "fishy3927",
+        "shop_name": "Mini StonkCo 5",
+        "guild_name": null,
+        "description": "WIP. WTB 5* fish.",
+        "stock": null,
+        "palette": "Stonkco blocks",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Currently locked and WIP."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Currently locked and WIP."
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
   },
   {
     "id": "lightgray-2",
     "zone": "Light Gray",
-    "x": -590,
-    "z": 1030,
+    "x": -588,
+    "z": 1025,
     "is_guild": false,
     "shop": {
-      "owner": "Akuser1reta",
-      "shop_name": null,
+      "owner": "aAkuia",
+      "shop_name": "[kitten] Charms Emporium",
       "guild_name": null,
-      "description": "Empty plot.",
-      "stock": null,
-      "palette": null,
+      "description": "Collection of zenith charms, shop says it is still wip / contact ari.yuh to purchase charms",
+      "stock": "celestial zenith charms cz charms",
+      "palette": "pink and white glass",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "lock": "unlocked",
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-11-12",
-          "body": "NEW! But empty."
-        }
-      ]
+      "comments": []
     },
     "past_shops": [
       {
@@ -2185,39 +2194,62 @@
           }
         ],
         "closed": "2025-11-12"
+      },
+      {
+        "owner": "Akuser1reta",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Empty plot.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-11-12",
+            "body": "NEW! But empty."
+          }
+        ],
+        "closed": "2026-10-05"
       }
     ]
   },
   {
     "id": "lightgray-3",
     "zone": "Light Gray",
-    "x": -580,
-    "z": 1030,
+    "x": -578,
+    "z": 1025,
     "is_guild": false,
     "shop": {
-      "owner": "sleepyemmaline",
-      "shop_name": null,
+      "owner": "Weslaifu",
+      "shop_name": "Ryakuu's Instant Epic Infusion Crystals",
       "guild_name": null,
-      "description": "Kitten's Instant Epic Infusion service — take fully infused true norths, refund the infusion, then use that on your item. Water and prismarine shop shaped like an exp bottle.",
-      "stock": null,
-      "palette": null,
+      "description": "Take fully infused true norths, refund the infusion, then use that on your item",
+      "stock": "infusion service infusion rental",
+      "palette": "Water and prismarine shop shaped like an exp bottle",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
-      "comments": []
+      "comments": [
+        {
+          "date": "2026-10-05",
+          "body": "still running"
+        }
+      ]
     },
     "past_shops": []
   },
   {
     "id": "lightgray-4",
     "zone": "Light Gray",
-    "x": -600,
-    "z": 1040,
+    "x": -598,
+    "z": 1035,
     "is_guild": false,
     "shop": {
       "owner": "Ryakuu",
@@ -2232,7 +2264,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
       "comments": [
         {
@@ -2242,6 +2274,10 @@
         {
           "date": "2025-11-12",
           "body": "Stock expanding, \"we have all sets and charms done but dawn\" -Ryakuu."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "still running"
         }
       ]
     },
@@ -2250,23 +2286,23 @@
   {
     "id": "lightgray-5",
     "zone": "Light Gray",
-    "x": -580,
-    "z": 1040,
+    "x": -578,
+    "z": 1035,
     "is_guild": false,
     "shop": {
       "owner": "niirvus",
       "shop_name": null,
       "guild_name": null,
-      "description": "Just a bunch of random blocks placed on the plot.",
-      "stock": null,
-      "palette": null,
+      "description": "More CZ charm stonks and other R3 stonks in basement",
+      "stock": "Stonks: cz common uncommon and rare charms, silver memory fragment, fractured psyche, combat scroll, puzzle scroll",
+      "palette": "mangrove and mud",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
       },
       "comments": [
         {
@@ -2276,6 +2312,10 @@
         {
           "date": "2025-11-12",
           "body": "Still WIP, Ryakuu told me what this is going to be and I forgot. CZ rares or something."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "now open and running"
         }
       ]
     },
@@ -2284,30 +2324,25 @@
   {
     "id": "lightgray-6",
     "zone": "Light Gray",
-    "x": -600,
-    "z": 1050,
+    "x": -598,
+    "z": 1045,
     "is_guild": false,
     "shop": {
-      "owner": "marcywawa",
+      "owner": "Ian1KV",
       "shop_name": null,
       "guild_name": null,
-      "description": "Really cool banner art, worth standing here for ten minutes and just looking at it.",
+      "description": "tier 5 fish exchange",
       "stock": null,
-      "palette": null,
+      "palette": "cherry planks",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "lock": "locked",
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-11-12",
-          "body": "NEW!"
-        }
-      ]
+      "comments": []
     },
     "past_shops": [
       {
@@ -2323,84 +2358,130 @@
         "comments": [
           {
             "date": "2025-10-06",
-            "body": "MOVED! T5 exchange now next door in the [VEIL] guild shop."
+            "body": "MOVED! T5 exchange now next door in the [VEIL] guild shop"
           },
           {
             "date": "2025-11-12",
-            "body": "Ian1KV's old plot replaced with marcywawa."
+            "body": "Ian1KV's old plot replaced with marcywawa"
           }
         ],
         "closed": "2025-11-12"
+      },
+      {
+        "owner": "marcywawa",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Really cool banner art, worth standing here for ten minutes and just looking at it",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-11-12",
+            "body": "NEW!"
+          }
+        ],
+        "closed": "2026-10-05"
       }
     ]
   },
   {
     "id": "lightgray-7",
     "zone": "Light Gray",
-    "x": -590,
-    "z": 1050,
+    "x": -588,
+    "z": 1045,
     "is_guild": false,
     "shop": {
-      "owner": "Reeba",
-      "shop_name": null,
+      "owner": "buniior",
+      "shop_name": "[kitten] Hexfall Rentals",
       "guild_name": null,
-      "description": "Big hole, not full of water.",
+      "description": "Hexfall rental sets in honor of dearboy",
       "stock": null,
-      "palette": null,
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "NEW! But also WIP and empty."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still empty."
-        }
-      ]
-    },
-    "past_shops": []
-  },
-  {
-    "id": "lightgray-8",
-    "zone": "Light Gray",
-    "x": -580,
-    "z": 1050,
-    "is_guild": false,
-    "shop": {
-      "owner": "carasouels",
-      "shop_name": null,
-      "guild_name": null,
-      "description": "Kitten Patron item shop. Stock: Eclipse Splitter, Lamb Chop, Big Hat, Vivace, Jeans of the Fire Eagle, Embers of Thori'dal, Gas Mask, Heaven's Lullaby, Peripatetic Sandals. Also (no own barrels): Baxeico, Heiress' Rapier, Crown of the Depths, Doomsday Clock, Failnaught. Other items: Shadebound Shackles, Godtree Greaves, Razorleaf Breeches, Silver Heart, Morphic Breaker, The Overclocker, Toxic-Cursed Bind, Across the Ocean, Short Circuit, Loci's Hunger.",
-      "stock": null,
-      "palette": "Black and lime concrete, lime glass, pride flags",
+      "palette": "stone brick floor and terracotta witch statue",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "New but WIP."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "NEW!"
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Reeba",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Big hole, not full of water",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NEW! But also WIP and empty"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still empty"
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
+  },
+  {
+    "id": "lightgray-8",
+    "zone": "Light Gray",
+    "x": -578,
+    "z": 1045,
+    "is_guild": false,
+    "shop": {
+      "owner": "realers",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "free lootrun rental set",
+      "stock": null,
+      "palette": "snow and ice",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "carasouels",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Kitten Patron item shop. Stock: Eclipse Splitter, Lamb Chop, Big Hat, Vivace, Jeans of the Fire Eagle, Embers of Thori'dal, Gas Mask, Heaven's Lullaby, Peripatetic Sandals. Also (no own barrels): Baxeico, Heiress' Rapier, Crown of the Depths, Doomsday Clock, Failnaught. Other items: Shadebound Shackles, Godtree Greaves, Razorleaf Breeches, Silver Heart, Morphic Breaker, The Overclocker, Toxic-Cursed Bind, Across the Ocean, Short Circuit, Loci's Hunger.",
+        "stock": null,
+        "palette": "Black and lime concrete, lime glass, pride flags",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "New but WIP."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "NEW!"
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
   },
   {
     "id": "willows-1",
