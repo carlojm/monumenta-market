@@ -2486,17 +2486,33 @@
   {
     "id": "willows-1",
     "zone": "Willows",
-    "x": -720,
-    "z": 1060,
+    "x": -726,
+    "z": 1057,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Mudykippy",
+      "shop_name": "[MOZZA] Shop",
+      "guild_name": null,
+      "description": "awesome mouse statue but shop is wip",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "WIP",
+        "lock": "locked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "willows-2",
     "zone": "Willows",
-    "x": -710,
-    "z": 1060,
+    "x": -716,
+    "z": 1057,
     "is_guild": false,
     "shop": null,
     "past_shops": []
@@ -2504,8 +2520,8 @@
   {
     "id": "willows-3",
     "zone": "Willows",
-    "x": -700,
-    "z": 1060,
+    "x": -706,
+    "z": 1057,
     "is_guild": false,
     "shop": {
       "owner": "juicyradish",
@@ -2520,7 +2536,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
       "comments": [
         {
@@ -2530,6 +2546,10 @@
         {
           "date": "2025-11-12",
           "body": "Still open and stocked."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "still running"
         }
       ]
     },
@@ -2538,147 +2558,224 @@
   {
     "id": "willows-4",
     "zone": "Willows",
-    "x": -720,
-    "z": 1070,
+    "x": -726,
+    "z": 1067,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "ExiOre",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "wip",
+      "stock": null,
+      "palette": "diorite and quartz and birch",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": [
+        {
+          "date": "2026-10-05",
+          "body": "seems like currently wip"
+        }
+      ]
+    },
     "past_shops": []
   },
   {
     "id": "willows-5",
     "zone": "Willows",
-    "x": -700,
-    "z": 1070,
+    "x": -706,
+    "z": 1067,
     "is_guild": false,
     "shop": {
-      "owner": "Geek1001",
-      "shop_name": "COMEX",
+      "owner": "Gonzelk",
+      "shop_name": "PROOH",
       "guild_name": null,
-      "description": "Giveaways. Free pride flags.",
+      "description": "Selling gear from R1 R2 R3 but seemingly still wip",
       "stock": null,
-      "palette": "Emerald blocks, lime, gold, grass",
+      "palette": "spruce with a big elephant statue on top",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "WIP",
+        "lock": "locked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "Geek1001",
+        "shop_name": "COMEX",
+        "guild_name": null,
+        "description": "Giveaways. Free pride flags.",
+        "stock": null,
+        "palette": "Emerald blocks, lime, gold, grass",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Locked, no giveaway active currently."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Unlocked but nothin going on right now."
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
+  },
+  {
+    "id": "willows-6",
+    "zone": "Willows",
+    "x": -726,
+    "z": 1077,
+    "is_guild": false,
+    "shop": {
+      "owner": "DallMit",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Stonks for unopened loot chests, seemingly still wip",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "Moe_block",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Also a Christmas plot. Snowman.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still dormant."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Is it time yet?"
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
+  },
+  {
+    "id": "willows-7",
+    "zone": "Willows",
+    "x": -716,
+    "z": 1077,
+    "is_guild": false,
+    "shop": {
+      "owner": "9LifeSpentNeko",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Nothing in stock but there is a cool doorbell",
+      "stock": null,
+      "palette": "black concrete and diorite",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "TemberCasa",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Christmas plot. Big Christmas tree. Unclear purpose, maybe a secret Santa thing.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still dormant."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Thawing soon?"
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
+  },
+  {
+    "id": "willows-8",
+    "zone": "Willows",
+    "x": -706,
+    "z": 1077,
+    "is_guild": false,
+    "shop": {
+      "owner": "TheLegend001B",
+      "shop_name": "Clucked Up!",
+      "guild_name": null,
+      "description": "Emergency clucking potions for free as long as you replace with a new one within 48 hours",
+      "stock": "potion of clucking, Jar of Clucks",
+      "palette": "quartz and red banners",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Locked, no giveaway active currently."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Unlocked but nothin going on right now."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
-  },
-  {
-    "id": "willows-6",
-    "zone": "Willows",
-    "x": -720,
-    "z": 1080,
-    "is_guild": false,
-    "shop": {
-      "owner": "Moe_block",
-      "shop_name": null,
-      "guild_name": null,
-      "description": "Also a Christmas plot. Snowman.",
-      "stock": null,
-      "palette": null,
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still dormant."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Is it time yet?"
-        }
-      ]
-    },
-    "past_shops": []
-  },
-  {
-    "id": "willows-7",
-    "zone": "Willows",
-    "x": -710,
-    "z": 1080,
-    "is_guild": false,
-    "shop": {
-      "owner": "TemberCasa",
-      "shop_name": null,
-      "guild_name": null,
-      "description": "Christmas plot. Big Christmas tree. Unclear purpose, maybe a secret Santa thing.",
-      "stock": null,
-      "palette": null,
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still dormant."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Thawing soon?"
-        }
-      ]
-    },
-    "past_shops": []
-  },
-  {
-    "id": "willows-8",
-    "zone": "Willows",
-    "x": -700,
-    "z": 1080,
-    "is_guild": false,
-    "shop": {
-      "owner": "TheLegend001B",
-      "shop_name": "Depths Inc",
-      "guild_name": null,
-      "description": "Depths shop, currently locked.",
-      "stock": null,
-      "palette": "Deep slate and cyan",
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still locked."
-        }
-      ]
-    },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "TheLegend001B_old",
+        "shop_name": "Depths Inc",
+        "guild_name": null,
+        "description": "Depths shop, currently locked.",
+        "stock": null,
+        "palette": "Deep slate and cyan",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still locked."
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
   },
   {
     "id": "cyan-1",
