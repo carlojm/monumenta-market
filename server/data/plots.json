@@ -2780,8 +2780,8 @@
   {
     "id": "cyan-1",
     "zone": "Cyan",
-    "x": -720,
-    "z": 1090,
+    "x": -726,
+    "z": 1089,
     "is_guild": false,
     "shop": {
       "owner": "JAY_zixuan",
@@ -2795,8 +2795,8 @@
       "secondary_color": null,
       "report": {
         "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "lock": "unlocked",
+        "date": "2026-10-05"
       },
       "comments": [
         {
@@ -2806,6 +2806,10 @@
         {
           "date": "2025-11-12",
           "body": "..."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "still here"
         }
       ]
     },
@@ -2814,11 +2818,11 @@
   {
     "id": "cyan-2",
     "zone": "Cyan",
-    "x": -710,
-    "z": 1090,
+    "x": -716,
+    "z": 1089,
     "is_guild": false,
     "shop": {
-      "owner": "Firestorm256",
+      "owner": "TorixWW",
       "shop_name": null,
       "guild_name": null,
       "description": "R1/R2 rares stonks.",
@@ -2830,7 +2834,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
       "comments": [
         {
@@ -2840,6 +2844,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "still active"
         }
       ]
     },
@@ -2848,15 +2856,15 @@
   {
     "id": "cyan-3",
     "zone": "Cyan",
-    "x": -700,
-    "z": 1090,
+    "x": -706,
+    "z": 1089,
     "is_guild": false,
     "shop": {
       "owner": "Shireee",
       "shop_name": null,
       "guild_name": null,
-      "description": "Maple syrup stonk, Creeper delight stonk, ADE stonk, SKT rare frag stonk. Selling food, lapis, R2 rares. Rush of dissonance set for rental. Offering intruder carry service.",
-      "stock": null,
+      "description": "Various EC and DD and misc stonks. Some gear sets for rent.",
+      "stock": "Ephemeral Corridor Artifact stonks. Darkest Depths Artifact stonks. Aurora Map stonks. Maple syrup and corn syrup stonks. Selling EC discs (but currently out of stock). Rush of dissonance set for rental. Offering intruder carry service. WTB godspore cuttings. R1 Warrior, R2 Tenebrist, R2 Assassin, R3 Sword Sage gear rental sets.",
       "palette": null,
       "guild_color": null,
       "primary_color": null,
@@ -2864,12 +2872,16 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
       "comments": [
         {
           "date": "2025-11-12",
           "body": "NEW! Still runnin."
+        },
+        {
+          "date": "2026-10-05",
+          "body": "stock has changed a lot but still active"
         }
       ]
     },
@@ -2878,72 +2890,150 @@
   {
     "id": "cyan-4",
     "zone": "Cyan",
-    "x": -720,
-    "z": 1100,
+    "x": -726,
+    "z": 1099,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Red_loyalty6863",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling odds and ends but seems to be out of stock/inactive",
+      "stock": null,
+      "palette": "oak wood",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "cyan-5",
     "zone": "Cyan",
-    "x": -700,
-    "z": 1100,
-    "is_guild": false,
-    "shop": null,
-    "past_shops": []
-  },
-  {
-    "id": "cyan-6",
-    "zone": "Cyan",
-    "x": -720,
-    "z": 1110,
-    "is_guild": false,
-    "shop": null,
-    "past_shops": []
-  },
-  {
-    "id": "cyan-7",
-    "zone": "Cyan",
-    "x": -710,
-    "z": 1110,
-    "is_guild": false,
-    "shop": null,
-    "past_shops": []
-  },
-  {
-    "id": "cyan-8",
-    "zone": "Cyan",
-    "x": -700,
-    "z": 1110,
+    "x": -706,
+    "z": 1099,
     "is_guild": false,
     "shop": {
-      "owner": "Col7",
-      "shop_name": null,
+      "owner": "waveringsea",
+      "shop_name": "sea's little rental",
       "guild_name": null,
-      "description": "R3 rares, potions, lesser charms, augments. Free food barrel.",
-      "stock": null,
-      "palette": "Copper, deep slate",
+      "description": "Various handy rentals needed for content",
+      "stock": "for rent: Narsen's Will for Eye of the Storm. Fleshbreaker for Perfect Christallizer. Upgraded light gray tesseract for Englightening. Replica Rose Wool for Scepter of Agony. Unwavering Will for Mist's Wake. 163.39% speed set for the race council. Twisted Luciae for hardmode intruder and stalker bestiary. Pot sherds and Decorated Pot for Versatile Vase. Otherworldly Fruit for A Union Cross: Dark Fate quest. quest rentals content rentals quest items",
+      "palette": "deepslate and diorite",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-05"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still open, selling R3 potion carriers, block carriers (stone, copper, misc.), misc. items (Rocket Boots, Crown of the Lost Beyond, Duskborn Graft), as well as stuff listed above."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin."
-        }
-      ]
+      "comments": []
     },
     "past_shops": []
+  },
+  {
+    "id": "cyan-6",
+    "zone": "Cyan",
+    "x": -726,
+    "z": 1109,
+    "is_guild": false,
+    "shop": {
+      "owner": "SmolFox",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling Versatile Vase for 12 har each",
+      "stock": null,
+      "palette": "stone brick",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-7",
+    "zone": "Cyan",
+    "x": -716,
+    "z": 1109,
+    "is_guild": false,
+    "shop": {
+      "owner": "pulsing_orb",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Selling R3 rares, bag of tricks, mog rares, aurora map tiles. Buying r3 rares and Bread. Soul of Ishnir rentals",
+      "stock": "R3 rares for sale: Sirius, Zenith cz, Masquerader's Ruin, Portal, Sanguine Halls, Maina Noir, Gallery of Fear, Ring Fishing rares, Diamenean Hunts rares, Silver Knight's Remnants",
+      "palette": "spruce and moss",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": []
+  },
+  {
+    "id": "cyan-8",
+    "zone": "Cyan",
+    "x": -706,
+    "z": 1109,
+    "is_guild": false,
+    "shop": {
+      "owner": "Husk_Nihilus",
+      "shop_name": "ACONCO",
+      "guild_name": null,
+      "description": "R3 rare shop wip",
+      "stock": null,
+      "palette": "dark oak, moss, amethyst",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-05"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "Col7",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R3 rares, potions, lesser charms, augments. Free food barrel.",
+        "stock": null,
+        "palette": "Copper, deep slate",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still open, selling R3 potion carriers, block carriers (stone, copper, misc.), misc. items (Rocket Boots, Crown of the Lost Beyond, Duskborn Graft), as well as stuff listed above."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still runnin."
+          }
+        ],
+        "closed": "2026-10-05"
+      }
+    ]
   },
   {
     "id": "lightblue-1",
