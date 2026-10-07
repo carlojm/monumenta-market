@@ -3377,53 +3377,99 @@
   {
     "id": "orange-1",
     "zone": "Orange",
-    "x": -690,
-    "z": 1140,
+    "x": -694,
+    "z": 1137,
     "is_guild": false,
     "shop": {
-      "owner": "zBaconn",
+      "owner": "TennoClock",
       "shop_name": null,
       "guild_name": null,
-      "description": "Personal shop, locked.",
+      "description": "reverie artifact exchange. teal artifact exchange. buying PEBs",
       "stock": null,
-      "palette": "Blackstone and black concrete",
+      "palette": "white glass floor",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still locked."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "zBaconn",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Personal shop, locked.",
+        "stock": null,
+        "palette": "Blackstone and black concrete",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still locked."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "orange-2",
     "zone": "Orange",
-    "x": -680,
-    "z": 1140,
+    "x": -684,
+    "z": 1137,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Ian0822",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "selling Essence of the Above aurora mat for 1har",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "orange-3",
     "zone": "Orange",
-    "x": -670,
-    "z": 1140,
+    "x": -674,
+    "z": 1137,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "byBackfish",
+      "shop_name": "Darx's Patron Item Service",
+      "guild_name": null,
+      "description": "Lectern contains a list of patron items available to order. Put a book in one of the barrels to place an order",
+      "stock": "green wool and moss and green concrete",
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": [
       {
         "owner": "Mirnixer1",
@@ -3452,17 +3498,33 @@
   {
     "id": "orange-4",
     "zone": "Orange",
-    "x": -690,
-    "z": 1150,
+    "x": -694,
+    "z": 1147,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "AmaRaku",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Banner printing shop, currently wip",
+      "stock": null,
+      "palette": "white glass white concrete",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "WIP",
+        "lock": "locked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "orange-5",
     "zone": "Orange",
-    "x": -670,
-    "z": 1150,
+    "x": -674,
+    "z": 1147,
     "is_guild": false,
     "shop": {
       "owner": "carlo_m",
@@ -3477,7 +3539,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3487,6 +3549,10 @@
         {
           "date": "2025-11-12",
           "body": "Still buying carriers! Feed me! Throw your trash into the black hole of my building collection!"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still here! also added a basement with an archive of the treasures of viridia scavenger hunt from december 2025. memories..."
         }
       ]
     },
@@ -3495,23 +3561,23 @@
   {
     "id": "orange-6",
     "zone": "Orange",
-    "x": -690,
-    "z": 1160,
+    "x": -694,
+    "z": 1157,
     "is_guild": false,
     "shop": {
       "owner": "Num_12345678901",
       "shop_name": null,
       "guild_name": null,
-      "description": "CZ rental sets. Mostly bare plot except for a red sandstone pillar.",
+      "description": "Experience stash stonk. Aurora full first map tile set for sale CZ charm auction wts barrel.",
       "stock": null,
-      "palette": null,
+      "palette": "red sandstone and amethyst",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3521,6 +3587,10 @@
         {
           "date": "2025-11-12",
           "body": "Still running, free steak barrel."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "rental set is gone but there are some new items for sale"
         }
       ]
     },
@@ -3529,23 +3599,44 @@
   {
     "id": "orange-7",
     "zone": "Orange",
-    "x": -680,
-    "z": 1160,
+    "x": -684,
+    "z": 1157,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "DukeVolikia",
+      "shop_name": "Duke's Random Trades",
+      "guild_name": null,
+      "description": "personal general shop. EC Enhancements. Gear bounty service. Gear rental. Random deals. R2 and R3 portable frag plate (wants rares). Free uncommons.",
+      "stock": null,
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-07"
+      },
+      "comments": [
+        {
+          "date": "2026-10-07",
+          "body": "cant get all the details yet because shop is locked"
+        }
+      ]
+    },
     "past_shops": []
   },
   {
     "id": "orange-8",
     "zone": "Orange",
-    "x": -670,
-    "z": 1160,
+    "x": -674,
+    "z": 1157,
     "is_guild": false,
     "shop": {
       "owner": "autumntheace",
-      "shop_name": "Autumn & Deepa's Patreon Item Emporium (+Library) (WIP)",
+      "shop_name": "Autumn's Rental Shop'",
       "guild_name": null,
-      "description": "",
+      "description": "Various rentals for rares and artifacts. Free food and blocks.",
       "stock": null,
       "palette": "Moss",
       "guild_color": null,
@@ -3554,7 +3645,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3564,6 +3655,10 @@
         {
           "date": "2025-11-12",
           "body": "Currently selling lesser warlock charms, lesser mage charms, Mermaid's Touch. New mossy build."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still running with more items available to rent"
         }
       ]
     },
