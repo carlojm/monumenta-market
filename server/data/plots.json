@@ -76,7 +76,7 @@
       "comments": [
         {
           "date": "2026-10-04",
-          "body": "Fun fact i used to own this shop for the very first iteration of this project. It was called the Yellow Pages and let players index their shop. It was built out of sandstone and back then you could use pistons to replace the blocks around the border of the shop, which is why there is still sandstone here today"
+          "body": "Fun fact i used to own this shop for the very first iteration of this project. It was called the Yellow Pages and let players index their shop. It was built out of sandstone and i used pistons to replace the blocks around the border of the shop, which is why there is still sandstone here today"
         }
       ]
     },
@@ -4544,57 +4544,71 @@
   {
     "id": "yellow-1",
     "zone": "Yellow",
-    "x": -600,
-    "z": 1090,
+    "x": -598,
+    "z": 1089,
     "is_guild": false,
     "shop": {
-      "owner": "Sw_Fox",
-      "shop_name": null,
+      "owner": "zckieqa",
+      "shop_name": "PIGGY G1",
       "guild_name": null,
-      "description": "R1, R2 rare stonks. WTS sea daffodils.",
+      "description": "Part of the PIGGY conglomerate. Selling Sea Daffodils in exchange for money or other bouquet flowers. Koal Coalrupted Fragment stonk.",
       "stock": null,
-      "palette": "White glass and snow",
+      "palette": "quartz",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": null,
+        "lock": null,
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "NEW!"
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still running."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Sw_Fox",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R1, R2 rare stonks. WTS sea daffodils.",
+        "stock": null,
+        "palette": "White glass and snow",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NEW!"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still running."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "yellow-2",
     "zone": "Yellow",
-    "x": -590,
-    "z": 1090,
+    "x": -588,
+    "z": 1089,
     "is_guild": false,
     "shop": {
       "owner": "Leolu666",
-      "shop_name": null,
+      "shop_name": "PIGGY G2",
       "guild_name": null,
-      "description": "Selling R2 rares, R3 rares, Pulsing Orb, Quickening Mycosis, Forum Mats Binah Leaf. Narsen's Will for rent.",
+      "description": "Part of the PIGGY conglomerate. Isles Explorer Fragment and Valley Explorer Fragment.",
       "stock": null,
-      "palette": "White glass, barrels, and a very nice doorbell",
+      "palette": "andesite",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4604,6 +4618,10 @@
         {
           "date": "2025-11-12",
           "body": "Doorbell is even more intricate."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "stock has changed and shop is part of the piggy shops now but same owner. awesome doorbell is gone!"
         }
       ]
     },
@@ -4612,42 +4630,56 @@
   {
     "id": "yellow-3",
     "zone": "Yellow",
-    "x": -580,
-    "z": 1090,
+    "x": -578,
+    "z": 1089,
     "is_guild": false,
     "shop": {
-      "owner": "excellentbear",
-      "shop_name": "IRS Infusion Service",
+      "owner": "Slime1225",
+      "shop_name": "PIGGY Y",
       "guild_name": null,
-      "description": "Defunct? Moved to guild shop.",
+      "description": "Part of the PIGGY conglomerate. Selling NPC supply crates and Bag of Tricks.",
       "stock": null,
-      "palette": "Gold and lapis blocks",
+      "palette": "quartz",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "inactive",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still defunct."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still defunct."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "excellentbear",
+        "shop_name": "IRS Infusion Service",
+        "guild_name": null,
+        "description": "Defunct? Moved to guild shop.",
+        "stock": null,
+        "palette": "Gold and lapis blocks",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still defunct."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still defunct."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "yellow-4",
     "zone": "Yellow",
-    "x": -600,
-    "z": 1100,
+    "x": -598,
+    "z": 1099,
     "is_guild": false,
     "shop": {
       "owner": "Laapsap",
@@ -4662,7 +4694,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4672,6 +4704,10 @@
         {
           "date": "2025-11-12",
           "body": "Inventory running out, but patron items still for sale: Colored Fire, Skyfeller, Bramble Blaster, Tome of the Pretsell, Pragmatism, B.O.N.K. Rental basement has almost all R1/R2 patron items."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "order services are closed. a few patron items left in stock. rental still running in basement."
         }
       ]
     },
@@ -4680,112 +4716,175 @@
   {
     "id": "yellow-5",
     "zone": "Yellow",
-    "x": -580,
-    "z": 1100,
+    "x": -578,
+    "z": 1099,
     "is_guild": false,
     "shop": {
-      "owner": "MCJAWang2007",
-      "shop_name": "IRS Rare Exchange",
+      "owner": "frieduhe",
+      "shop_name": "PIGGY B",
       "guild_name": null,
-      "description": "WIP or defunct, not sure.",
+      "description": "Part of the PIGGY conglomerate. Forum and Teal artifact stonks.",
       "stock": null,
-      "palette": "Gold and lapis blocks",
+      "palette": "quartz",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "inactive",
+        "activity": null,
         "lock": null,
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still defunct."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still defunct."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "MCJAWang2007",
+        "shop_name": "IRS Rare Exchange",
+        "guild_name": null,
+        "description": "WIP or defunct, not sure.",
+        "stock": null,
+        "palette": "Gold and lapis blocks",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still defunct."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still defunct."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "yellow-6",
     "zone": "Yellow",
-    "x": -600,
-    "z": 1110,
+    "x": -598,
+    "z": 1109,
     "is_guild": false,
     "shop": {
-      "owner": "fumoa",
-      "shop_name": null,
+      "owner": "Moe_Muyo",
+      "shop_name": "HAT",
       "guild_name": null,
-      "description": "Plot for Harry_Cake's \"3rd unofficial architect's ring anniversary giveaway,\" final entry date 10/28/2025.",
-      "stock": null,
-      "palette": "Spruce and jungle leaves",
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "NEW!"
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Dormant now."
-        }
-      ]
-    },
-    "past_shops": []
-  },
-  {
-    "id": "yellow-7",
-    "zone": "Yellow",
-    "x": -590,
-    "z": 1110,
-    "is_guild": false,
-    "shop": {
-      "owner": "Lemon1011",
-      "shop_name": null,
-      "guild_name": null,
-      "description": "Mail and auction services. Infusion service.",
-      "stock": null,
-      "palette": "Spruce wood",
+      "description": "Free dyed fedoras. Personal general store.",
+      "stock": "pottery sherds for versatile vase rental, otherworldy fruit rental",
+      "palette": "white concrete",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
-          "date": "2025-10-06",
-          "body": "Still running."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still running."
+          "date": "2026-10-07",
+          "body": "this used to be in a different section and now it is here"
         }
       ]
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "fumoa",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Plot for Harry_Cake's \"3rd unofficial architect's ring anniversary giveaway,\" final entry date 10/28/2025.",
+        "stock": null,
+        "palette": "Spruce and jungle leaves",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NEW!"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Dormant now."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
+  },
+  {
+    "id": "yellow-7",
+    "zone": "Yellow",
+    "x": -588,
+    "z": 1109,
+    "is_guild": false,
+    "shop": {
+      "owner": "Sp1My1ove",
+      "shop_name": "PIGGY N",
+      "guild_name": null,
+      "description": "Part of the PIGGY conglomerate. Colossal Cognac and Colossus Core stonks. Twisted Tepache and Tormented Tepache stonks.",
+      "stock": null,
+      "palette": "andesite",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "Lemon1011",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Mail and auction services. Infusion service.",
+        "stock": null,
+        "palette": "Spruce wood",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still running."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "yellow-8",
     "zone": "Yellow",
-    "x": -580,
-    "z": 1110,
+    "x": -578,
+    "z": 1109,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "jason_HONUG",
+      "shop_name": "PIGGY K",
+      "guild_name": null,
+      "description": "Part of the PIGGY conglomerate. Heart of Dread stonk. Stacks of vanilla sponge stonk.",
+      "stock": null,
+      "palette": "quartz",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
