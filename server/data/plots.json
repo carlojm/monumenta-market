@@ -3667,32 +3667,36 @@
   {
     "id": "shifting-1",
     "zone": "Shifting",
-    "x": -660,
-    "z": 1160,
+    "x": -662,
+    "z": 1153,
     "is_guild": false,
     "shop": {
       "owner": "RBT_Fireball",
       "shop_name": null,
       "guild_name": null,
-      "description": "Trophy plot for the server's first bouquet of gold.",
+      "description": "Trophy plot for the server's first bouquet of gold",
       "stock": null,
       "palette": "Warped, oak, birch, nether brick, mud, gold",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still here, still aura farming."
+          "body": "Still here, still aura farming"
         },
         {
           "date": "2025-11-12",
-          "body": "Aura."
+          "body": "Aura"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still here"
         }
       ]
     },
@@ -3701,57 +3705,55 @@
   {
     "id": "shifting-2",
     "zone": "Shifting",
-    "x": -650,
-    "z": 1160,
+    "x": -652,
+    "z": 1153,
     "is_guild": false,
-    "shop": {
-      "owner": "B_G_YG",
-      "shop_name": null,
-      "guild_name": null,
-      "description": "Lesser and rare charms on sale. R3 potion stonks. Zenith pot stonks and delve pot stonks.",
-      "stock": null,
-      "palette": "Quartz, spruce, stone brick",
-      "guild_color": null,
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still running and stocked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin."
-        }
-      ]
-    },
-    "past_shops": []
+    "shop": null,
+    "past_shops": [
+      {
+        "owner": "B_G_YG",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Lesser and rare charms on sale. R3 potion stonks. Zenith pot stonks and delve pot stonks.",
+        "stock": null,
+        "palette": "Quartz, spruce, stone brick",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running and stocked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still runnin."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "shifting-3",
     "zone": "Shifting",
-    "x": -640,
-    "z": 1160,
+    "x": -642,
+    "z": 1153,
     "is_guild": false,
     "shop": {
       "owner": "Vicella",
       "shop_name": null,
       "guild_name": null,
-      "description": "Market stall build, WIP. Buying 1, 2, 3-star fish, buying sand stickers.",
+      "description": "Buying Vessel of Boons. Trading T4 mungfish for T5 mungfish",
       "stock": null,
-      "palette": "Oak, red, white",
+      "palette": "Oak, red, white market stall building",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3761,6 +3763,10 @@
         {
           "date": "2025-11-12",
           "body": "Still buying fish."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "stock has changed, buying vessel of boons and tier 5 mungfish"
         }
       ]
     },
@@ -3769,41 +3775,61 @@
   {
     "id": "shifting-4",
     "zone": "Shifting",
-    "x": -660,
-    "z": 1170,
-    "is_guild": false,
-    "shop": null,
-    "past_shops": []
-  },
-  {
-    "id": "shifting-5",
-    "zone": "Shifting",
-    "x": -640,
-    "z": 1170,
+    "x": -662,
+    "z": 1163,
     "is_guild": false,
     "shop": {
-      "owner": "NetrixC1",
+      "owner": "OBOIOE",
       "shop_name": null,
       "guild_name": null,
-      "description": "Police call box. A couple of barrels, all sold out. Personal shop, possibly WIP.",
-      "stock": null,
+      "description": "Buying rares from all regions. Selling arrows and potions. Selling True North. Selling casino tokens.",
+      "stock": "buying r1 rares buying r2 rares buying r3 rares",
       "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "active",
         "lock": "locked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
+    "past_shops": []
+  },
+  {
+    "id": "shifting-5",
+    "zone": "Shifting",
+    "x": -642,
+    "z": 1163,
+    "is_guild": false,
+    "shop": {
+      "owner": "NetrixC1",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "R2 silverthread set rental.",
+      "stock": null,
+      "palette": "police call box build",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Currently locked."
+          "body": "Currently locked"
         },
         {
           "date": "2025-11-12",
-          "body": "Still locked."
+          "body": "Still locked"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "theres a rental set here now, other barrels all sold out"
         }
       ]
     },
@@ -3812,49 +3838,95 @@
   {
     "id": "shifting-6",
     "zone": "Shifting",
-    "x": -660,
-    "z": 1180,
+    "x": -662,
+    "z": 1173,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Ano_onimus",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "there is a set of noteblocks here tuned to play some song but i've never seen it active",
+      "stock": null,
+      "palette": "noteblocks",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "shifting-7",
     "zone": "Shifting",
-    "x": -650,
-    "z": 1180,
+    "x": -652,
+    "z": 1173,
     "is_guild": false,
     "shop": {
-      "owner": "ramiue",
-      "shop_name": null,
+      "owner": "server_red",
+      "shop_name": "The EC Store",
       "guild_name": null,
-      "description": "Bag of hoarding, hope skinning.",
-      "stock": null,
-      "palette": "Sand and pink umbrella",
+      "description": "Selling all Ephemeral Corridors Enhancement artifacts. Buy/sell barrels for Ephemeral Corridors normal artifacts. Stonks for EC frags and EC potions. Buy/sell for EC key fragments. Selling EC discs.",
+      "stock": "ephemeral enhancements ec artifacts corridors enhancements corridors artifacts discs disks key frags ec fragments",
+      "palette": "black concrete purple glass",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-11-12",
-          "body": "NEW!"
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "ramiue",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Bag of hoarding, hope skinning.",
+        "stock": null,
+        "palette": "Sand and pink umbrella",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-11-12",
+            "body": "NEW!"
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "shifting-8",
     "zone": "Shifting",
-    "x": -640,
-    "z": 1180,
+    "x": -642,
+    "z": 1173,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Svelton",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "Personal general shop on ground floor. Selling charms, depths artifacts, misc. in basement. Gear rental sets in basement.",
+      "stock": "Selling emblem of greed, selling black sun brew, selling various lesser charms, selling dd artis, selling tablet of ruin seasonal pass artifact. Trading 30 tokens in exchange for 1 ticket wheel. Renting various R1 R2 and R3 rares and artifacts and charms. Free food barrel.",
+      "palette": "blackstone and snow and copper",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
