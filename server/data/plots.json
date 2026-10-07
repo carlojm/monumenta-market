@@ -3038,28 +3038,32 @@
   {
     "id": "lightblue-1",
     "zone": "Light Blue",
-    "x": -690,
-    "z": 1110,
+    "x": -694,
+    "z": 1105,
     "is_guild": false,
     "shop": {
       "owner": "Dumplingsushi",
       "shop_name": null,
       "guild_name": null,
-      "description": "Buying all lesser charms, 4 AR per.",
+      "description": "Buying all lesser charms on ground floor. Selling charms for each class on other floors. Rare and epic charms for each class for rent. ",
       "stock": null,
-      "palette": "Quartz and light blue glass",
+      "palette": "Quartz and dark prismarine",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-11-12",
           "body": "NEW!"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still running and now has floors to buy and rent charms"
         }
       ]
     },
@@ -3091,42 +3095,56 @@
   {
     "id": "lightblue-2",
     "zone": "Light Blue",
-    "x": -680,
-    "z": 1110,
+    "x": -684,
+    "z": 1105,
     "is_guild": false,
     "shop": {
-      "owner": "Pandamonium",
-      "shop_name": null,
+      "owner": "Luhein22",
+      "shop_name": "Luhein and Vocracity Rentals",
       "guild_name": null,
-      "description": "The last vestige of \"enemy shop,\" so sad. Hope service. Block carriers.",
-      "stock": null,
-      "palette": "Orange, red, and cyan/green",
+      "description": "Armor and agility rental sets for each class. Currently R1 sets only, work in progess.",
+      "stock": "R1 agility set rental R1 armor set rental all classes",
+      "palette": "spruce",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still locked."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Pandamonium",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "The last vestige of \"enemy shop,\" so sad. Hope service. Block carriers.",
+        "stock": null,
+        "palette": "Orange, red, and cyan/green",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still locked."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "lightblue-3",
     "zone": "Light Blue",
-    "x": -670,
-    "z": 1110,
+    "x": -674,
+    "z": 1105,
     "is_guild": false,
     "shop": {
       "owner": "TimTaroo",
@@ -3139,9 +3157,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3151,6 +3169,10 @@
         {
           "date": "2025-11-12",
           "body": "Now selling CZ rares, elevator still awesome."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "oh god the elevator broke two weeks ago i cant get down there to check"
         }
       ]
     },
@@ -3178,8 +3200,8 @@
   {
     "id": "lightblue-4",
     "zone": "Light Blue",
-    "x": -690,
-    "z": 1120,
+    "x": -694,
+    "z": 1115,
     "is_guild": false,
     "shop": {
       "owner": "White_Ouhhang",
@@ -3192,9 +3214,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "inactive",
         "lock": "locked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3204,6 +3226,10 @@
         {
           "date": "2025-11-12",
           "body": "Still locked."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still here still locked username changed to ethereal_noctyra"
         }
       ]
     },
@@ -3212,14 +3238,14 @@
   {
     "id": "lightblue-5",
     "zone": "Light Blue",
-    "x": -670,
-    "z": 1120,
+    "x": -674,
+    "z": 1115,
     "is_guild": false,
     "shop": {
       "owner": "dearboy",
       "shop_name": null,
       "guild_name": null,
-      "description": "Hexfall and zenith free rental sets. R2 glass DPS rental set.",
+      "description": "Speed sets for author races with notes on how to use the sets for the races. R1 Acumen set and a set of CZ charms for maxing enlightenment xp. DPS (cloak) + Coup, Tank (warlock), and buffbot (seraph) rental sets on F2. CZ charm rental sets in the basement, some currently wip",
       "stock": null,
       "palette": "Dark oak with blue crystal above, mud, moss",
       "guild_color": null,
@@ -3228,7 +3254,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3238,6 +3264,10 @@
         {
           "date": "2025-11-12",
           "body": "New acumen rental set."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "the building has changed and the rental sets have changed"
         }
       ]
     },
@@ -3246,17 +3276,33 @@
   {
     "id": "lightblue-6",
     "zone": "Light Blue",
-    "x": -690,
-    "z": 1130,
+    "x": -694,
+    "z": 1125,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Mir_Dome",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "selling various R3 rares",
+      "stock": "cz rares, intruder rares, skr rares, aurora rares, hunt rares, mr rares, r3 rares",
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "lightblue-7",
     "zone": "Light Blue",
-    "x": -680,
-    "z": 1130,
+    "x": -684,
+    "z": 1125,
     "is_guild": false,
     "shop": {
       "owner": "Curtis_uwu",
@@ -3271,7 +3317,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3281,6 +3327,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin, still scary."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still scary and on fire but out of stock when i checked"
         }
       ]
     },
@@ -3289,8 +3339,8 @@
   {
     "id": "lightblue-8",
     "zone": "Light Blue",
-    "x": -670,
-    "z": 1130,
+    "x": -674,
+    "z": 1125,
     "is_guild": false,
     "shop": {
       "owner": "greenfroge",
@@ -3303,9 +3353,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "active",
         "lock": "locked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -3315,6 +3365,10 @@
         {
           "date": "2025-11-12",
           "body": "Currently locked."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still here but locked when i checked it"
         }
       ]
     },
