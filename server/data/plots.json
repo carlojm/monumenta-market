@@ -2643,7 +2643,7 @@
       "owner": "DallMit",
       "shop_name": null,
       "guild_name": null,
-      "description": "Stonks for unopened loot chests, seemingly still wip",
+      "description": "Buy/sell for unopened loot chests, still wip",
       "stock": null,
       "palette": null,
       "guild_color": null,
@@ -3151,7 +3151,7 @@
       "shop_name": null,
       "guild_name": null,
       "description": "EC discs, DD discs, EC artis for sale. Free pottery sherds for borrowing. Now also selling CZ rares.",
-      "stock": null,
+      "stock": "also black swan song discs",
       "palette": "Sick elevator, black concrete",
       "guild_color": null,
       "primary_color": null,
@@ -3172,7 +3172,7 @@
         },
         {
           "date": "2026-10-07",
-          "body": "oh god the elevator broke two weeks ago i cant get down there to check"
+          "body": "still active and stocked"
         }
       ]
     },
@@ -3932,32 +3932,36 @@
   {
     "id": "sanctum-1",
     "zone": "Sanctum",
-    "x": -660,
-    "z": 1120,
+    "x": -662,
+    "z": 1121,
     "is_guild": false,
     "shop": {
       "owner": "Jerry_Na",
       "shop_name": null,
       "guild_name": null,
-      "description": "Garden. Come smell the extremely rare roses.",
-      "stock": null,
+      "description": "Garden plot. Stop and smell the extremely rare roses",
+      "stock": "null",
       "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still aura farming."
+          "body": "Still aura farming"
         },
         {
           "date": "2025-11-12",
-          "body": "Aura."
+          "body": "Aura"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still here mogging"
         }
       ]
     },
@@ -3966,42 +3970,56 @@
   {
     "id": "sanctum-2",
     "zone": "Sanctum",
-    "x": -650,
-    "z": 1120,
+    "x": -652,
+    "z": 1121,
     "is_guild": false,
     "shop": {
-      "owner": "Moe_Muyo",
-      "shop_name": "HAT",
+      "owner": "Moe_block",
+      "shop_name": null,
       "guild_name": null,
-      "description": "Free dyed fedoras. Personal general store.",
-      "stock": null,
-      "palette": "Warped and mangrove",
+      "description": "wip plot",
+      "stock": "granite",
+      "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "WIP",
+        "lock": "locked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still got fedoras."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Nothin but fedoras."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Moe_Muyo",
+        "shop_name": "HAT",
+        "guild_name": null,
+        "description": "Free dyed fedoras. Personal general store.",
+        "stock": null,
+        "palette": "Warped and mangrove",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still got fedoras."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Nothin but fedoras."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "sanctum-3",
     "zone": "Sanctum",
-    "x": -640,
-    "z": 1120,
+    "x": -642,
+    "z": 1121,
     "is_guild": false,
     "shop": {
       "owner": "_wu_feng_",
@@ -4016,16 +4034,20 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still open, full stonk list added."
+          "body": "Still open, full stonk list added"
         },
         {
           "date": "2025-11-12",
-          "body": "Still uwuwuing."
+          "body": "Still uwuwuing"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still running"
         }
       ]
     },
@@ -4034,8 +4056,8 @@
   {
     "id": "sanctum-4",
     "zone": "Sanctum",
-    "x": -660,
-    "z": 1130,
+    "x": -662,
+    "z": 1131,
     "is_guild": false,
     "shop": {
       "owner": "TheJinzou",
@@ -4050,7 +4072,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4060,6 +4082,10 @@
         {
           "date": "2025-11-12",
           "body": "Still running and dressed up for Halloween. Nobody else decorated for Halloween! Good job TheJinzou!"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still running and extremely well stocked"
         }
       ]
     },
@@ -4068,8 +4094,8 @@
   {
     "id": "sanctum-5",
     "zone": "Sanctum",
-    "x": -640,
-    "z": 1130,
+    "x": -642,
+    "z": 1131,
     "is_guild": false,
     "shop": {
       "owner": "NuLL_Inf",
@@ -4082,9 +4108,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4094,6 +4120,10 @@
         {
           "date": "2025-11-12",
           "body": "The build has changed, there's an obelisk with maybe a Chinese proverb etched into it. \"What do you see in the mirror?\""
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still just a cryptic statue"
         }
       ]
     },
@@ -4102,8 +4132,8 @@
   {
     "id": "sanctum-6",
     "zone": "Sanctum",
-    "x": -660,
-    "z": 1140,
+    "x": -662,
+    "z": 1141,
     "is_guild": false,
     "shop": {
       "owner": "qwqqwqqwqqwqw",
@@ -4116,9 +4146,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
+        "activity": "inactive",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4128,6 +4158,10 @@
         {
           "date": "2025-11-12",
           "body": "Still kinda empty."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "no stock"
         }
       ]
     },
@@ -4136,8 +4170,8 @@
   {
     "id": "sanctum-7",
     "zone": "Sanctum",
-    "x": -650,
-    "z": 1140,
+    "x": -652,
+    "z": 1141,
     "is_guild": false,
     "shop": {
       "owner": "Shark_YE",
@@ -4150,9 +4184,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4162,6 +4196,10 @@
         {
           "date": "2025-11-12",
           "body": "Thawing I presume."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still merry"
         }
       ]
     },
@@ -4170,48 +4208,62 @@
   {
     "id": "sanctum-8",
     "zone": "Sanctum",
-    "x": -640,
-    "z": 1140,
+    "x": -642,
+    "z": 1141,
     "is_guild": false,
     "shop": {
-      "owner": "Dinolamaous",
-      "shop_name": "WOOF",
+      "owner": "Sw_Fox",
+      "shop_name": null,
       "guild_name": null,
-      "description": "R3 rares and epics, locked.",
-      "stock": null,
-      "palette": "Stone brick, calcite, brown",
+      "description": "NPC trade service. Instead of spending frags/mats on rares and other items with NPCs, you can buy the items here for the same prices and keep that currency in circulation instead of voiding it to an NPC trade. Some barrels still wip. Free phone charging stations.",
+      "stock": "Mock NPC trades for: R1 dungeon rares R1 rares R1 artifacts King's Warden R2 dungeon rares R2 artifacts R3 rares R3 artifacts",
+      "palette": "quartz",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still locked."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Dinolamaous",
+        "shop_name": "WOOF",
+        "guild_name": null,
+        "description": "R3 rares and epics, locked.",
+        "stock": null,
+        "palette": "Stone brick, calcite, brown",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still locked."
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "teal-1",
     "zone": "Teal",
-    "x": -600,
-    "z": 1060,
+    "x": -598,
+    "z": 1057,
     "is_guild": false,
     "shop": {
       "owner": "Hanjizen",
       "shop_name": null,
       "guild_name": null,
-      "description": "Charm rental. Closed on purpose — locked, with a sign that says closed.",
+      "description": "Charm rental. Sign on the front says closed.",
       "stock": null,
       "palette": null,
       "guild_color": null,
@@ -4219,17 +4271,21 @@
       "secondary_color": null,
       "report": {
         "activity": "inactive",
-        "lock": null,
-        "date": "2025-11-12"
+        "lock": "locked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still closed."
+          "body": "Still closed"
         },
         {
           "date": "2025-11-12",
-          "body": "Still closed."
+          "body": "Still closed"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still inactive"
         }
       ]
     },
@@ -4238,42 +4294,56 @@
   {
     "id": "teal-2",
     "zone": "Teal",
-    "x": -590,
-    "z": 1060,
+    "x": -588,
+    "z": 1057,
     "is_guild": false,
     "shop": {
-      "owner": "TrainerEevee",
+      "owner": "snowoo",
       "shop_name": null,
       "guild_name": null,
-      "description": "Instant Infusion XP Service. R3 rare exchange.",
+      "description": "there is a statue of a girl holding a fish tank",
       "stock": null,
-      "palette": "Dark oak, spruce, green",
+      "palette": null,
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "inactive",
-        "lock": null,
-        "date": "2025-11-12"
+        "lock": "locked",
+        "date": "2026-10-07"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still running."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Defunct? Services are gone!"
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "TrainerEevee",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Instant Infusion XP Service. R3 rare exchange.",
+        "stock": null,
+        "palette": "Dark oak, spruce, green",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Defunct? Services are gone!"
+          }
+        ],
+        "closed": "2026-10-07"
+      }
+    ]
   },
   {
     "id": "teal-3",
     "zone": "Teal",
-    "x": -580,
-    "z": 1060,
+    "x": -578,
+    "z": 1057,
     "is_guild": false,
     "shop": {
       "owner": "Heleith",
@@ -4286,9 +4356,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4297,7 +4367,11 @@
         },
         {
           "date": "2025-11-12",
-          "body": "Someone rigged redstone to shoot an arrow at a nearby bell when you press a nearby button. Really clever, kudos to whoever built it."
+          "body": "Someone rigged redstone to shoot an arrow at a nearby bell when you press a nearby button. Really clever, whoever built it must be really cool..."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still active still has the button to ring the bell and also now harbors my three wolves that i love."
         }
       ]
     },
@@ -4306,8 +4380,8 @@
   {
     "id": "teal-4",
     "zone": "Teal",
-    "x": -600,
-    "z": 1070,
+    "x": -598,
+    "z": 1067,
     "is_guild": false,
     "shop": {
       "owner": "gasp97",
@@ -4315,14 +4389,14 @@
       "guild_name": null,
       "description": "Large gear collection for vanity sets.",
       "stock": null,
-      "palette": null,
+      "palette": "pink terracotta",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4332,6 +4406,10 @@
         {
           "date": "2025-11-12",
           "body": "Still running!"
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still active"
         }
       ]
     },
@@ -4340,8 +4418,8 @@
   {
     "id": "teal-5",
     "zone": "Teal",
-    "x": -580,
-    "z": 1070,
+    "x": -578,
+    "z": 1067,
     "is_guild": false,
     "shop": {
       "owner": "CS_Aristotle",
@@ -4356,7 +4434,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4366,6 +4444,10 @@
         {
           "date": "2025-11-12",
           "body": "Still open."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still active"
         }
       ]
     },
@@ -4374,8 +4456,8 @@
   {
     "id": "teal-6",
     "zone": "Teal",
-    "x": -600,
-    "z": 1080,
+    "x": -598,
+    "z": 1077,
     "is_guild": false,
     "shop": {
       "owner": "michthemoo",
@@ -4390,7 +4472,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4400,6 +4482,10 @@
         {
           "date": "2025-11-12",
           "body": "Still running."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still active"
         }
       ]
     },
@@ -4408,19 +4494,51 @@
   {
     "id": "teal-7",
     "zone": "Teal",
-    "x": -590,
-    "z": 1080,
+    "x": -588,
+    "z": 1077,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Rivellon019",
+      "shop_name": "PIGGY P",
+      "guild_name": null,
+      "description": "Part of the PIGGY conglomerate. HCS to HAR and HXP to HAR trading. buy GPT Grand Prize Tickets. Buy Seasonal Pass artifacts. Buy consuming elixir and morphic breaker.",
+      "stock": null,
+      "palette": "andesite",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
     "id": "teal-8",
     "zone": "Teal",
-    "x": -580,
-    "z": 1080,
+    "x": -578,
+    "z": 1077,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Megaloe",
+      "shop_name": "PIGGY I",
+      "guild_name": null,
+      "description": "Part of the PIGGY conglomerate. A few artifact stonks.",
+      "stock": "stonks for Shimmering Wave, Hellborn Crown, Ghost Captain's Visage, Flame of Fallen Grace",
+      "palette": "quartz",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
