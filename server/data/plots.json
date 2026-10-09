@@ -5236,19 +5236,19 @@
     "z": 1137,
     "is_guild": false,
     "shop": {
-      "owner": "altephcomputer2",
-      "shop_name": null,
+      "owner": "Mlin_",
+      "shop_name": "SKR Scroll Service",
       "guild_name": null,
-      "description": "Moved here from -610, 1150. R123 rares stonks (WIP after the move). Epics and utility items for rent, free. R1 lootrun set for rent, free. Arrows, various artis, azacor uncommons for sale in basement.",
+      "description": "Mlin, Luhein and Jin's SKR Scroll Service. Input SKR scrolls and they will be completed for you at the tax of one fragment from the scroll reward",
       "stock": null,
-      "palette": "Bare stone brick and barrel",
+      "palette": "spruce basalt",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-09"
       },
       "comments": []
     },
@@ -5274,6 +5274,19 @@
           }
         ],
         "closed": "2025-11-12"
+      },
+      {
+        "owner": "altephcomputer2",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Moved here from -610, 1150. R123 rares stonks (WIP after the move). Epics and utility items for rent, free. R1 lootrun set for rent, free. Arrows, various artis, azacor uncommons for sale in basement.",
+        "stock": null,
+        "palette": "Bare stone brick and barrel",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [],
+        "closed": "2026-10-09"
       }
     ]
   },
@@ -5284,32 +5297,46 @@
     "z": 1137,
     "is_guild": false,
     "shop": {
-      "owner": "TKW256",
-      "shop_name": null,
+      "owner": "Aless_2002",
+      "shop_name": "GLOP's Darkest Depths Shop",
       "guild_name": null,
-      "description": "R1 rental set. Arrows by the stack. Dye, beds.",
-      "stock": null,
-      "palette": "Pink wool, pink glass",
+      "description": "Everything darkest depths! Including EDD rental sets",
+      "stock": "Endless Darkest Depths fully infused rental sets: Shadow Earth Dawn Caster Steel dd sets. Buy all depths dd artifacts. Buy all depths discs. Buy carriers of dd potions, Hadopelagic Tincture Epipelagic Essence Bathypelagic Brew",
+      "palette": "slime, blackstone",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-09"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Currently locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Stock is a little low, currently have arrows stocked and a few R3 items: Stargazer's Revelation, Treads of the Hungerer, Effulgent Fragment, Crimson Tithe."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "TKW256",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "R1 rental set. Arrows by the stack. Dye, beds.",
+        "stock": null,
+        "palette": "Pink wool, pink glass",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Currently locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Stock is a little low, currently have arrows stocked and a few R3 items: Stargazer's Revelation, Treads of the Hungerer, Effulgent Fragment, Crimson Tithe."
+          }
+        ],
+        "closed": "2026-10-09"
+      }
+    ]
   },
   {
     "id": "gray-3",
@@ -5318,32 +5345,46 @@
     "z": 1137,
     "is_guild": false,
     "shop": {
-      "owner": "Velis_Bluedron",
-      "shop_name": "Heavenly Area",
+      "owner": "9teX",
+      "shop_name": null,
       "guild_name": null,
-      "description": "EC artis and discs. Locked, so hard to tell what else is here.",
+      "description": "Selling sea daffodil",
       "stock": null,
-      "palette": "Quartz and magma blocks",
+      "palette": "quartz",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
-      "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
-      },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still locked."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still locked."
+          "body": "used to have rentals but inactive for now. according to 9tex, other shops have lr sets and kitten has a better steel charm set if people are looking for sets"
         }
       ]
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Velis_Bluedron",
+        "shop_name": "Heavenly Area",
+        "guild_name": null,
+        "description": "EC artis and discs. Locked, so hard to tell what else is here.",
+        "stock": null,
+        "palette": "Quartz and magma blocks",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still locked."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still locked."
+          }
+        ],
+        "closed": "2026-10-09"
+      }
+    ]
   },
   {
     "id": "gray-4",
@@ -5351,7 +5392,23 @@
     "x": -630,
     "z": 1147,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "NiamN",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "General shop with various items",
+      "stock": "Buying pureshard adze and armory slot unlock. Selling: delve dps dummy spawn eggs, aurora map art tiles, a18 trophies, carriers of r3 rares",
+      "palette": "copper deepslate",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-09"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
@@ -5360,7 +5417,23 @@
     "x": -610,
     "z": 1147,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "GardeniaBud",
+      "shop_name": "Chest Inc",
+      "guild_name": null,
+      "description": "Buy/sell for chests with custom textures/names.",
+      "stock": null,
+      "palette": "moss, spruce, ice",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-09"
+      },
+      "comments": []
+    },
     "past_shops": [
       {
         "owner": "altephcomputer2",
@@ -5403,18 +5476,22 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-09"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Currently locked."
+          "body": "Currently locked"
         },
         {
           "date": "2025-11-12",
-          "body": "No longer locked, runnin."
+          "body": "No longer locked, runnin"
+        },
+        {
+          "date": "2026-10-09",
+          "body": "still here but locked when i checked"
         }
       ]
     },
@@ -5426,7 +5503,23 @@
     "x": -620,
     "z": 1157,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "1yum",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "infusion service but killed by infusion rework. there's still a cz steel set for rent tho",
+      "stock": null,
+      "palette": "deepslate",
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "unclear",
+        "lock": "unlocked",
+        "date": "2026-10-09"
+      },
+      "comments": []
+    },
     "past_shops": []
   },
   {
@@ -5435,7 +5528,23 @@
     "x": -610,
     "z": 1157,
     "is_guild": false,
-    "shop": null,
+    "shop": {
+      "owner": "Hycenea_",
+      "shop_name": null,
+      "guild_name": null,
+      "description": "stonks for r3 casino pots, tormented tepache, ambrosia, twisted pome",
+      "stock": "r3 casino pot stonks r3 casino potions sticks and stones tavern shade hunter's delight stoneborn ale silvari holy bomb fissure tonic dendweller's decoction deeproot beer frosted philter veilwalker's vial",
+      "palette": null,
+      "guild_color": null,
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-09"
+      },
+      "comments": []
+    },
     "past_shops": [
       {
         "owner": "Shadowstep130_",
