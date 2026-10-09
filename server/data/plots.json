@@ -4891,13 +4891,13 @@
     "id": "reverie-1",
     "zone": "Reverie",
     "x": -630,
-    "z": 1110,
+    "z": 1105,
     "is_guild": false,
     "shop": {
       "owner": "ztw0_0",
       "shop_name": null,
       "guild_name": null,
-      "description": "Great collection of R1 and R2 items for rent, cheap. Some R2 teal rares for sale too.",
+      "description": "Great collection of R1 and R2 max infused items for rent, including many hope skinned items for vanity",
       "stock": null,
       "palette": "Barrels, stone bricks, sandstone",
       "guild_color": null,
@@ -4906,7 +4906,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4916,6 +4916,10 @@
         {
           "date": "2025-11-12",
           "body": "Still running, huge collection, great for vanity."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "still running, great selection of hope skinned items"
         }
       ]
     },
@@ -4925,22 +4929,22 @@
     "id": "reverie-2",
     "zone": "Reverie",
     "x": -620,
-    "z": 1110,
+    "z": 1105,
     "is_guild": false,
     "shop": {
       "owner": "CheesePusheen",
       "shop_name": null,
       "guild_name": null,
-      "description": "Personal general shop, mostly WIP.",
-      "stock": null,
+      "description": "Various useful stonks. Continuation of ztw0_0's next door shop with R3 max infused items for rent in the basement, including hope skinned items for vanity.",
+      "stock": "List of stonks: tormented fragment, fractured psyche, essence of the above, loadout lockbox, torn canvas sanguine halls, deathly piece of eight marina noir, remnant scroll fragment, remnant combat scroll, puzzle scroll, koal coalrupted fragment, wanderer's fortune rares / wanderer's fortune fragment, blue brown indigo silver knight's tomb hexfall rares frags, architect's ring r3 overworld rares frags, star point and pelias' keep and wolfswood rares frags, seasonal pass sp artis for har. basement stonks: hoard key golden key, shifting discs golden grooves frayed cacophony cityscape symphony shifting synthwave entangled electronica, r3 casino potions sticks and stones tavern shade hunter's delight stoneborn ale silvari holy bomb fissure tonic dendweller's decoction deeproot beer frosted philter veilwalker's vial wow that's a lot",
       "palette": "Just barrels and stone bricks",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-07"
       },
       "comments": [
         {
@@ -4950,6 +4954,10 @@
         {
           "date": "2025-11-12",
           "body": "Empty except for a vanity chest, not sure if it's rental or has other rules."
+        },
+        {
+          "date": "2026-10-07",
+          "body": "stock has changed a lot, lots of stonks now and the bottom floor includes the r3 items missing from the rental shop next door"
         }
       ]
     },
@@ -4959,56 +4967,70 @@
     "id": "reverie-3",
     "zone": "Reverie",
     "x": -610,
-    "z": 1110,
+    "z": 1105,
     "is_guild": false,
     "shop": {
-      "owner": "Mine_Hinata",
-      "shop_name": null,
+      "owner": "BM_baofeng",
+      "shop_name": "PIGGY A",
       "guild_name": null,
-      "description": "Some misc stonks, mostly WIP.",
+      "description": "nothing here right now except a cool stall build probably a rotating general shop",
       "stock": null,
-      "palette": "Dark oak, blackstone, spruce, leaves",
+      "palette": "stone brick cherry planks",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "unlocked",
+        "date": "2026-10-09"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Taxless anvil, shulker, and lockbox stonks in basement."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Same few stonks, mostly WIP."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Mine_Hinata",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Some misc stonks, mostly WIP.",
+        "stock": null,
+        "palette": "Dark oak, blackstone, spruce, leaves",
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Taxless anvil, shulker, and lockbox stonks in basement."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Same few stonks, mostly WIP."
+          }
+        ],
+        "closed": "2026-10-09"
+      }
+    ]
   },
   {
     "id": "reverie-4",
     "zone": "Reverie",
     "x": -630,
-    "z": 1120,
+    "z": 1115,
     "is_guild": false,
     "shop": {
       "owner": "Honeypint",
       "shop_name": null,
       "guild_name": null,
-      "description": "WTB strike trophies.",
+      "description": "buying all strike trophies",
       "stock": null,
       "palette": "Stonkco blocks, stone bricks, oak",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-09"
       },
       "comments": [
         {
@@ -5018,6 +5040,10 @@
         {
           "date": "2025-11-12",
           "body": "Still buying strike trophies."
+        },
+        {
+          "date": "2026-10-09",
+          "body": "still here but locked when i checked it"
         }
       ]
     },
@@ -5027,7 +5053,7 @@
     "id": "reverie-5",
     "zone": "Reverie",
     "x": -610,
-    "z": 1120,
+    "z": 1115,
     "is_guild": false,
     "shop": {
       "owner": "Harry_Cake",
@@ -5040,9 +5066,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-09"
       },
       "comments": [
         {
@@ -5052,6 +5078,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-09",
+          "body": "still here but seems to have been inactive for a while"
         }
       ]
     },
@@ -5061,29 +5091,24 @@
     "id": "reverie-6",
     "zone": "Reverie",
     "x": -630,
-    "z": 1130,
+    "z": 1125,
     "is_guild": false,
     "shop": {
-      "owner": "Pontosaurus",
+      "owner": "daniel3k",
       "shop_name": null,
       "guild_name": null,
-      "description": "Empty plot.",
-      "stock": null,
-      "palette": null,
+      "description": "Trade augments for augment potions. R1 R2 R3 lootrun rental sets. R3 sets i think they are hexfall sets maybe",
+      "stock": "Trade alacrity augments for carrier of potion of alacrity. Trade fortitude augments for carrier of potion of fortitude. Trade potency augments for carrier of potion of potency.",
+      "palette": "capybara",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-09"
       },
-      "comments": [
-        {
-          "date": "2025-11-12",
-          "body": "Empty plot."
-        }
-      ]
+      "comments": []
     },
     "past_shops": [
       {
@@ -5107,6 +5132,24 @@
           }
         ],
         "closed": "2025-11-12"
+      },
+      {
+        "owner": "Pontosaurus",
+        "shop_name": null,
+        "guild_name": null,
+        "description": "Empty plot.",
+        "stock": null,
+        "palette": null,
+        "guild_color": null,
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-11-12",
+            "body": "Empty plot."
+          }
+        ],
+        "closed": "2026-10-09"
       }
     ]
   },
@@ -5114,14 +5157,14 @@
     "id": "reverie-7",
     "zone": "Reverie",
     "x": -620,
-    "z": 1130,
+    "z": 1125,
     "is_guild": false,
     "shop": {
       "owner": "StupefiedSteve",
       "shop_name": null,
       "guild_name": null,
-      "description": "5* fish exchange, free. Portable cornifer trades. Some other fish trades. Some zenith rares for sale.",
-      "stock": null,
+      "description": "Shulker box stonk. Veilripper free rental.",
+      "stock": "purpur, glass, cobblestone",
       "palette": "Quartz basement, mostly bare on top",
       "guild_color": null,
       "primary_color": null,
@@ -5129,7 +5172,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-09"
       },
       "comments": [
         {
@@ -5139,6 +5182,10 @@
         {
           "date": "2025-11-12",
           "body": "Still here with lots of zenith rares."
+        },
+        {
+          "date": "2026-10-09",
+          "body": "build and stock has changed, fish exchange and other stock is gone"
         }
       ]
     },
@@ -5148,7 +5195,7 @@
     "id": "reverie-8",
     "zone": "Reverie",
     "x": -610,
-    "z": 1130,
+    "z": 1125,
     "is_guild": false,
     "shop": {
       "owner": "AirFloat",
@@ -5161,9 +5208,9 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "unclear",
+        "lock": "locked",
+        "date": "2026-10-09"
       },
       "comments": [
         {
@@ -5173,6 +5220,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-09",
+          "body": "still here but locked"
         }
       ]
     },
@@ -5182,7 +5233,7 @@
     "id": "gray-1",
     "zone": "Gray",
     "x": -630,
-    "z": 1140,
+    "z": 1137,
     "is_guild": false,
     "shop": {
       "owner": "altephcomputer2",
@@ -5230,7 +5281,7 @@
     "id": "gray-2",
     "zone": "Gray",
     "x": -620,
-    "z": 1140,
+    "z": 1137,
     "is_guild": false,
     "shop": {
       "owner": "TKW256",
@@ -5264,7 +5315,7 @@
     "id": "gray-3",
     "zone": "Gray",
     "x": -610,
-    "z": 1140,
+    "z": 1137,
     "is_guild": false,
     "shop": {
       "owner": "Velis_Bluedron",
@@ -5298,7 +5349,7 @@
     "id": "gray-4",
     "zone": "Gray",
     "x": -630,
-    "z": 1150,
+    "z": 1147,
     "is_guild": false,
     "shop": null,
     "past_shops": []
@@ -5307,7 +5358,7 @@
     "id": "gray-5",
     "zone": "Gray",
     "x": -610,
-    "z": 1150,
+    "z": 1147,
     "is_guild": false,
     "shop": null,
     "past_shops": [
@@ -5339,7 +5390,7 @@
     "id": "gray-6",
     "zone": "Gray",
     "x": -630,
-    "z": 1160,
+    "z": 1157,
     "is_guild": false,
     "shop": {
       "owner": "Abtruse",
@@ -5373,7 +5424,7 @@
     "id": "gray-7",
     "zone": "Gray",
     "x": -620,
-    "z": 1160,
+    "z": 1157,
     "is_guild": false,
     "shop": null,
     "past_shops": []
@@ -5382,7 +5433,7 @@
     "id": "gray-8",
     "zone": "Gray",
     "x": -610,
-    "z": 1160,
+    "z": 1157,
     "is_guild": false,
     "shop": null,
     "past_shops": [
