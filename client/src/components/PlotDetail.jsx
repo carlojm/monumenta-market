@@ -253,10 +253,14 @@ function PlotDetail({ plot, onClose, onReported }) {
           </dd>
         </dl>
 
-        {shop?.description && <p className="plot-detail__description">{shop.description}</p>}
+        {shop?.description && (
+          <p className="plot-detail__description">
+            <span className="plot-detail__label">About:</span> {shop.description}
+          </p>
+        )}
         {shop?.stock && (
           <p className="plot-detail__description">
-            <span className="plot-detail__label">Stock:</span> {shop.stock}
+            <span className="plot-detail__label">Keywords:</span> {shop.stock}
           </p>
         )}
         {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
