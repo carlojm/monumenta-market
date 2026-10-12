@@ -29,7 +29,7 @@ function AdminCommentQueue() {
       {pending.map((c) => (
         <li key={c.id}>
           <p className="admin-queue__meta">
-            Plot <span className="coord">{c.plot_x}, {c.plot_z}</span> — {c.author || 'Anonymous'}
+            <span className="coord">{c.plot_id}</span> ({c.owner}) — {c.author || 'Anonymous'}
           </p>
           <p>{c.body}</p>
           <button onClick={() => approve(c.id)}>Approve</button>

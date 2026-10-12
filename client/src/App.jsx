@@ -11,11 +11,14 @@ function App() {
   const [error, setError] = useState(null);
   const [selectedPlot, setSelectedPlot] = useState(null);
 
-  useEffect(() => {
+  const loadPlots = () =>
     fetch('/api/plots')
       .then((res) => res.json())
       .then(setPlots)
       .catch((err) => setError(err.message));
+
+  useEffect(() => {
+    loadPlots();
   }, []);
 
   const searchResults = useMemo(() => getSearchResults(plots, query), [plots, query]);
@@ -31,7 +34,7 @@ function App() {
         <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={setSelectedPlot} />
         <SearchBar value={query} onChange={setQuery} />
         <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={setSelectedPlot} />
-        <PlotDetail plot={selectedPlot} onClose={() => setSelectedPlot(null)} />
+        <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={() => setSelectedPlot(null)} onReported={loadPlots} />
       </main>
     </div>
   );

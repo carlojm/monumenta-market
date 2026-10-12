@@ -53,3 +53,13 @@
     padding: 0.65rem 0.5rem;
   }
 }
+.plot-table__row--vacant td:first-child {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.plot-table__age {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}

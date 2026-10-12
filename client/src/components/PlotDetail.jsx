@@ -1,102 +1,178 @@
 import { useEffect, useState } from 'react';
 import './PlotDetail.css';
-import { canReport, recordReport, cooldownRemainingMinutes, timeAgo } from '../lib/reports';
+import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
+import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
-function PlotDetail({ plot, onClose }) {
+async function postJson(url, body) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
+  return res.json();
+}
+
+function CommentList({ comments }) {
+  if (!comments.length) return <p className="plot-detail__empty">No comments yet.</p>;
+  return (
+    <ul className="plot-detail__comments">
+      {comments.map((c) => (
+        <li
+          key={c.id}
+          className={c.is_system ? 'plot-detail__comment--system' : c.pending ? 'plot-detail__comment--pending' : ''}
+        >
+          {c.is_system ? (
+            <span className="plot-detail__comment-tag">Update</span>
+          ) : (
+            <strong>{c.author || 'Anonymous'}</strong>
+          )}
+          {c.pending && <span className="plot-detail__comment-tag">Pending approval</span>}
+          <p>{c.body}</p>
+          <time>{formatDate(c.created_at)}</time>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// A past shop, loaded the first time it's expanded.
+function PastShop({ summary }) {
+  const [shop, setShop] = useState(null);
+  const load = (e) => {
+    if (!e.currentTarget.open || shop) return;
+    fetch(`/api/shops/${summary.id}`).then((res) => res.json()).then(setShop);
+  };
+  return (
+    <details className="plot-detail__past-shop" onToggle={load}>
+      <summary>
+        {displayName(summary)}
+        <span className="plot-detail__muted"> · closed {formatDate(summary.closed_at)}</span>
+      </summary>
+      {!shop ? (
+        <p className="plot-detail__muted">Loading…</p>
+      ) : (
+        <>
+          {shop.description && <p className="plot-detail__description">{shop.description}</p>}
+          {shop.stock && <p><span className="plot-detail__label">Stock:</span> {shop.stock}</p>}
+          <CommentList comments={shop.comments} />
+        </>
+      )}
+    </details>
+  );
+}
+
+function ReportForm({ plotId, onReported }) {
+  const [activity, setActivity] = useState(null);
+  const [lock, setLock] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const allowed = canReport(plotId);
+
+  const submit = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await postJson(`/api/plots/${plotId}/report`, { activity, lock });
+      recordReport(plotId);
+      onReported({ activity, lock, created_at: new Date().toISOString() });
+      setActivity(null);
+      setLock(null);
+    } catch (err) {
+      setError(`Could not submit report: ${err.message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!allowed) {
+    return (
+      <p className="plot-detail__muted">
+        Thanks for reporting. You can report this plot again in {cooldownRemainingMinutes(plotId)}m.
+      </p>
+    );
+  }
+
+  const toggle = (current, value, set) => set(current === value ? null : value);
+
+  return (
+    <div className="plot-detail__report-form">
+      <span className="plot-detail__muted">Were you just here? Report what you saw:</span>
+      <div className="plot-detail__chips" role="group" aria-label="Activity">
+        {ACTIVITIES.map((a) => (
+          <button key={a} type="button" aria-pressed={activity === a} onClick={() => toggle(activity, a, setActivity)}>
+            {ACTIVITY_LABELS[a]}
+          </button>
+        ))}
+      </div>
+      <div className="plot-detail__chips" role="group" aria-label="Lock">
+        {LOCKS.map((l) => (
+          <button key={l} type="button" aria-pressed={lock === l} onClick={() => toggle(lock, l, setLock)}>
+            {l === 'locked' ? 'Locked' : 'Unlocked'}
+          </button>
+        ))}
+      </div>
+      {(activity || lock) && (
+        <button type="button" className="plot-detail__submit" onClick={submit} disabled={submitting}>
+          {submitting ? 'Sending…' : `Report ${reportLabel({ activity, lock })}`}
+        </button>
+      )}
+      {error && <p className="plot-detail__error">{error}</p>}
+    </div>
+  );
+}
+
+function PlotDetail({ plot, onClose, onReported }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const [commentBody, setCommentBody] = useState('');
   const [commentAuthor, setCommentAuthor] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [optimisticComments, setOptimisticComments] = useState([]);
-
-  const [latestReport, setLatestReport] = useState(null);
-  const [reportSubmitting, setReportSubmitting] = useState(false);
-
-  const [pendingVote, setPendingVote] = useState(null); // 'open' | 'closed' | null
-  const requestVote = (type) => {
-    setPendingVote(type);
-  };
-  const confirmVote = async () => {
-    const type = pendingVote;
-    setPendingVote(null);
-    await handleReport(type);
-  };
-  const cancelVote = () => {
-    setPendingVote(null);
-  };
+  const [myComments, setMyComments] = useState([]);
+  const [myReports, setMyReports] = useState([]);
 
   useEffect(() => {
     if (!plot) return;
-    setImageIndex(0);
-    setOptimisticComments([]);
-    fetch(`/api/plots/${plot.x}/${plot.z}`)
+    fetch(`/api/plots/${plot.id}`)
       .then((res) => res.json())
-      .then((data) => {
-        setDetail(data);
-        setLatestReport(data.latestReport);
-      })
+      .then(setDetail)
       .catch((err) => setError(err.message));
   }, [plot]);
 
   if (!plot) return null;
 
-  const images = detail?.images || [];
-  const comments = [...optimisticComments, ...(detail?.comments || [])];
+  const shop = detail ? detail.shop : plot.shop;
+  const images = shop?.images || [];
+  const comments = [...myComments, ...(shop?.comments || [])];
+  const reports = [...myReports, ...(detail?.reports || [])];
+  const latestReport = reports[0] || plot.latest_report;
+  const pastShops = detail?.past_shops || [];
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!commentBody.trim()) return;
     setSubmitting(true);
-
     const body = commentBody.trim();
     const author = commentAuthor.trim() || null;
-
     try {
-      await fetch(`/api/plots/${plot.x}/${plot.z}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body, author }),
-      });
-
-      setOptimisticComments((prev) => [
-        {
-          id: `pending-${Date.now()}`,
-          author,
-          body,
-          created_at: new Date().toISOString(),
-          pending: true,
-        },
+      await postJson(`/api/plots/${plot.id}/comments`, { body, author });
+      setMyComments((prev) => [
+        { id: `pending-${Date.now()}`, author, body, created_at: new Date().toISOString(), pending: true },
         ...prev,
       ]);
       setCommentBody('');
     } catch (err) {
-      setError('Could not submit comment: ' + err.message);
+      setError(`Could not submit comment: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleReport = async (reportType) => {
-    setReportSubmitting(true);
-    try {
-      await fetch(`/api/plots/${plot.x}/${plot.z}/report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ report_type: reportType }),
-      });
-      recordReport(plot.x, plot.z);
-      setLatestReport({ report_type: reportType, created_at: new Date().toISOString() });
-    } catch (err) {
-      setError('Could not submit report: ' + err.message);
-    } finally {
-      setReportSubmitting(false);
-    }
+  const handleReported = (report) => {
+    setMyReports((prev) => [report, ...prev]);
+    onReported?.();
   };
-
-  const canReportNow = plot && canReport(plot.x, plot.z);
-  const cooldownMins = plot ? cooldownRemainingMinutes(plot.x, plot.z) : 0;
 
   return (
     <div className="plot-detail__overlay" onClick={onClose}>
@@ -105,11 +181,11 @@ function PlotDetail({ plot, onClose }) {
           ×
         </button>
 
-        <h2>{plot.shop_name || plot.owner || `Plot ${plot.x}, ${plot.z}`}</h2>
+        <h2>{displayName(shop)}</h2>
 
         {images.length > 0 && (
           <div className="plot-detail__carousel">
-            <img src={images[imageIndex].url} alt={`${plot.owner || 'shop'} photo ${imageIndex + 1}`} />
+            <img src={images[imageIndex].url} alt={`${displayName(shop)} photo ${imageIndex + 1}`} />
             {images.length > 1 && (
               <>
                 <button
@@ -135,104 +211,96 @@ function PlotDetail({ plot, onClose }) {
         )}
 
         <dl className="plot-detail__meta">
-          <dt>Owner</dt>
-          <dd>{plot.owner || '—'}</dd>
+          {shop && (
+            <>
+              <dt>{shop.guild_name ? 'Guild' : 'Owner'}</dt>
+              <dd>{ownerLabel(shop)}</dd>
+            </>
+          )}
+          <dt>Plot</dt>
+          <dd><span className="coord">{plot.id}</span> · {plot.zone}</dd>
           <dt>Coords</dt>
-          <dd>{plot.x}, {plot.z}</dd>
-          <dt>Zone</dt>
-          <dd>{plot.zone || '—'}</dd>
+          <dd className="coord">{plot.x}, {plot.z}</dd>
+          {shop?.palette && (
+            <>
+              <dt>Palette</dt>
+              <dd>{shop.palette}</dd>
+            </>
+          )}
           <dt>Status</dt>
           <dd className="plot-detail__status">
-            <div className="plot-detail__status-line">
-              {/* <span>{plot.status}</span> */}
-              <span className="plot-detail__status-report">
-                {latestReport
-                  ? `last reported ${latestReport.report_type} ${timeAgo(latestReport.created_at)}`
-                  : 'no reports yet'}
+            {latestReport ? (
+              <span>
+                {reportLabel(latestReport)}{' '}
+                <span className="plot-detail__muted">{timeAgo(latestReport.created_at)}</span>
               </span>
-            </div>
-
-            {pendingVote ? (
-              <div className="plot-detail__status-confirm">
-                <span>Mark this shop as currently {pendingVote}?</span>
-                <div className="plot-detail__status-confirm-actions">
-                  <button onClick={confirmVote} disabled={reportSubmitting}>Confirm</button>
-                  <button onClick={cancelVote} disabled={reportSubmitting}>Cancel</button>
-                </div>
-              </div>
             ) : (
-              <div className="plot-detail__status-actions">
-                <button
-                  className="plot-detail__vote-btn"
-                  disabled={!canReportNow}
-                  onClick={() => requestVote('open')}
-                  aria-label="Report open"
-                >
-                  It's open
-                </button>
-                <button
-                  className="plot-detail__vote-btn"
-                  disabled={!canReportNow}
-                  onClick={() => requestVote('closed')}
-                  aria-label="Report closed"
-                >
-                  It's closed
-                </button>
-                {!canReportNow && <span className="plot-detail__status-cooldown">again in {cooldownMins}m</span>}
-              </div>
+              <span className="plot-detail__muted">No reports yet</span>
             )}
+            {reports.length > 1 && (
+              <details className="plot-detail__history">
+                <summary>History ({reports.length})</summary>
+                <ul>
+                  {reports.map((r, i) => (
+                    <li key={i}>
+                      {reportLabel(r)} <span className="plot-detail__muted">{timeAgo(r.created_at)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            <ReportForm plotId={plot.id} onReported={handleReported} />
           </dd>
         </dl>
 
-        {plot.description && <p className="plot-detail__description">{plot.description}</p>}
-
-        <hr />
-
-        <h3>Comments</h3>
-        <p className="plot-detail__comment-hint">
-          Leave a comment or suggested change if this plot is different from described.
-          Comments must be approved before they're shown to others.
-        </p>
-
-        <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-          <input
-            type="text"
-            placeholder="Name (optional)"
-            value={commentAuthor}
-            onChange={(e) => setCommentAuthor(e.target.value)}
-          />
-          <textarea
-            placeholder="This shop has changed / is now selling..."
-            value={commentBody}
-            onChange={(e) => setCommentBody(e.target.value)}
-            required
-          />
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Posting…' : 'Post comment'}
-          </button>
-        </form>
+        {shop?.description && <p className="plot-detail__description">{shop.description}</p>}
+        {shop?.stock && (
+          <p className="plot-detail__description">
+            <span className="plot-detail__label">Stock:</span> {shop.stock}
+          </p>
+        )}
+        {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
 
         {error && <p className="plot-detail__error">{error}</p>}
 
-        <ul className="plot-detail__comments">
-          {comments.map((c) => (
-            <li
-              key={c.id}
-              className={
-                c.is_system ? 'plot-detail__comment--system' : c.pending ? 'plot-detail__comment--pending' : ''
-              }
-            >
-              {c.is_system ? (
-                <span className="plot-detail__comment-tag">Update</span>
-              ) : (
-                <strong>{c.author || 'Anonymous'}</strong>
-              )}
-              {c.pending && <span className="plot-detail__comment-tag">Pending approval</span>}
-              <p>{c.body}</p>
-              <time>{new Date(c.created_at).toLocaleDateString()}</time>
-            </li>
-          ))}
-        </ul>
+        {shop && (
+          <>
+            <hr />
+            <h3>Comments</h3>
+            <p className="plot-detail__comment-hint">
+              Leave a comment if this shop is different from described.
+              Comments must be approved before they're shown to others.
+            </p>
+
+            <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
+              <input
+                type="text"
+                placeholder="Name (optional)"
+                value={commentAuthor}
+                onChange={(e) => setCommentAuthor(e.target.value)}
+              />
+              <textarea
+                placeholder="This shop has changed / is now selling..."
+                value={commentBody}
+                onChange={(e) => setCommentBody(e.target.value)}
+                required
+              />
+              <button type="submit" disabled={submitting}>
+                {submitting ? 'Posting…' : 'Post comment'}
+              </button>
+            </form>
+
+            <CommentList comments={comments} />
+          </>
+        )}
+
+        {pastShops.length > 0 && (
+          <>
+            <hr />
+            <h3>Past shops on this plot</h3>
+            {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
+          </>
+        )}
       </div>
     </div>
   );

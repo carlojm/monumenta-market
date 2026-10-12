@@ -15,15 +15,57 @@
   image-rendering: pixelated;
 }
 
+/* Positioned by its NW corner, sized to the real plot. */
 .market-map__plot {
   position: absolute;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  border-radius: 2px;
-  cursor: pointer;
+  box-sizing: border-box;
   padding: 0;
+  border: 1px solid var(--plot-color);
+  background: color-mix(in srgb, var(--plot-color) 80%, transparent);
+  border-radius: 1px;
+  cursor: pointer;
 }
 
-.market-map__plot:hover {
+.market-map__plot--vacant {
+  border: 1px dashed var(--text-muted);
+}
+
+.market-map__plot--dimmed {
+  opacity: 0.15;
+}
+
+.market-map__plot:hover,
+.market-map__plot:focus-visible {
   outline: 2px solid var(--text);
+  z-index: 1;
+}
+
+.market-map__legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.9rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.market-map__legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.market-map__swatch {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 1px;
+}
+
+.market-map__swatch--vacant {
+  border: 1px dashed var(--text-muted);
+  box-sizing: border-box;
 }

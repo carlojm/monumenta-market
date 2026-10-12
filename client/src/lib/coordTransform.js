@@ -1,27 +1,21 @@
-// Calibration: map two known in-game coordinate points to their pixel
-// positions on market_map.png (224 x 256). Update these once you've
-// identified two reliable reference plots on the image.
-const CALIBRATION = {
-  pointA: { gameX: -768, gameZ: 944, pixelX: 1, pixelY: 1 },
-  pointB: { gameX: -545, gameZ: 1199, pixelX: 224, pixelY: 256 },
-};
+// market_map.png is 224 x 256 at 1 pixel per block. Its top-left pixel is
+// in-game x -768, z 944 (north is up, so z grows downward).
+const ORIGIN = { x: -768, z: 944 };
+const IMG_WIDTH = 224;
+const IMG_HEIGHT = 256;
 
-const { pointA: A, pointB: B } = CALIBRATION;
+// Plot sizes in blocks, measured from the map image.
+export const PLOT_SIZE = 8;
+export const GUILD_PLOT_SIZE = 13;
 
-const scaleX = (B.pixelX - A.pixelX) / (B.gameX - A.gameX);
-const scaleY = (B.pixelY - A.pixelY) / (B.gameZ - A.gameZ);
-
-const IMG_WIDTH = 223;
-const IMG_HEIGHT = 254;
-
-// Converts in-game x/z to a percentage position on the map image,
-// suitable for CSS `left`/`top` on an absolutely positioned overlay.
-export function gameToPercent(gameX, gameZ) {
-  const pixelX = A.pixelX + (gameX - A.gameX) * scaleX;
-  const pixelY = A.pixelY + (gameZ - A.gameZ) * scaleY;
-
+// Position and size of a plot (x, z = its NW corner) as CSS percentages
+// of the map image.
+export function plotRect(x, z, isGuild) {
+  const size = isGuild ? GUILD_PLOT_SIZE : PLOT_SIZE;
   return {
-    left: `${(pixelX / IMG_WIDTH) * 100}%`,
-    top: `${(pixelY / IMG_HEIGHT) * 100}%`,
+    left: `${((x - ORIGIN.x) / IMG_WIDTH) * 100}%`,
+    top: `${((z - ORIGIN.z) / IMG_HEIGHT) * 100}%`,
+    width: `${(size / IMG_WIDTH) * 100}%`,
+    height: `${(size / IMG_HEIGHT) * 100}%`,
   };
 }

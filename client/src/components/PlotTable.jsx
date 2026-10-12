@@ -1,11 +1,12 @@
+import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
 
 function PlotTable({ plots, searchResults, onSelectPlot }) {
   const rows = searchResults
     ? [...plots].sort((a, b) => {
-        const aIndex = searchResults.orderedKeys.indexOf(`${a.x}_${a.z}`);
-        const bIndex = searchResults.orderedKeys.indexOf(`${b.x}_${b.z}`);
+        const aIndex = searchResults.orderedIds.indexOf(a.id);
+        const bIndex = searchResults.orderedIds.indexOf(b.id);
         const aRank = aIndex === -1 ? Infinity : aIndex;
         const bRank = bIndex === -1 ? Infinity : bIndex;
         return aRank - bRank;
@@ -16,7 +17,7 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
     <table className="plot-table">
       <thead>
         <tr>
-          <th>Owner</th>
+          <th>Shop</th>
           <th>Zone</th>
           <th>Status</th>
           {searchResults && <th>Match</th>}
@@ -24,22 +25,28 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
       </thead>
       <tbody>
         {rows.map((plot) => {
-          const key = `${plot.x}_${plot.z}`;
-          const isMatch = searchResults ? searchResults.matchedKeys.has(key) : true;
-          const snippet = searchResults?.snippets[key];
+          const isMatch = searchResults ? searchResults.matchedIds.has(plot.id) : true;
+          const snippet = searchResults?.snippets[plot.id];
+          const report = plot.latest_report;
 
           return (
             <tr
-              key={key}
+              key={plot.id}
               onClick={() => onSelectPlot(plot)}
-              className={searchResults && !isMatch ? 'plot-table__row--dimmed' : ''}
+              className={[
+                searchResults && !isMatch && 'plot-table__row--dimmed',
+                !plot.shop && 'plot-table__row--vacant',
+              ].filter(Boolean).join(' ')}
             >
-              <td>{plot.owner || '—'}</td>
-              <td>{plot.zone || '—'}</td>
+              <td>{displayName(plot.shop)}</td>
+              <td>{plot.zone}</td>
               <td>
-                {plot.latest_report_type
-                  ? `${plot.latest_report_type} ${timeAgo(plot.latest_report_at)}`
-                  : '—'}
+                {report ? (
+                  <>
+                    {reportLabel(report)}{' '}
+                    <span className="plot-table__age">{timeAgo(report.created_at)}</span>
+                  </>
+                ) : '—'}
               </td>
               {searchResults && (
                 <td className="plot-table__match">

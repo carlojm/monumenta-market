@@ -1,47 +1,49 @@
 import mapImage from '../assets/market_map.png';
-import { gameToPercent } from '../lib/coordTransform';
+import { plotRect } from '../lib/coordTransform';
+import { displayName, statusColor, STATUS_COLORS, ACTIVITY_LABELS } from '../lib/plots';
 import './MarketMap.css';
 
-const STATUS_COLORS = {
-  active: '#4a7c4a',
-  closed: '#8a8a8a',
-  locked: '#b0902a',
-  unclear: '#666666',
-};
+const LEGEND = ['active', 'inactive', 'wip', 'unclear'];
 
 function MarketMap({ plots, searchResults, onSelectPlot }) {
   return (
-    <div className="market-map">
-      <img src={mapImage} alt="Market island map" className="market-map__image" />
-      {plots.map((plot) => {
-        const key = `${plot.x}_${plot.z}`;
-        const pos = (plot.map_x_pct != null && plot.map_z_pct != null)
-          ? { left: `${plot.map_x_pct}%`, top: `${plot.map_z_pct}%` }
-          : gameToPercent(plot.x, plot.z);
-        const size = plot.is_guild ? '5%' : '3.5%';
-
-        let opacity = 0.9;
-        if (searchResults) {
-            opacity = searchResults.matchedKeys.has(key) ? 1 : 0.15;
-        }
-
-        return (
-          <button
-            key={key}
-            className="market-map__plot"
-            style={{
-              left: pos.left,
-              top: pos.top,
-              width: size,
-              height: size,
-              backgroundColor: STATUS_COLORS[plot.status] || STATUS_COLORS.unclear,
-              opacity,
-            }}
-            onClick={() => onSelectPlot(plot)}
-            aria-label={plot.shop_name || plot.owner || `Plot ${plot.x}, ${plot.z}`}
-          />
-        );
-      })}
+    <div>
+      <div className="market-map">
+        <img src={mapImage} alt="Market island map" className="market-map__image" />
+        {plots.map((plot) => {
+          const dimmed = searchResults && !searchResults.matchedIds.has(plot.id);
+          const color = statusColor(plot);
+          return (
+            <button
+              key={plot.id}
+              className={[
+                'market-map__plot',
+                !plot.shop && 'market-map__plot--vacant',
+                dimmed && 'market-map__plot--dimmed',
+              ].filter(Boolean).join(' ')}
+              style={{
+                ...plotRect(plot.x, plot.z, plot.is_guild),
+                '--plot-color': plot.shop ? color : 'transparent',
+              }}
+              onClick={() => onSelectPlot(plot)}
+              aria-label={`${displayName(plot.shop)} (${plot.id})`}
+              title={`${displayName(plot.shop)} · ${plot.id}`}
+            />
+          );
+        })}
+      </div>
+      <ul className="market-map__legend">
+        {LEGEND.map((key) => (
+          <li key={key}>
+            <span className="market-map__swatch" style={{ background: STATUS_COLORS[key] }} />
+            {ACTIVITY_LABELS[key]}
+          </li>
+        ))}
+        <li>
+          <span className="market-map__swatch market-map__swatch--vacant" />
+          Vacant
+        </li>
+      </ul>
     </div>
   );
 }

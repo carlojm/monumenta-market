@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
 
 const FUSE_OPTIONS = {
-  keys: ['owner', 'shop_name', 'zone', 'description', 'comment_text'],
+  keys: ['owner', 'shop_name', 'guild_name', 'zone', 'id', 'description', 'stock', 'palette', 'comment_text'],
   threshold: 0.35,
   ignoreLocation: true,
   includeMatches: true,
@@ -10,14 +10,18 @@ const FUSE_OPTIONS = {
 const FIELD_LABELS = {
   owner: 'Owner',
   shop_name: 'Shop name',
+  guild_name: 'Guild',
   zone: 'Zone',
+  id: 'Plot',
   description: 'Description',
+  stock: 'Stock',
+  palette: 'Palette',
   comment_text: 'Comments',
 };
 
-// Prefer showing a match from description/comments over owner/zone,
+// Prefer showing a match from stock/description/comments over owner/zone,
 // since those are more informative as "why did this match."
-const FIELD_PRIORITY = ['description', 'comment_text', 'shop_name', 'owner', 'zone'];
+const FIELD_PRIORITY = ['stock', 'description', 'comment_text', 'palette', 'shop_name', 'guild_name', 'owner', 'zone', 'id'];
 
 function buildSnippet(matches) {
   if (!matches || matches.length === 0) return null;
@@ -42,20 +46,21 @@ function buildSnippet(matches) {
   };
 }
 
-// Returns { matchedKeys: Set, orderedKeys: string[], snippets: Record<key, snippet> } | null
+// Flattens a plot and its current shop into one searchable record.
+function toSearchRecord(plot) {
+  // Plot id last: the shop has its own numeric id that must not win.
+  return { ...(plot.shop || {}), id: plot.id, zone: plot.zone };
+}
+
+// Returns { matchedIds: Set, orderedIds: string[], snippets: Record<plotId, snippet> } | null
 export function getSearchResults(plots, query) {
   if (!query.trim()) return null;
-  const fuse = new Fuse(plots, FUSE_OPTIONS);
+  const fuse = new Fuse(plots.map(toSearchRecord), FUSE_OPTIONS);
   const results = fuse.search(query);
 
-  const orderedKeys = results.map((r) => `${r.item.x}_${r.item.z}`);
-  const matchedKeys = new Set(orderedKeys);
+  const orderedIds = results.map((r) => r.item.id);
   const snippets = {};
+  for (const r of results) snippets[r.item.id] = buildSnippet(r.matches);
 
-  for (const r of results) {
-    const key = `${r.item.x}_${r.item.z}`;
-    snippets[key] = buildSnippet(r.matches);
-  }
-
-  return { matchedKeys, orderedKeys, snippets };
+  return { matchedIds: new Set(orderedIds), orderedIds, snippets };
 }
