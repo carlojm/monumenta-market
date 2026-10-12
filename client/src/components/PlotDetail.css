@@ -216,7 +216,16 @@
 .plot-detail__chips {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.3rem;
+}
+
+/* Marks each row as its own set of choices. */
+.plot-detail__chips::before {
+  content: '▸';
+  color: var(--text-muted);
+  /* margin-right: 0.1rem; */
+  margin-top: -6px;
 }
 
 .plot-detail__chips button {

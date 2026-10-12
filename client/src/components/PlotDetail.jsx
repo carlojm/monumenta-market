@@ -94,6 +94,8 @@ function ReportForm({ plotId, onReported }) {
   }
 
   const toggle = (current, value, set) => set(current === value ? null : value);
+  // A lock state is required, except for a vacant plot (nothing to lock).
+  const canSubmit = !!lock || activity === 'vacant';
 
   return (
     <div className="plot-detail__report-form">
@@ -113,9 +115,13 @@ function ReportForm({ plotId, onReported }) {
         ))}
       </div>
       {(activity || lock) && (
-        <button type="button" className="plot-detail__submit" onClick={submit} disabled={submitting}>
-          {submitting ? 'Sending…' : `Report ${reportLabel({ activity, lock })}`}
-        </button>
+        canSubmit ? (
+          <button type="button" className="plot-detail__submit" onClick={submit} disabled={submitting}>
+            {submitting ? 'Sending…' : `Report ${reportLabel({ activity, lock })}`}
+          </button>
+        ) : (
+          <span className="plot-detail__muted">Also pick locked or unlocked.</span>
+        )
       )}
       {error && <p className="plot-detail__error">{error}</p>}
     </div>
