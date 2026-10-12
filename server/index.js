@@ -18,149 +18,211 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// --- API routes ---
+const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
+  'guild_color', 'primary_color', 'secondary_color'];
+const ACTIVITY = ['vacant', 'wip', 'unclear', 'inactive', 'active'];
+const LOCK = ['locked', 'unlocked'];
+const REPORT_HISTORY = 20;
+
+// --- Shared queries ---
+
+const getPlot = db.prepare('SELECT * FROM plots WHERE id = ?');
+const getCurrentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL');
+const getShop = db.prepare('SELECT * FROM shops WHERE id = ?');
+const getApprovedComments = db.prepare(
+  "SELECT * FROM comments WHERE shop_id = ? AND status = 'approved' ORDER BY created_at DESC, id DESC"
+);
+const getImages = db.prepare('SELECT * FROM images WHERE shop_id = ? ORDER BY sort_order');
+const insertSystemComment = db.prepare(
+  "INSERT INTO comments (shop_id, author, body, is_system, status) VALUES (?, NULL, ?, 1, 'approved')"
+);
+
+function shopWithDetails(shop) {
+  if (!shop) return null;
+  return { ...shop, comments: getApprovedComments.all(shop.id), images: getImages.all(shop.id) };
+}
+
+// Blank strings from forms mean "not set".
+function cleanShopFields(body) {
+  const out = {};
+  for (const f of SHOP_FIELDS) {
+    if (f in body) out[f] = typeof body[f] === 'string' && body[f].trim() === '' ? null : body[f];
+  }
+  return out;
+}
+
+const insertShop = db.prepare(`
+  INSERT INTO shops (plot_id, owner, shop_name, guild_name, description, stock, palette,
+    guild_color, primary_color, secondary_color, opened_at)
+  VALUES (@plot_id, @owner, @shop_name, @guild_name, @description, @stock, @palette,
+    @guild_color, @primary_color, @secondary_color, CURRENT_TIMESTAMP)
+`);
+const closeShop = db.prepare('UPDATE shops SET closed_at = CURRENT_TIMESTAMP WHERE id = ?');
+
+function openShop(plotId, fields) {
+  const row = Object.fromEntries(SHOP_FIELDS.map((f) => [f, fields[f] ?? null]));
+  const { lastInsertRowid } = insertShop.run({ ...row, plot_id: plotId });
+  insertSystemComment.run(lastInsertRowid, `Shop opened by ${fields.owner}`);
+  return lastInsertRowid;
+}
+
+// --- Public API ---
 
 app.get('/api/plots', (req, res) => {
-  const plots = db.prepare(`
+  const rows = db.prepare(`
     SELECT p.*,
-      (SELECT GROUP_CONCAT(body, ' ')
-       FROM comments c WHERE c.plot_x = p.x AND c.plot_z = p.z AND c.status = 'approved'
-      ) AS comment_text,
-      (SELECT report_type FROM reports r
-       WHERE r.plot_x = p.x AND r.plot_z = p.z ORDER BY r.created_at DESC LIMIT 1
-      ) AS latest_report_type,
-      (SELECT created_at FROM reports r
-       WHERE r.plot_x = p.x AND r.plot_z = p.z ORDER BY r.created_at DESC LIMIT 1
-      ) AS latest_report_at
+      s.id AS shop_id, s.owner, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
+      s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
+      (SELECT GROUP_CONCAT(body, ' ') FROM comments c
+       WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0) AS comment_text,
+      r.activity AS report_activity, r.lock AS report_lock, r.created_at AS report_at
     FROM plots p
+    LEFT JOIN shops s ON s.plot_id = p.id AND s.closed_at IS NULL
+    LEFT JOIN reports r ON r.id = (
+      SELECT id FROM reports WHERE plot_id = p.id ORDER BY created_at DESC, id DESC LIMIT 1
+    )
+    ORDER BY p.id
   `).all();
-  res.json(plots);
+
+  res.json(rows.map((r) => ({
+    id: r.id,
+    zone: r.zone,
+    x: r.x,
+    z: r.z,
+    is_guild: !!r.is_guild,
+    shop: r.shop_id ? {
+      id: r.shop_id,
+      ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, r[f]])),
+      updated_at: r.updated_at,
+      comment_text: r.comment_text,
+    } : null,
+    latest_report: r.report_at
+      ? { activity: r.report_activity, lock: r.report_lock, created_at: r.report_at }
+      : null,
+  })));
 });
 
-app.get('/api/plots/:x/:z', (req, res) => {
-  const { x, z } = req.params;
-  const plot = db.prepare('SELECT * FROM plots WHERE x = ? AND z = ?').get(x, z);
+app.get('/api/plots/:id', (req, res) => {
+  const plot = getPlot.get(req.params.id);
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
 
-  const comments = db.prepare(
-    'SELECT * FROM comments WHERE plot_x = ? AND plot_z = ? AND status = ? ORDER BY created_at DESC'
-  ).all(x, z, 'approved');
+  const reports = db.prepare(
+    'SELECT activity, lock, created_at FROM reports WHERE plot_id = ? ORDER BY created_at DESC, id DESC LIMIT ?'
+  ).all(plot.id, REPORT_HISTORY);
 
-  const images = db.prepare(
-    'SELECT * FROM images WHERE plot_x = ? AND plot_z = ? ORDER BY sort_order'
-  ).all(x, z);
+  const pastShops = db.prepare(`
+    SELECT id, owner, shop_name, guild_name, opened_at, closed_at FROM shops
+    WHERE plot_id = ? AND closed_at IS NOT NULL ORDER BY closed_at DESC, id DESC
+  `).all(plot.id);
 
-  const latestReport = db.prepare(
-    'SELECT report_type, created_at FROM reports WHERE plot_x = ? AND plot_z = ? ORDER BY created_at DESC LIMIT 1'
-  ).get(x, z);
-
-  res.json({ ...plot, comments, images, latestReport: latestReport || null });
+  res.json({
+    ...plot,
+    is_guild: !!plot.is_guild,
+    shop: shopWithDetails(getCurrentShop.get(plot.id)),
+    reports,
+    past_shops: pastShops,
+  });
 });
 
-app.post('/api/plots/:x/:z/comments', (req, res) => {
-  const { x, z } = req.params;
+// A single shop, current or past (for viewing a plot's history).
+app.get('/api/shops/:id', (req, res) => {
+  const shop = getShop.get(req.params.id);
+  if (!shop) return res.status(404).json({ error: 'Shop not found' });
+  res.json(shopWithDetails(shop));
+});
+
+app.post('/api/plots/:id/comments', (req, res) => {
+  const shop = getCurrentShop.get(req.params.id);
+  if (!shop) return res.status(409).json({ error: 'This plot has no shop to comment on' });
   const { author, body } = req.body;
   if (!body || !body.trim()) return res.status(400).json({ error: 'Comment body required' });
 
-  const result = db.prepare(
-    'INSERT INTO comments (plot_x, plot_z, author, body) VALUES (?, ?, ?, ?)'
-  ).run(x, z, author || null, body.trim());
+  const result = db.prepare('INSERT INTO comments (shop_id, author, body) VALUES (?, ?, ?)')
+    .run(shop.id, author?.trim() || null, body.trim());
 
   res.status(201).json({ id: result.lastInsertRowid, status: 'pending' });
 });
 
-app.post('/api/plots/:x/:z/report', (req, res) => {
-  const { x, z } = req.params;
-  const { report_type } = req.body;
+app.post('/api/plots/:id/report', (req, res) => {
+  const plot = getPlot.get(req.params.id);
+  if (!plot) return res.status(404).json({ error: 'Plot not found' });
+  const activity = req.body.activity || null;
+  const lock = req.body.lock || null;
+  if (!activity && !lock) return res.status(400).json({ error: 'Report needs an activity or a lock state' });
+  if (activity && !ACTIVITY.includes(activity)) return res.status(400).json({ error: `activity must be one of ${ACTIVITY.join(', ')}` });
+  if (lock && !LOCK.includes(lock)) return res.status(400).json({ error: `lock must be one of ${LOCK.join(', ')}` });
 
-  if (!['open', 'closed'].includes(report_type)) {
-    return res.status(400).json({ error: 'report_type must be "open" or "closed"' });
-  }
-
-  db.prepare(
-    'INSERT INTO reports (plot_x, plot_z, report_type) VALUES (?, ?, ?)'
-  ).run(x, z, report_type);
+  const shop = getCurrentShop.get(plot.id);
+  db.prepare('INSERT INTO reports (plot_id, shop_id, activity, lock) VALUES (?, ?, ?, ?)')
+    .run(plot.id, shop?.id ?? null, activity, lock);
 
   res.status(201).json({ recorded: true });
 });
 
-// --- Admin: update plot (upsert + diff-based activity log) ---
+// --- Admin: edit a plot's shop ---
+//
+// Body: any SHOP_FIELDS, plus `rename: true` to fix an owner typo in place.
+// - Plot is vacant: opens a new shop (owner required).
+// - Owner changed (and not a rename): closes the current shop and opens a new
+//   one with the submitted fields. The old shop keeps its history.
+// - Otherwise: updates the current shop and logs each changed field.
 
-const TRACKED_FIELDS = ['owner', 'shop_name', 'zone', 'status', 'description'];
+app.put('/api/plots/:id/shop', adminAuth, (req, res) => {
+  const plot = getPlot.get(req.params.id);
+  if (!plot) return res.status(404).json({ error: 'Plot not found' });
+  const fields = cleanShopFields(req.body);
+  const current = getCurrentShop.get(plot.id);
 
-app.put('/api/plots/:x/:z', adminAuth, (req, res) => {
-  const { x, z } = req.params;
-  const updates = { ...req.body };
-
-  // Treat blank strings from the form the same as "not set"
-  for (const field of ['owner', 'shop_name', 'zone', 'description']) {
-    if (updates[field] === '') updates[field] = null;
-  }
-
-  const existing = db.prepare('SELECT * FROM plots WHERE x = ? AND z = ?').get(x, z);
-  const now = new Date().toISOString();
-
-  if (!existing) {
-    db.prepare(`
-      INSERT INTO plots (x, z, owner, shop_name, zone, status, description, is_guild, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      x, z,
-      updates.owner || null,
-      updates.shop_name || null,
-      updates.zone || null,
-      updates.status || 'active',
-      updates.description || null,
-      updates.is_guild ? 1 : 0,
-      now
-    );
-    return res.status(201).json({ created: true });
-  }
-
-  const TRACKED_FIELDS = ['owner', 'shop_name', 'zone', 'status', 'description'];
-  const insertSystemComment = db.prepare(`
-    INSERT INTO comments (plot_x, plot_z, author, body, is_system, status)
-    VALUES (?, ?, NULL, ?, 1, 'approved')
-  `);
-
-  for (const field of TRACKED_FIELDS) {
-    if (field in updates && updates[field] !== existing[field]) {
-      const oldVal = existing[field] || '(empty)';
-      const newVal = updates[field] || '(empty)';
-      insertSystemComment.run(x, z, `${field} updated from "${oldVal}" to "${newVal}"`);
+  const result = db.transaction(() => {
+    if (!current) {
+      if (!fields.owner) return { status: 400, body: { error: 'Owner is required to open a shop' } };
+      return { status: 201, body: { opened: openShop(plot.id, fields) } };
     }
-  }
 
-  // Use "in" rather than ?? — a field explicitly sent as null (cleared by
-  // the user) must overwrite the existing value, not fall back to it.
-  const merged = {
-    owner: 'owner' in updates ? updates.owner : existing.owner,
-    shop_name: 'shop_name' in updates ? updates.shop_name : existing.shop_name,
-    zone: 'zone' in updates ? updates.zone : existing.zone,
-    status: 'status' in updates ? updates.status : existing.status,
-    description: 'description' in updates ? updates.description : existing.description,
-    is_guild: 'is_guild' in updates ? (updates.is_guild ? 1 : 0) : existing.is_guild,
-  };
+    if ('owner' in fields && !fields.owner) {
+      return { status: 400, body: { error: 'Owner can\'t be blank. Use vacate to empty the plot.' } };
+    }
 
-  db.prepare(`
-    UPDATE plots SET owner = ?, shop_name = ?, zone = ?, status = ?, description = ?, is_guild = ?, updated_at = ?
-    WHERE x = ? AND z = ?
-  `).run(
-    merged.owner, merged.shop_name, merged.zone, merged.status, merged.description, merged.is_guild,
-    now, x, z
-  );
+    if (fields.owner && fields.owner !== current.owner && !req.body.rename) {
+      closeShop.run(current.id);
+      insertSystemComment.run(current.id, `Shop closed, plot taken over by ${fields.owner}`);
+      return { status: 201, body: { closed: current.id, opened: openShop(plot.id, fields) } };
+    }
 
-  res.json({ updated: true });
+    const changed = SHOP_FIELDS.filter((f) => f in fields && fields[f] !== current[f]);
+    if (!changed.length) return { status: 200, body: { updated: false } };
+    for (const f of changed) {
+      insertSystemComment.run(current.id,
+        `${f} updated from "${current[f] ?? '(empty)'}" to "${fields[f] ?? '(empty)'}"`);
+    }
+    const sets = changed.map((f) => `${f} = @${f}`).join(', ');
+    db.prepare(`UPDATE shops SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = @id`)
+      .run({ ...Object.fromEntries(changed.map((f) => [f, fields[f]])), id: current.id });
+    return { status: 200, body: { updated: changed } };
+  })();
+
+  res.status(result.status).json(result.body);
 });
 
-// --- Admin: upload image to R2 ---
+app.post('/api/plots/:id/vacate', adminAuth, (req, res) => {
+  const current = getCurrentShop.get(req.params.id);
+  if (!current) return res.status(409).json({ error: 'Plot is already vacant' });
+  db.transaction(() => {
+    closeShop.run(current.id);
+    insertSystemComment.run(current.id, 'Shop closed, plot is now vacant');
+  })();
+  res.json({ closed: current.id });
+});
 
-app.post('/api/plots/:x/:z/image', adminAuth, upload.single('image'), async (req, res) => {
-  const { x, z } = req.params;
+// --- Admin: images (attached to the plot's current shop) ---
+
+app.post('/api/plots/:id/image', adminAuth, upload.single('image'), async (req, res) => {
+  const shop = getCurrentShop.get(req.params.id);
+  if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to' });
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
   const ext = req.file.originalname.split('.').pop();
-  const key = `market/${x}_${z}_${Date.now()}.${ext}`;
+  const key = `market/${req.params.id}_${shop.id}_${Date.now()}.${ext}`;
 
   await r2.send(new PutObjectCommand({
     Bucket: R2_BUCKET,
@@ -170,14 +232,10 @@ app.post('/api/plots/:x/:z/image', adminAuth, upload.single('image'), async (req
   }));
 
   const url = `${R2_PUBLIC_URL}/${key}`;
-
-  const maxOrder = db.prepare(
-    'SELECT COALESCE(MAX(sort_order), -1) AS m FROM images WHERE plot_x = ? AND plot_z = ?'
-  ).get(x, z).m;
-
-  const result = db.prepare(
-    'INSERT INTO images (plot_x, plot_z, url, sort_order) VALUES (?, ?, ?, ?)'
-  ).run(x, z, url, maxOrder + 1);
+  const maxOrder = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM images WHERE shop_id = ?')
+    .get(shop.id).m;
+  const result = db.prepare('INSERT INTO images (shop_id, url, sort_order) VALUES (?, ?, ?)')
+    .run(shop.id, url, maxOrder + 1);
 
   res.status(201).json({ id: result.lastInsertRowid, url });
 });
@@ -190,9 +248,10 @@ app.delete('/api/admin/images/:id', adminAuth, (req, res) => {
 // --- Admin: comment moderation ---
 
 app.get('/api/admin/comments/pending', adminAuth, (req, res) => {
-  const comments = db.prepare(
-    "SELECT * FROM comments WHERE status = 'pending' ORDER BY created_at ASC"
-  ).all();
+  const comments = db.prepare(`
+    SELECT c.*, s.plot_id, s.owner FROM comments c JOIN shops s ON s.id = c.shop_id
+    WHERE c.status = 'pending' ORDER BY c.created_at ASC
+  `).all();
   res.json(comments);
 });
 
@@ -206,13 +265,12 @@ app.post('/api/admin/comments/:id/reject', adminAuth, (req, res) => {
   res.json({ rejected: true });
 });
 
-
-
 // --- Serve React build in production ---
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, 'dist');
   app.use(express.static(clientDist));
-  app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
+  // Express 5 needs a named wildcard; a bare '*' throws at startup.
+  app.get('/{*splat}', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
