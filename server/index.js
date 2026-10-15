@@ -37,6 +37,27 @@ const insertSystemComment = db.prepare(
   "INSERT INTO comments (shop_id, author, body, is_system, status) VALUES (?, NULL, ?, 1, 'approved')"
 );
 
+// A plot's current status. Reports can leave out a part, so activity and lock
+// each come from the most recent report that has them. created_at is the time
+// of the newest report of any kind.
+const latestActivity = db.prepare(
+  'SELECT activity FROM reports WHERE plot_id = ? AND activity IS NOT NULL ORDER BY created_at DESC, id DESC LIMIT 1'
+);
+const latestLock = db.prepare(
+  'SELECT lock FROM reports WHERE plot_id = ? AND lock IS NOT NULL ORDER BY created_at DESC, id DESC LIMIT 1'
+);
+const latestReportAt = db.prepare('SELECT MAX(created_at) AS at FROM reports WHERE plot_id = ?');
+
+function latestStatus(plotId) {
+  const created_at = latestReportAt.get(plotId).at;
+  if (!created_at) return null;
+  return {
+    activity: latestActivity.get(plotId)?.activity ?? null,
+    lock: latestLock.get(plotId)?.lock ?? null,
+    created_at,
+  };
+}
+
 function shopWithDetails(shop) {
   if (!shop) return null;
   return { ...shop, comments: getApprovedComments.all(shop.id), images: getImages.all(shop.id) };
@@ -74,13 +95,9 @@ app.get('/api/plots', (req, res) => {
       s.id AS shop_id, s.owner, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
       s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
       (SELECT GROUP_CONCAT(body, ' ') FROM comments c
-       WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0) AS comment_text,
-      r.activity AS report_activity, r.lock AS report_lock, r.created_at AS report_at
+       WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0) AS comment_text
     FROM plots p
     LEFT JOIN shops s ON s.plot_id = p.id AND s.closed_at IS NULL
-    LEFT JOIN reports r ON r.id = (
-      SELECT id FROM reports WHERE plot_id = p.id ORDER BY created_at DESC, id DESC LIMIT 1
-    )
     ORDER BY p.id
   `).all();
 
@@ -96,9 +113,7 @@ app.get('/api/plots', (req, res) => {
       updated_at: r.updated_at,
       comment_text: r.comment_text,
     } : null,
-    latest_report: r.report_at
-      ? { activity: r.report_activity, lock: r.report_lock, created_at: r.report_at }
-      : null,
+    latest_report: latestStatus(r.id),
   })));
 });
 
@@ -119,6 +134,7 @@ app.get('/api/plots/:id', (req, res) => {
     ...plot,
     is_guild: !!plot.is_guild,
     shop: shopWithDetails(getCurrentShop.get(plot.id)),
+    latest_report: latestStatus(plot.id),
     reports,
     past_shops: pastShops,
   });
@@ -148,7 +164,7 @@ app.post('/api/plots/:id/report', (req, res) => {
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
   const activity = req.body.activity || null;
   const lock = req.body.lock || null;
-  if (!activity && !lock) return res.status(400).json({ error: 'Report needs an activity or a lock state' });
+  if (!lock && activity !== 'vacant') return res.status(400).json({ error: 'Report needs a lock state (locked or unlocked)' });
   if (activity && !ACTIVITY.includes(activity)) return res.status(400).json({ error: `activity must be one of ${ACTIVITY.join(', ')}` });
   if (lock && !LOCK.includes(lock)) return res.status(400).json({ error: `lock must be one of ${LOCK.join(', ')}` });
 
