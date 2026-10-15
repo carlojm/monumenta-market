@@ -5579,34 +5579,25 @@
   {
     "id": "northguild-1",
     "zone": "Northern Guild Plots",
-    "x": -660,
-    "z": 1030,
+    "x": -662,
+    "z": 1025,
     "is_guild": true,
     "shop": {
-      "owner": "NDH",
+      "owner": "EN",
       "shop_name": null,
-      "guild_name": "No Drags Here",
-      "description": "Spruce, deepslate, dark purple tag. Vanity shop, not yet open.",
+      "guild_name": "EveryName",
+      "description": "currently wip",
       "stock": null,
-      "palette": null,
-      "guild_color": "dark purple",
+      "palette": "black stained glass",
+      "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
+        "activity": "wip",
         "lock": "locked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "NEW! Vanity shop, not yet open."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Not yet open, locked."
-        }
-      ]
+      "comments": []
     },
     "past_shops": [
       {
@@ -5616,82 +5607,122 @@
         "description": "",
         "stock": null,
         "palette": null,
-        "guild_color": null,
+        "guild_color": "light purple",
         "primary_color": null,
         "secondary_color": null,
         "comments": [
           {
             "date": "2025-10-06",
-            "body": "Gone! Plot given to NDH."
+            "body": "Gone! Plot given to NDH"
           }
         ],
         "closed": "2025-10-06"
+      },
+      {
+        "owner": "NDH",
+        "shop_name": null,
+        "guild_name": "No Drags Here",
+        "description": "Spruce, deepslate, dark purple tag. Vanity shop, not yet open",
+        "stock": null,
+        "palette": null,
+        "guild_color": "dark purple",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NEW! Vanity shop, not yet open"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Not yet open, locked"
+          }
+        ],
+        "closed": "2026-10-15"
       }
     ]
   },
   {
     "id": "northguild-2",
     "zone": "Northern Guild Plots",
-    "x": -640,
-    "z": 1030,
+    "x": -646,
+    "z": 1025,
     "is_guild": true,
     "shop": {
-      "owner": "Smoke",
+      "owner": "tea",
       "shop_name": null,
-      "guild_name": "big smoke 100",
-      "description": "R3 mat stonks. Guild member bazaar.",
+      "guild_name": "zenith tea party",
+      "description": "currently wip but there is a cafe here now",
       "stock": null,
-      "palette": "Quartz, amethyst, moss, orange guild tag",
-      "guild_color": "orange",
+      "palette": "cherry wood",
+      "guild_color": "light blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
+        "activity": "wip",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still running."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin, stocked with mats."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Smoke",
+        "shop_name": null,
+        "guild_name": "big smoke 100",
+        "description": "R3 mat stonks. Guild member bazaar.",
+        "stock": null,
+        "palette": "Quartz, amethyst, moss, orange guild tag",
+        "guild_color": "orange",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still runnin, stocked with mats."
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   },
   {
     "id": "northguild-3",
     "zone": "Northern Guild Plots",
-    "x": -660,
-    "z": 1050,
+    "x": -662,
+    "z": 1041,
     "is_guild": true,
     "shop": {
       "owner": "WOOL",
       "shop_name": null,
       "guild_name": "Woolbearers",
-      "description": "Sandstone, dark gray tag. WIP.",
-      "stock": null,
+      "description": "Patron item request service on roof. \"Pocket Trader\" service on ground floor: rares and artifacts in exchange for fragments/materials. Basement floors: R1/R2/R3 rare artifact charm item rentals.",
+      "stock": "R1 rare artifact item rental R2 rare artifact item rental R3 rare artifact charm item rental patron service R1 R2 R3 rare artifact trade in exchange for frags and mats",
       "palette": null,
       "guild_color": "dark gray",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still WIP but there's a nice build here now."
+          "body": "Still WIP but there's a nice build here now"
         },
         {
           "date": "2025-11-12",
-          "body": "Still not ready to open."
+          "body": "not open yet"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "open and stocked"
         }
       ]
     },
@@ -5700,16 +5731,16 @@
   {
     "id": "northguild-4",
     "zone": "Northern Guild Plots",
-    "x": -640,
-    "z": 1050,
+    "x": -646,
+    "z": 1041,
     "is_guild": true,
     "shop": {
       "owner": "Rend",
       "shop_name": null,
       "guild_name": "Renegades",
-      "description": "Gray/brown/green text, lime green tag. \"NEW Syrup Exchange.\" R1/R2 rares and artis for sale in basement. Piano out front.",
+      "description": "Mostly used to facilitate the annual secret santa exchange. R1/R2 trades in basement and syrup exchange on ground floor currently inactive. Cool floor piano in the front",
       "stock": null,
-      "palette": null,
+      "palette": "christmas",
       "guild_color": "lime green",
       "primary_color": null,
       "secondary_color": null,
@@ -5721,11 +5752,11 @@
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Currently locked."
+          "body": "Currently locked"
         },
         {
           "date": "2025-11-12",
-          "body": "Unlocked, still got syrup!"
+          "body": "Unlocked, \"NEW Syrup Exchange\""
         }
       ]
     },
@@ -5734,32 +5765,36 @@
   {
     "id": "southguild-1",
     "zone": "Southern Guild Plots",
-    "x": -660,
-    "z": 1090,
+    "x": -662,
+    "z": 1089,
     "is_guild": true,
     "shop": {
       "owner": "LxT",
       "shop_name": null,
       "guild_name": "Solis Crudelia",
-      "description": "Purple nametag, deep slate and warped signs. Lesser charms WTS. CZ rares WTS. Delve epics for 80% NPC price. Auction wall. 5* fish exchange with 24ar fee. R3 rate exchange with 12ar fee.",
-      "stock": null,
-      "palette": null,
+      "description": "5 star and 4 star fish exchange. R3 rare/fragment exchange with 12ar fee. WTB mungfish and concentrated mungfish. Auction wall.",
+      "stock": "T4 T5 fish exchange",
+      "palette": "deep slate and warped signs",
       "guild_color": "purple",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still running."
+          "body": "Still running"
         },
         {
           "date": "2025-11-12",
-          "body": "Still running."
+          "body": "Still running"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "stock has changed since my last check"
         }
       ]
     },
@@ -5768,66 +5803,84 @@
   {
     "id": "southguild-2",
     "zone": "Southern Guild Plots",
-    "x": -640,
-    "z": 1090,
+    "x": -646,
+    "z": 1089,
     "is_guild": true,
     "shop": {
-      "owner": "MAID",
+      "owner": "BLISS",
       "shop_name": null,
-      "guild_name": "Maids of Monumenta",
-      "description": "Light gray nametag, purple/white/black build aesthetic. Buy/sell R1/R2 rares. 5* fish exchange. Lesser charms for sale. Guild member bazaar.",
-      "stock": null,
-      "palette": null,
-      "guild_color": "light gray",
+      "guild_name": "Blissfully Ignorant",
+      "description": "R1 R2 R3 rare exchanges with 8ar fee/12 ar fee for fragments. 5 star fish exchange. Portal Alchemist rental set. Guild member WTB barrels: Wolfswood Fury carrier, Empowered Swiftshield Tincture carrier, SKR scroll fragments, SKR scrolls.",
+      "stock": "T5 fish exchange",
+      "palette": "deepslate, light blue and white wool",
+      "guild_color": "light blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still runnin."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "First floor has been gutted, but everything listed above is still in service."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "MAID",
+        "shop_name": null,
+        "guild_name": "Maids of Monumenta",
+        "description": "Light gray nametag, purple/white/black build aesthetic. Buy/sell R1/R2 rares. 5* fish exchange. Lesser charms for sale. Guild member bazaar.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "light gray",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still runnin."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "First floor has been gutted, but everything listed above is still in service."
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   },
   {
     "id": "southguild-3",
     "zone": "Southern Guild Plots",
-    "x": -660,
-    "z": 1110,
+    "x": -662,
+    "z": 1105,
     "is_guild": true,
     "shop": {
       "owner": "ZR",
       "shop_name": null,
       "guild_name": "Zenkor Reborn",
-      "description": "Pink/magenta nametag, Squidnee (blue terracotta). Hexed item collection for vanity skins. R3 rares, 2har each. Lesser charms for sale. Various R3 exchanges. Free food barrel. Hexfall loadouts for rent (gear, charms, even yellow tess for skill loadout). New and endgame items for rent.",
-      "stock": null,
-      "palette": null,
+      "description": "Almost always has items from new content for rent. R3 rares, 2har each. Lesser charms for sale. Various R3 exchanges. Free food barrel. Hexfall loadouts for rent (gear, charms, even yellow tess for skill loadout). R1 rares for sale in basement floor 1. R1 R2 potions for sale in basement 2. Free carriers of blocks in basement 2",
+      "stock": "Aurora map tile exchange, pass artifact exchange, skr scroll exchange, fortune rare exchange, hexed skins for vanity, cz wind charm rental, versatile vase items and lg tess (u) for borrowing, aurora item rental, exalted lime item rental, fortune wander item rental, decade pass arti rental, hexfall rental sets: assassin, melee seraph, soothsayer, hunter",
+      "palette": "squidnee",
       "guild_color": "pink/magenta",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still runnin, now has the new R3 POI rares for rent."
+          "body": "Still running, now has the new R3 POI rares for rent"
         },
         {
           "date": "2025-11-12",
           "body": "New season pass arti (Sheol), rush artis (Mask of Cacophony, Rose Touch, Scarlet Shift, Void Heart), and spirit archery artis (Lacrimosa, Wanderer's Wick, The Kindling Steps, Speaker's Ward) available for rental."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still stocked with new items as they come out"
         }
       ]
     },
@@ -5836,8 +5889,8 @@
   {
     "id": "southguild-4",
     "zone": "Southern Guild Plots",
-    "x": -640,
-    "z": 1110,
+    "x": -646,
+    "z": 1105,
     "is_guild": true,
     "shop": {
       "owner": "HVN",
@@ -5852,7 +5905,7 @@
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -5862,6 +5915,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still stocked, a few new barrels maybe: free fishing cache chests"
         }
       ]
     },
