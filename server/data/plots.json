@@ -5896,10 +5896,10 @@
       "owner": "HVN",
       "shop_name": null,
       "guild_name": "Haven",
-      "description": "Elusive blue nametag, stone structure with pond around it. Blocks, fishing bait, gold and iron ingots for sale. Free food barrels. \"Charm Evaluation Emporium\" service.",
+      "description": "Blocks, fishing bait, gold ingots, iron ingots for sale. Free food barrels. \"Charm Evaluation Emporium\" service.",
       "stock": null,
-      "palette": null,
-      "guild_color": "blue",
+      "palette": "stone structure with pond",
+      "guild_color": "elusive blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
@@ -5928,22 +5928,22 @@
     "id": "eastguild-1",
     "zone": "Eastern Guild Plots",
     "x": -630,
-    "z": 1040,
+    "z": 1041,
     "is_guild": true,
     "shop": {
       "owner": "FISH",
       "shop_name": null,
       "guild_name": "The Aquarium",
-      "description": "Blue tag. Blocks of all kinds.",
-      "stock": null,
-      "palette": null,
+      "description": "Shop focused on blocks. Buy blocks in basement. Custom chest exchange, emerald block stonk, custom order lectern on ground floor. Map information on top floor. Taking donations for blocks of raw iron, lapis blocks, light weighted gold pressure plates on top floor. Barrels for free maps, free Eye of the Storm, free food",
+      "stock": "Buy logs, planks, dirt, sand, mushroom blocks, jungle leaves, sandstone, bone blocks, stone, blackstone, quartz, terracotta, concrete, prismarine, snow, glass, ice, packed ice, blue ice, obsidian, coal blocks in underwater basement",
+      "palette": "gray and light gray concrete",
       "guild_color": "blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -5953,6 +5953,10 @@
         {
           "date": "2025-11-12",
           "body": "Refurbished! Brand new build! Blocks restocked! Now buying certain rare blocks on the top floor."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still running"
         }
       ]
     },
@@ -5961,66 +5965,84 @@
   {
     "id": "eastguild-2",
     "zone": "Eastern Guild Plots",
-    "x": -610,
-    "z": 1040,
+    "x": -614,
+    "z": 1041,
     "is_guild": true,
     "shop": {
-      "owner": "VEIL",
+      "owner": "kitten",
       "shop_name": null,
-      "guild_name": "Scholars of the Veil",
-      "description": "Light pink tag, deep slate. Member barrel bazaar. T5 fish exchange, 1 per person per day. T4 fish for sale. R2 rares, various shifting city items in basement.",
-      "stock": null,
-      "palette": null,
-      "guild_color": "light pink",
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "NOW OPEN! NEW!"
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin!"
-        }
-      ]
-    },
-    "past_shops": []
-  },
-  {
-    "id": "eastguild-3",
-    "zone": "Eastern Guild Plots",
-    "x": -630,
-    "z": 1060,
-    "is_guild": true,
-    "shop": {
-      "owner": "TCL",
-      "shop_name": null,
-      "guild_name": "The Collectionists",
-      "description": "Stonkco",
-      "stock": null,
-      "palette": null,
+      "guild_name": "kitty kats",
+      "description": "Celestial Zenith cz rentals for all classes/trees. Lectern includes a beginner's guide to CZ. Each floor contains books that teach more about each class.",
+      "stock": "CZ sets for frost flame shadow steel earth dawn wind",
+      "palette": "prismarine floor",
       "guild_color": null,
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
+      },
+      "comments": []
+    },
+    "past_shops": [
+      {
+        "owner": "VEIL",
+        "shop_name": null,
+        "guild_name": "Scholars of the Veil",
+        "description": "Light pink tag, deep slate. Member barrel bazaar. T5 fish exchange, 1 per person per day. T4 fish for sale. R2 rares, various shifting city items in basement.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "light pink",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "NOW OPEN! NEW!"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still runnin!"
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
+  },
+  {
+    "id": "eastguild-3",
+    "zone": "Eastern Guild Plots",
+    "x": -630,
+    "z": 1057,
+    "is_guild": true,
+    "shop": {
+      "owner": "TCL",
+      "shop_name": "Stonkco",
+      "guild_name": "The Collectionists",
+      "description": "It's stonkco you already know everything it has I'm not writing it all out",
+      "stock": null,
+      "palette": "quartz, emerald blocks",
+      "guild_color": "teal",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still stonkin."
+          "body": "Still stonkin"
         },
         {
           "date": "2025-11-12",
-          "body": "Still stonkin!"
+          "body": "Still stonky"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "stonkco forever"
         }
       ]
     },
@@ -6029,32 +6051,36 @@
   {
     "id": "eastguild-4",
     "zone": "Eastern Guild Plots",
-    "x": -610,
-    "z": 1060,
+    "x": -614,
+    "z": 1057,
     "is_guild": true,
     "shop": {
       "owner": "AEUGH",
       "shop_name": null,
       "guild_name": "Pufferfish",
-      "description": "Yellow tag, yellow and blue blocks. Lesser charms. Misc stonks.",
+      "description": "Lesser charms. Misc stonks",
       "stock": null,
-      "palette": null,
+      "palette": "yellow and blue",
       "guild_color": "yellow",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "active",
-        "lock": "unlocked",
-        "date": "2025-11-12"
+        "activity": "inactive",
+        "lock": "locked",
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "No longer locked! Also a new WTB diamenean hunt boss mats barrel."
+          "body": "No longer locked! Also a new WTB diamenean hunt boss mats barrel"
         },
         {
           "date": "2025-11-12",
-          "body": "Still runnin."
+          "body": "Still running"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still here but locked seems inactive"
         }
       ]
     },
@@ -6064,15 +6090,15 @@
     "id": "eastguild-5",
     "zone": "Eastern Guild Plots",
     "x": -630,
-    "z": 1080,
+    "z": 1073,
     "is_guild": true,
     "shop": {
       "owner": "FORCE",
       "shop_name": null,
       "guild_name": "Dark Force Rising",
-      "description": "Rouge/dark pinkish tag, dark oak, andesite, nether brick. Member barrel bazaar. R2/R3 pot stonks. R3 rare stonks. Other niche utility stonks like VR keys, GPT, lockboxes.",
-      "stock": null,
-      "palette": null,
+      "description": "Member barrel bazaar and currency exchange on ground floor. R3 casino rare potions, verdant remnant keys, and R3 rare stonks in basement. Niche utility stonks on the top floor.",
+      "stock": "Top floor stonks: Loadout Lockbox, Aesir's Embrace, Emblem of Greed, Corrupted Siershen's Caster, Corrupted Watcher's Sword, Psycho Mask, Hoard Key Golden Key, Broken Beyond, Tide's Chime, Ghost Captain's Visage, Golden Grooves, Frayed Cacophony, Twisted Tepache, Bathypelagic Brew, Epipelagic Essence, Hadopelagic Tincture.",
+      "palette": "dark oak, andesite, nether brick",
       "guild_color": "rouge/dark pink",
       "primary_color": null,
       "secondary_color": null,
@@ -6084,11 +6110,11 @@
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still runnin (one of the big guild shops that sells everything)."
+          "body": "still active and stocked"
         },
         {
           "date": "2025-11-12",
-          "body": "Yeah, still runnin."
+          "body": "still running"
         }
       ]
     },
@@ -6097,57 +6123,71 @@
   {
     "id": "eastguild-6",
     "zone": "Eastern Guild Plots",
-    "x": -610,
-    "z": 1080,
+    "x": -614,
+    "z": 1073,
     "is_guild": true,
     "shop": {
-      "owner": "NYAA",
+      "owner": "chim",
       "shop_name": null,
-      "guild_name": "Little Nyas",
-      "description": "Light pink tag, spruce build. Utility items like anvils, torches, food, arrows, potions (stock is mostly empty). R1/R2 rares in basement. Portable keloch, jean bay, infusion master in basement.",
-      "stock": null,
-      "palette": null,
-      "guild_color": "light pink",
+      "guild_name": "Chirping High in Midair",
+      "description": "Free rentals. Top floor: CZ sets, infinite consumables, R3 bounty rares. Ground floor: Hexfall sets, all unskinned epics. Basement: All skinned epics, all rare charms, season pass artifacts.",
+      "stock": "everything",
+      "palette": "stripped dark oak and stone brick",
+      "guild_color": "light blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "unclear",
+        "activity": null,
         "lock": null,
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still runnin."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Kinda cleaned out, but basement still has some stock."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "NYAA",
+        "shop_name": null,
+        "guild_name": "Little Nyas",
+        "description": "Light pink tag, spruce build. Utility items like anvils, torches, food, arrows, potions (stock is mostly empty). R1/R2 rares in basement. Portable keloch, jean bay, infusion master in basement.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "light pink",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still runnin."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Kinda cleaned out, but basement still has some stock."
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   },
   {
     "id": "eastguild-7",
     "zone": "Eastern Guild Plots",
     "x": -630,
-    "z": 1100,
+    "z": 1089,
     "is_guild": true,
     "shop": {
       "owner": "EDE",
       "shop_name": null,
       "guild_name": "Grand",
-      "description": "Super light pink tag, snow blocks. Member barrel bazaar. Various R123 rares. R2 rogue set rental.",
+      "description": "Member barrel bazaar. Various R123 rares. R2 rogue set rental.",
       "stock": null,
-      "palette": null,
-      "guild_color": "super light pink",
+      "palette": "snow and ice",
+      "guild_color": "pale pink",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -6157,6 +6197,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin!"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still here and running"
         }
       ]
     },
@@ -6165,23 +6209,23 @@
   {
     "id": "eastguild-8",
     "zone": "Eastern Guild Plots",
-    "x": -610,
-    "z": 1100,
+    "x": -614,
+    "z": 1089,
     "is_guild": true,
     "shop": {
       "owner": "PIG",
       "shop_name": null,
       "guild_name": "GG Bond",
-      "description": "Light pink tag, cherry pink build. R3 rares and currencies stonks. R3 set rentals. R3 pot stonk. R2/R1 utility stonks. R123 mats stonks and rare frag stonks, more stonks than can fit on a sign.",
+      "description": "R3 rares and currencies stonks. R3 set rentals. R3 pot stonk. R2/R1 utility stonks. R123 mats stonks and rare frag stonks, everything Stonkco doesn't have basically",
       "stock": null,
-      "palette": null,
+      "palette": "cherry wood and froglights",
       "guild_color": "light pink",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -6191,6 +6235,10 @@
         {
           "date": "2025-11-12",
           "body": "Maybe even more rental sets now, some stonks have moved around."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still here and running"
         }
       ]
     },
