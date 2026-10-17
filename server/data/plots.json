@@ -6247,66 +6247,84 @@
   {
     "id": "westguild-1",
     "zone": "Western Guild Plots",
-    "x": -690,
-    "z": 1040,
+    "x": -694,
+    "z": 1041,
     "is_guild": true,
     "shop": {
-      "owner": "IRS",
+      "owner": "Silly",
       "shop_name": null,
-      "guild_name": "Incredible Raccoon Squadron",
-      "description": "Blue tag. Seemingly WIP.",
+      "guild_name": "Custard Club",
+      "description": "cool banner art but still wip",
       "stock": null,
-      "palette": null,
-      "guild_color": "blue",
+      "palette": "yellow terracotta, banners",
+      "guild_color": "yellow",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": "inactive",
-        "lock": null,
-        "date": "2025-11-12"
+        "activity": "wip",
+        "lock": "locked",
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still closed."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still defunct."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "IRS",
+        "shop_name": null,
+        "guild_name": "Incredible Raccoon Squadron",
+        "description": "Blue tag. Seemingly WIP.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "blue",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still closed."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still defunct."
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   },
   {
     "id": "westguild-2",
     "zone": "Western Guild Plots",
-    "x": -670,
-    "z": 1040,
+    "x": -678,
+    "z": 1041,
     "is_guild": true,
     "shop": {
       "owner": "Skadi",
       "shop_name": null,
       "guild_name": "Aegir",
-      "description": "Light blue tag. R3 rental sets. Charms.",
-      "stock": null,
-      "palette": null,
+      "description": "R3 rental sets. Charm auctions. Basic potions buy/sell. Various stonks in basement. Various misc barrels in basement with rares and artis. Season pass artis. A Union Cross Quest items in basement 2. Twisted dummy exchange. Lesser charm buy/sell.",
+      "stock": "Basement stonks: Region 3 rare/frags for fortune, blue, brown. indigo, wolfswood, keep, star point, skt, mr, portal. Ethereal Rib, Heart of Dread, Colossus Core, Flittering Spark, Permafrost Denarius, Eternity Gem, Dormant Halloween Spirit. Curse of the Dark Soul, Gift of the Stars truest north third and fourth mats. SKR puzzle and combat remnant scroll, remnant scroll fragments. Experience Stash, Condensed Experience. Basement 2 stonks: Festering Toxin, Tainted Spores, Hallowed Roots.",
+      "palette": "deepslate, copper",
       "guild_color": "light blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "Still runnin."
+          "body": "Still running"
         },
         {
           "date": "2025-11-12",
-          "body": "Nothing's changed, still runnin."
+          "body": "still running"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still running with more stonks"
         }
       ]
     },
@@ -6315,23 +6333,23 @@
   {
     "id": "westguild-3",
     "zone": "Western Guild Plots",
-    "x": -690,
-    "z": 1060,
+    "x": -694,
+    "z": 1057,
     "is_guild": true,
     "shop": {
       "owner": "DAY",
       "shop_name": null,
       "guild_name": "Daybreak",
-      "description": "Dark purple tag. Potions and blocks for sale. Speedrun set and other sets for rent. Free food barrel.",
+      "description": "Race council free rental set. Covenmourns for rent. SKR Lore book library. Basic potions, blocks, TNT for sale in basement. RoD Bers/DD earth rental set.",
       "stock": null,
-      "palette": null,
+      "palette": "deepslate, dark oak, mangrove wood",
       "guild_color": "dark purple",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -6341,6 +6359,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still here but basement potions and blocks are out of stock"
         }
       ]
     },
@@ -6349,23 +6371,23 @@
   {
     "id": "westguild-4",
     "zone": "Western Guild Plots",
-    "x": -670,
-    "z": 1060,
+    "x": -678,
+    "z": 1057,
     "is_guild": true,
     "shop": {
       "owner": "VH",
       "shop_name": null,
       "guild_name": "Vault Hunter",
-      "description": "Black tag. Food, arrows, anvils, shulkers, potions, blocks. R123 rares and tiered gear for sale; possibly the only shop in the whole market that sells tiered gear.",
-      "stock": null,
-      "palette": null,
+      "description": "Food, arrows, anvils, shulkers, potions, blocks on top floors. R1 R2 R3 rares, uncommons, artifacts, tier 5s for sale in basements; possibly the only shop in the whole market that sells tiered gear.",
+      "stock": "blocks for sale on top floor: glass, cherry blossom leaves, leaves, terracotta, sand, concrete, snow, wood, mossy, cobblestone, bone block, ice, andesite, bricks, bone blocks, dirt, tuff, calcite, decorative heads, prismarine, blackstone, soul sand, plants, flowers, granite, amethyst, pumpkins, misc other blocks and carriers of blocks. second floor also has brewing stands and potion related player heads.",
+      "palette": "quartz and dark prismarine",
       "guild_color": "black",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
@@ -6375,6 +6397,10 @@
         {
           "date": "2025-11-12",
           "body": "Still runnin."
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still running and continues to stock with new stuff"
         }
       ]
     },
@@ -6383,32 +6409,36 @@
   {
     "id": "westguild-5",
     "zone": "Western Guild Plots",
-    "x": -690,
-    "z": 1080,
+    "x": -694,
+    "z": 1073,
     "is_guild": true,
     "shop": {
       "owner": "HTT",
       "shop_name": null,
       "guild_name": "HOKAGO TEA TIME",
-      "description": "Light pink tag. 5* fish sell/trade. R23 rares and charms. Carnival wheels. EC pots and artis.",
+      "description": "Selling/exchanging 5 star fish. R2 R3 rares and charms. Carnival wheels. Totems of undying.  EC pots and artis.",
       "stock": null,
-      "palette": null,
+      "palette": "miku",
       "guild_color": "light pink",
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-15"
       },
       "comments": [
         {
           "date": "2025-10-06",
-          "body": "No longer locked! Selling R2 rares."
+          "body": "No longer locked! Selling R2 rares"
         },
         {
           "date": "2025-11-12",
-          "body": "Locked!"
+          "body": "Locked"
+        },
+        {
+          "date": "2026-10-15",
+          "body": "still running though the top floor is still vacant"
         }
       ]
     },
@@ -6417,103 +6447,155 @@
   {
     "id": "westguild-6",
     "zone": "Western Guild Plots",
-    "x": -670,
-    "z": 1080,
+    "x": -678,
+    "z": 1073,
     "is_guild": true,
     "shop": {
-      "owner": "Miku",
+      "owner": "ANGEL",
       "shop_name": null,
-      "guild_name": "Miku Fan Club",
-      "description": "Cyan/light blue tag. Lesser charms. R123 rental sets and rental charms.",
+      "guild_name": "Concilium Angelorum",
+      "description": "Still work in progress but active. Ground floor: selling corrupted potion carriers, boss utility items, gilded sentinel items. Top floor: labs epic and rares, paladin boss set, cz steel set, r3 epic rentals. Most rentals are wip/currently guild only.",
       "stock": null,
       "palette": null,
-      "guild_color": "cyan/light blue",
+      "guild_color": "pale blue",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "Still runnin, some new rentals maybe."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin, some WIP barrels on ground floor."
-        }
-      ]
+      "comments": []
     },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "Miku",
+        "shop_name": null,
+        "guild_name": "Miku Fan Club",
+        "description": "Lesser charms. R123 rental sets and rental charms.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "light blue",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still running, some new rentals maybe"
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still running, some WIP barrels on ground floor"
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   },
   {
     "id": "westguild-7",
     "zone": "Western Guild Plots",
-    "x": -690,
-    "z": 1100,
+    "x": -694,
+    "z": 1089,
+    "is_guild": true,
+    "shop": {
+      "owner": "porb",
+      "shop_name": null,
+      "guild_name": "Pulsing Orb Lover",
+      "description": "CZ Dawn Boss+Rush set, CZ Shadowdancer Clear+Boss set, CZ Flame charm set, all 15 charm power.",
+      "stock": null,
+      "palette": "Dark oak",
+      "guild_color": "purple",
+      "primary_color": null,
+      "secondary_color": null,
+      "report": {
+        "activity": "active",
+        "lock": "unlocked",
+        "date": "2026-10-15"
+      },
+      "comments": [
+        {
+          "date": "2026-10-15",
+          "body": "seems to be wip, whole build is empty except for three zenith sets on the top floor"
+        }
+      ]
+    },
+    "past_shops": [
+      {
+        "owner": "-w-zZ",
+        "shop_name": null,
+        "guild_name": "No Gamble No Life",
+        "description": "Dark magenta tag. 5* fish exchange. Member bazaar barrels. Sand sticker and shattered gem stonks. Also selling zenith, hexfall, godspore, portal, marina noir, masquerades ruin, sanguine halls, and R3 transmogrifier rares in basement level 1.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "dark magenta",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "Still runnin, now selling the expanded rare list."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Still runnin."
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
+  },
+  {
+    "id": "westguild-8",
+    "zone": "Western Guild Plots",
+    "x": -678,
+    "z": 1089,
     "is_guild": true,
     "shop": {
       "owner": "-w-zZ",
       "shop_name": null,
       "guild_name": "No Gamble No Life",
-      "description": "Dark magenta tag. 5* fish exchange. Member bazaar barrels. Sand sticker and shattered gem stonks. Also selling zenith, hexfall, godspore, portal, marina noir, masquerades ruin, sanguine halls, and R3 transmogrifier rares in basement level 1.",
+      "description": "Top level: 5 star fish exchange and sand sticker stonk. Zenith rares and starblood ichor for sale. Ground level: Legendary charm, epic charm, and indigo blightdust stonks. Basement: twisted dummy eggs, sanguine halls rare, hexfall rare, masquerader's ruin rare wts barrels",
       "stock": null,
-      "palette": null,
+      "palette": "quartz and amethyst and prismarine",
       "guild_color": "dark magenta",
       "primary_color": null,
       "secondary_color": null,
       "report": {
         "activity": "active",
         "lock": "unlocked",
-        "date": "2025-11-12"
+        "date": "2026-10-15"
       },
       "comments": [
         {
-          "date": "2025-10-06",
-          "body": "Still runnin, now selling the expanded rare list."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Still runnin."
+          "date": "2026-10-15",
+          "body": "hey this used to be one plot over and now it is here with a new build and slightly different stock"
         }
       ]
     },
-    "past_shops": []
-  },
-  {
-    "id": "westguild-8",
-    "zone": "Western Guild Plots",
-    "x": -670,
-    "z": 1100,
-    "is_guild": true,
-    "shop": {
-      "owner": "OpM",
-      "shop_name": null,
-      "guild_name": "Opus Maximus",
-      "description": "Light purple tag. Plot building service. Gear rentals. Member barrel bazaar.",
-      "stock": null,
-      "palette": null,
-      "guild_color": "light purple",
-      "primary_color": null,
-      "secondary_color": null,
-      "report": {
-        "activity": null,
-        "lock": "locked",
-        "date": "2025-11-12"
-      },
-      "comments": [
-        {
-          "date": "2025-10-06",
-          "body": "New free pottery rental barrel on ground floor."
-        },
-        {
-          "date": "2025-11-12",
-          "body": "Locked!"
-        }
-      ]
-    },
-    "past_shops": []
+    "past_shops": [
+      {
+        "owner": "OpM",
+        "shop_name": null,
+        "guild_name": "Opus Maximus",
+        "description": "Light purple tag. Plot building service. Gear rentals. Member barrel bazaar.",
+        "stock": null,
+        "palette": null,
+        "guild_color": "light purple",
+        "primary_color": null,
+        "secondary_color": null,
+        "comments": [
+          {
+            "date": "2025-10-06",
+            "body": "New free pottery rental barrel on ground floor."
+          },
+          {
+            "date": "2025-11-12",
+            "body": "Locked!"
+          }
+        ],
+        "closed": "2026-10-15"
+      }
+    ]
   }
 ]
