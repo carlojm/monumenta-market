@@ -3635,7 +3635,7 @@
     "is_guild": false,
     "shop": {
       "owner": "autumntheace",
-      "shop_name": "Autumn's Rental Shop'",
+      "shop_name": "Autumn's Rental Shop",
       "guild_name": null,
       "description": "Various rentals for rares and artifacts. Free food and blocks.",
       "stock": null,
@@ -6137,8 +6137,8 @@
       "primary_color": null,
       "secondary_color": null,
       "report": {
-        "activity": null,
-        "lock": null,
+        "activity": "active",
+        "lock": "unlocked",
         "date": "2026-10-15"
       },
       "comments": []
