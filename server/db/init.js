@@ -71,10 +71,42 @@ export function createSchema() {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
     CREATE INDEX IF NOT EXISTS reports_plot ON reports(plot_id, created_at);
+
+    -- Verified players. Proven by joining the verify Minecraft server, which
+    -- gives us their Mojang UUID. Other tables link to the internal id.
+    CREATE TABLE IF NOT EXISTS accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uuid TEXT NOT NULL UNIQUE,                 -- Mojang UUID, never changes
+      name TEXT NOT NULL UNIQUE COLLATE NOCASE,  -- current Minecraft name
+      password_hash TEXT NOT NULL,               -- scrypt salt + hash, never the password
+      is_moderator INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Logins. The browser holds a random token in an httpOnly cookie; we store
+    -- only its hash, so a leaked database can't be used to log in.
+    CREATE TABLE IF NOT EXISTS sessions (
+      token_hash TEXT PRIMARY KEY,
+      account_id INTEGER NOT NULL REFERENCES accounts(id),
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      expires_at TEXT NOT NULL                   -- pushed forward on each visit (90 days)
+    );
+
+    -- One-time codes from the verify server's kick message. Claiming one on
+    -- the site creates the account, or resets its password if it exists.
+    CREATE TABLE IF NOT EXISTS verify_codes (
+      code TEXT PRIMARY KEY,                     -- e.g. 'K7QXM'
+      uuid TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      expires_at TEXT NOT NULL,                  -- 10 minutes after created_at
+      used_at TEXT                               -- set when claimed; a code works once
+    );
   `);
 }
 
-// Drops everything. Only used by the plots.json loader.
+// Drops the plot data tables. Only used by the plots.json loader. Accounts,
+// sessions and verify codes are left alone so a reload doesn't wipe accounts.
 export function dropSchema() {
   db.exec(`
     DROP TABLE IF EXISTS comments;
