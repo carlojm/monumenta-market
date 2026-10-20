@@ -58,11 +58,6 @@
   gap: 1rem;
 }
 
-/* `display: flex` would otherwise override the hidden attribute. */
-.app-main__list-body[hidden] {
-  display: none;
-}
-
 /* Desktop: map on the left (always in view), search + table on the right. */
 @media (min-width: 900px) {
   #root {
@@ -98,6 +93,30 @@
     background: var(--bg);
     padding-block: 0.75rem 0.25rem;
     margin-top: -0.75rem;
+  }
+
+  /* Card open: the left column holds a smaller map with the search + table
+     under it. The column fits the window, and the table scrolls inside it. */
+  .app-main__map--with-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: calc(100svh - 6rem);
+  }
+
+  .app-main__map--with-list .market-map {
+    max-width: min(100%, calc(50svh * 0.875));
+  }
+
+  .app-main__map--with-list .app-main__list-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .app-main__map--with-list .app-main__search {
+    margin-top: 0;
+    padding-top: 0;
   }
 }
 /* --- Admin (functional only; visual cleanup is a TODO) --- */

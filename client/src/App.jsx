@@ -51,6 +51,16 @@ function App() {
 
   const searchResults = useMemo(() => getSearchResults(plots, query), [plots, query]);
 
+  const cardOpenOnDesktop = isDesktop && !!selectedPlot;
+  const list = (
+    <div className="app-main__list-body">
+      <div className="app-main__search">
+        <SearchBar value={query} onChange={setQuery} />
+      </div>
+      <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+    </div>
+  );
+
   return (
     <div>
       <nav className="navbar">
@@ -59,22 +69,19 @@ function App() {
       </nav>
       <main className="app-main">
         {error && <p className="app-error">{error}</p>}
-        {/* On desktop these become two columns; on phones they stack. */}
-        <section className="app-main__map">
+        {/* On desktop these become two columns; on phones they stack.
+            With a card open on desktop, the card takes the right column and
+            the search + table move under the map so you can keep browsing. */}
+        <section className={`app-main__map${cardOpenOnDesktop ? ' app-main__map--with-list' : ''}`}>
           <MarketMap plots={plots} searchResults={searchResults} selectedId={plotId} onSelectPlot={openPlot} />
+          {cardOpenOnDesktop && list}
         </section>
         <section className="app-main__list">
-          {/* Desktop: the open card takes the list's place. The list is only
-              hidden, so the search and scroll position are kept for "Back". */}
-          {isDesktop && selectedPlot && (
+          {cardOpenOnDesktop ? (
             <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
+          ) : (
+            list
           )}
-          <div className="app-main__list-body" hidden={isDesktop && !!selectedPlot}>
-            <div className="app-main__search">
-              <SearchBar value={query} onChange={setQuery} />
-            </div>
-            <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
-          </div>
         </section>
         {/* Phones: the card is a bottom sheet over the page. */}
         {!isDesktop && (
