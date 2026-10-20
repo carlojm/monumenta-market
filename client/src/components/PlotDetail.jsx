@@ -152,7 +152,17 @@ function PlotDetail({ plot, onClose, onReported }) {
   const images = shop?.images || [];
   const comments = [...myComments, ...(shop?.comments || [])];
   const reports = [...myReports, ...(detail?.reports || [])];
-  const latestReport = reports[0] || plot.latest_report;
+  // The server's latest_report already fills in a missing part from earlier
+  // reports. A report submitted here is merged on top the same way.
+  const serverReport = detail?.latest_report ?? plot.latest_report;
+  const myReport = myReports[0];
+  const latestReport = myReport
+    ? {
+        activity: myReport.activity ?? serverReport?.activity ?? null,
+        lock: myReport.lock ?? serverReport?.lock ?? null,
+        created_at: myReport.created_at,
+      }
+    : serverReport;
   const pastShops = detail?.past_shops || [];
 
   const handleSubmitComment = async (e) => {
@@ -224,7 +234,7 @@ function PlotDetail({ plot, onClose, onReported }) {
             </>
           )}
           <dt>Plot</dt>
-          <dd><span className="coord">{plot.id}</span> · {plot.zone}</dd>
+          <dd><span className="coord">{plot.id}</span></dd>
           <dt>Coords</dt>
           <dd className="coord">{plot.x}, {plot.z}</dd>
           {shop?.palette && (
