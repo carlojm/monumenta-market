@@ -8,6 +8,7 @@ import multer from 'multer';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
 import { adminAuth } from './middleware/adminAuth.js';
+import { startVerifyServer } from './lib/verifyServer.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
@@ -290,3 +291,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// The fake Minecraft server for account verification runs in this same
+// process, so it shares the database. Set VERIFY_PORT (e.g. 25565) to enable.
+if (process.env.VERIFY_PORT) startVerifyServer(Number(process.env.VERIFY_PORT));
