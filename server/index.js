@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import db from './db/init.js';
@@ -9,6 +10,8 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
 import { adminAuth } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
+import { loadAccount } from './lib/auth.js';
+import authRoutes from './routes/auth.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
@@ -18,6 +21,9 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+app.use(loadAccount); // sets req.account when logged in
+app.use('/api/auth', authRoutes);
 
 const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
   'guild_color', 'primary_color', 'secondary_color'];
