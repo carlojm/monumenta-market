@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import MarketMap from './components/MarketMap';
 import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
@@ -9,7 +10,22 @@ function App() {
   const [plots, setPlots] = useState([]);
   const [query, setQuery] = useState('');
   const [error, setError] = useState(null);
-  const [selectedPlot, setSelectedPlot] = useState(null);
+  // The open card comes from the URL (/plot/:plotId), so it can be shared
+  // and the back button closes it.
+  const { plotId } = useParams();
+  const navigate = useNavigate();
+  const selectedPlot = plots.find((p) => p.id === plotId) ?? null;
+
+  // Cards opened from inside the app are tagged with `fromApp`, so closing can
+  // step back (Back won't reopen the card). A card opened from a direct link
+  // has no tag, so closing goes to "/" instead of leaving the site.
+  // Switching from one open card to another replaces the history entry, so
+  // Back always closes the card instead of stepping through cards.
+  const location = useLocation();
+  const fromApp = !!location.state?.fromApp;
+  const openPlot = (plot) =>
+    navigate(`/plot/${plot.id}`, { replace: !!plotId, state: { fromApp: plotId ? fromApp : true } });
+  const closePlot = () => (fromApp ? navigate(-1) : navigate('/', { replace: true }));
 
   const loadPlots = () =>
     fetch('/api/plots')
@@ -31,10 +47,10 @@ function App() {
       </nav>
       <main className="app-main">
         {error && <p className="app-error">{error}</p>}
-        <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={setSelectedPlot} />
+        <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
         <SearchBar value={query} onChange={setQuery} />
-        <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={setSelectedPlot} />
-        <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={() => setSelectedPlot(null)} onReported={loadPlots} />
+        <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+        <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
       </main>
     </div>
   );

@@ -11,6 +11,7 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/plot/:plotId" element={<App />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
