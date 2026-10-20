@@ -47,9 +47,16 @@ function App() {
       </nav>
       <main className="app-main">
         {error && <p className="app-error">{error}</p>}
-        <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
-        <SearchBar value={query} onChange={setQuery} />
-        <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+        {/* On desktop these become two columns; on phones they stack. */}
+        <section className="app-main__map">
+          <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+        </section>
+        <section className="app-main__list">
+          <div className="app-main__search">
+            <SearchBar value={query} onChange={setQuery} />
+          </div>
+          <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+        </section>
         <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
       </main>
     </div>

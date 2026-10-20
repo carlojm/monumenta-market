@@ -46,6 +46,52 @@
   padding: 0.5rem 0.75rem;
   border-radius: 3px;
 }
+
+/* Phones: the list column stacks search above the table. */
+.app-main__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* Desktop: map on the left (always in view), search + table on the right. */
+@media (min-width: 900px) {
+  #root {
+    max-width: 1240px;
+  }
+
+  .navbar {
+    padding-inline: 1.5rem;
+  }
+
+  .app-main {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+    gap: 1.5rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .app-error {
+    grid-column: 1 / -1;
+  }
+
+  .app-main__map {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  /* Search stays reachable while the table scrolls under it. */
+  .app-main__search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg);
+    padding-block: 0.75rem 0.25rem;
+    margin-top: -0.75rem;
+  }
+}
 /* --- Admin (functional only; visual cleanup is a TODO) --- */
 .admin-page {
   padding: 1rem;

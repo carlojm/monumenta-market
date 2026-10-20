@@ -8,6 +8,14 @@
   overflow: hidden;
 }
 
+/* Desktop: shrink the map so the whole island fits in the window height
+   (224 x 256 image, so width = height * 0.875). */
+@media (min-width: 900px) {
+  .market-map {
+    max-width: min(100%, calc((100svh - 8rem) * 0.875));
+  }
+}
+
 .market-map__image {
   width: 100%;
   height: auto;
