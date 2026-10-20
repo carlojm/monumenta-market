@@ -5,7 +5,7 @@ import './MarketMap.css';
 
 const LEGEND = ['active', 'inactive', 'wip', 'unclear'];
 
-function MarketMap({ plots, searchResults, onSelectPlot }) {
+function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
   return (
     <div>
       <div className="market-map">
@@ -20,6 +20,7 @@ function MarketMap({ plots, searchResults, onSelectPlot }) {
                 'market-map__plot',
                 !plot.shop && 'market-map__plot--vacant',
                 dimmed && 'market-map__plot--dimmed',
+                plot.id === selectedId && 'market-map__plot--selected',
               ].filter(Boolean).join(' ')}
               style={{
                 ...plotRect(plot.x, plot.z, plot.is_guild),

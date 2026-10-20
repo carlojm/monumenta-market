@@ -42,6 +42,13 @@
   opacity: 0.15;
 }
 
+.market-map__plot--selected {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  opacity: 1;
+  z-index: 1;
+}
+
 .market-map__plot:hover,
 .market-map__plot:focus-visible {
   outline: 2px solid var(--text);

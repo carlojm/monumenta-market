@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import MarketMap from './components/MarketMap';
 import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import { getSearchResults } from './lib/search';
+import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
 
 function App() {
   const [plots, setPlots] = useState([]);
@@ -23,9 +24,20 @@ function App() {
   // Back always closes the card instead of stepping through cards.
   const location = useLocation();
   const fromApp = !!location.state?.fromApp;
-  const openPlot = (plot) =>
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const listScroll = useRef(0);
+  const openPlot = (plot) => {
+    if (!plotId) listScroll.current = window.scrollY;
     navigate(`/plot/${plot.id}`, { replace: !!plotId, state: { fromApp: plotId ? fromApp : true } });
+  };
   const closePlot = () => (fromApp ? navigate(-1) : navigate('/', { replace: true }));
+
+  // Desktop: the card replaces the list, so start the card at the top and
+  // put the list back where it was on "Back".
+  useLayoutEffect(() => {
+    if (!isDesktop) return;
+    window.scrollTo(0, plotId ? 0 : listScroll.current);
+  }, [plotId, isDesktop]);
 
   const loadPlots = () =>
     fetch('/api/plots')
@@ -49,15 +61,25 @@ function App() {
         {error && <p className="app-error">{error}</p>}
         {/* On desktop these become two columns; on phones they stack. */}
         <section className="app-main__map">
-          <MarketMap plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+          <MarketMap plots={plots} searchResults={searchResults} selectedId={plotId} onSelectPlot={openPlot} />
         </section>
         <section className="app-main__list">
-          <div className="app-main__search">
-            <SearchBar value={query} onChange={setQuery} />
+          {/* Desktop: the open card takes the list's place. The list is only
+              hidden, so the search and scroll position are kept for "Back". */}
+          {isDesktop && selectedPlot && (
+            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
+          )}
+          <div className="app-main__list-body" hidden={isDesktop && !!selectedPlot}>
+            <div className="app-main__search">
+              <SearchBar value={query} onChange={setQuery} />
+            </div>
+            <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
           </div>
-          <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
         </section>
-        <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
+        {/* Phones: the card is a bottom sheet over the page. */}
+        {!isDesktop && (
+          <PlotDetail key={selectedPlot?.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
+        )}
       </main>
     </div>
   );

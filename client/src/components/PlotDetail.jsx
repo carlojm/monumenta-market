@@ -128,7 +128,7 @@ function ReportForm({ plotId, onReported }) {
   );
 }
 
-function PlotDetail({ plot, onClose, onReported }) {
+function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
@@ -190,12 +190,20 @@ function PlotDetail({ plot, onClose, onReported }) {
     onReported?.();
   };
 
-  return (
-    <div className="plot-detail__overlay" onClick={onClose}>
-      <div className="plot-detail__sheet" onClick={(e) => e.stopPropagation()}>
-        <button className="plot-detail__close" onClick={onClose} aria-label="Close">
-          ×
-        </button>
+  // `inline` (desktop): the card sits in the page's right column with a back
+  // button. Otherwise (phones): a bottom sheet over a dark overlay.
+  const sheet = (
+      <div
+        className={`plot-detail__sheet${inline ? ' plot-detail__sheet--inline' : ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {inline ? (
+          <button className="plot-detail__back" onClick={onClose}>← Back to list</button>
+        ) : (
+          <button className="plot-detail__close" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        )}
 
         <h2>{displayName(shop)}</h2>
 
@@ -322,6 +330,12 @@ function PlotDetail({ plot, onClose, onReported }) {
           </>
         )}
       </div>
+  );
+
+  if (inline) return sheet;
+  return (
+    <div className="plot-detail__overlay" onClick={onClose}>
+      {sheet}
     </div>
   );
 }
