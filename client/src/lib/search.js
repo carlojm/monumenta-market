@@ -34,7 +34,7 @@ function buildSnippet(matches) {
 
   const [start, end] = match.indices[0];
   const value = match.value;
-  const CONTEXT = 25;
+  const CONTEXT = 40;
   const snippetStart = Math.max(0, start - CONTEXT);
   const snippetEnd = Math.min(value.length, end + 1 + CONTEXT);
 

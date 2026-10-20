@@ -17,8 +17,9 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
     <table className="plot-table">
       <thead>
         <tr>
-          <th>Shop</th>
-          <th>Zone</th>
+          <th className="plot-table__shop">Shop</th>
+          {/* Zone only without a search, so the Match column gets the room. */}
+          {!searchResults && <th>Zone</th>}
           <th>Status</th>
           {searchResults && <th>Match</th>}
         </tr>
@@ -38,8 +39,8 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
                 !plot.shop && 'plot-table__row--vacant',
               ].filter(Boolean).join(' ')}
             >
-              <td>{displayName(plot.shop)}</td>
-              <td>{plot.zone}</td>
+              <td className="plot-table__shop">{displayName(plot.shop)}</td>
+              {!searchResults && <td>{plot.zone}</td>}
               <td>
                 {report ? (
                   <>

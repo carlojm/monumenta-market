@@ -29,10 +29,13 @@
   opacity: 0.4;
 }
 
+.plot-table__shop {
+  width: 30%;
+}
+
 .plot-table__match {
   font-size: 0.8rem;
   color: var(--text-muted);
-  max-width: 220px;
 }
 
 .plot-table__match-field {
