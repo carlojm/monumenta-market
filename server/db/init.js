@@ -45,11 +45,12 @@ export function createSchema() {
     CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       shop_id INTEGER NOT NULL REFERENCES shops(id),
-      author TEXT,
+      author TEXT,                             -- typed name (old comments) or the account's name when posted
       body TEXT NOT NULL,
       is_system INTEGER NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'pending',  -- 'pending' | 'approved'
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      account_id INTEGER REFERENCES accounts(id)  -- set for comments from linked accounts
     );
     CREATE INDEX IF NOT EXISTS comments_shop ON comments(shop_id);
 
@@ -103,6 +104,22 @@ export function createSchema() {
       used_at TEXT                               -- set when claimed; a code works once
     );
   `);
+
+  // --- Migrations: bring older databases up to date. Each runs once. ---
+
+  // Oct 2026: comments can belong to a linked account.
+  addColumnIfMissing('comments', 'account_id', 'INTEGER REFERENCES accounts(id)');
+  db.exec('CREATE INDEX IF NOT EXISTS comments_account ON comments(account_id)');
+}
+
+// CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns
+// on existing tables are added here instead.
+function addColumnIfMissing(table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns.includes(column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    console.log(`db: added ${table}.${column}`);
+  }
 }
 
 // Drops the plot data tables. Only used by the plots.json loader. Accounts,

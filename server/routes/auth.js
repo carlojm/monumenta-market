@@ -106,4 +106,19 @@ router.get('/me', (req, res) => {
   res.json({ account: publicAccount(req.account) });
 });
 
+// The logged-in account's comments, newest first, with the shop each is on
+// (shop_closed_at is set if that shop has since closed).
+const myComments = db.prepare(`
+  SELECT c.id, c.body, c.created_at, s.plot_id,
+    s.owner, s.shop_name, s.guild_name, s.closed_at AS shop_closed_at
+  FROM comments c JOIN shops s ON s.id = c.shop_id
+  WHERE c.account_id = ?
+  ORDER BY c.created_at DESC, c.id DESC
+`);
+
+router.get('/me/comments', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Not logged in' });
+  res.json(myComments.all(req.account.id));
+});
+
 export default router;

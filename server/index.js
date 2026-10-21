@@ -36,9 +36,21 @@ const REPORT_HISTORY = 20;
 const getPlot = db.prepare('SELECT * FROM plots WHERE id = ?');
 const getCurrentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL');
 const getShop = db.prepare('SELECT * FROM shops WHERE id = ?');
-const getApprovedComments = db.prepare(
-  "SELECT * FROM comments WHERE shop_id = ? AND status = 'approved' ORDER BY created_at DESC, id DESC"
-);
+// A linked comment shows the account's *current* name (so it follows renames)
+// and is marked verified. Older comments keep their typed name.
+const COMMENT_COLUMNS = `
+  c.id, c.shop_id, c.body, c.is_system, c.status, c.created_at, c.account_id,
+  COALESCE(a.name, c.author) AS author,
+  a.id IS NOT NULL AS verified
+`;
+const getApprovedComments = db.prepare(`
+  SELECT ${COMMENT_COLUMNS} FROM comments c LEFT JOIN accounts a ON a.id = c.account_id
+  WHERE c.shop_id = ? AND c.status = 'approved' ORDER BY c.created_at DESC, c.id DESC
+`);
+const getComment = db.prepare(`
+  SELECT ${COMMENT_COLUMNS} FROM comments c LEFT JOIN accounts a ON a.id = c.account_id WHERE c.id = ?
+`);
+const COMMENT_MAX = 2000;
 const getImages = db.prepare('SELECT * FROM images WHERE shop_id = ? ORDER BY sort_order');
 const insertSystemComment = db.prepare(
   "INSERT INTO comments (shop_id, author, body, is_system, status) VALUES (?, NULL, ?, 1, 'approved')"
@@ -154,16 +166,31 @@ app.get('/api/shops/:id', (req, res) => {
   res.json(shopWithDetails(shop));
 });
 
+// Linked accounts only. No approval queue: moderators delete bad comments afterwards.
 app.post('/api/plots/:id/comments', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to comment.' });
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to comment on' });
-  const { author, body } = req.body;
-  if (!body || !body.trim()) return res.status(400).json({ error: 'Comment body required' });
+  const body = typeof req.body.body === 'string' ? req.body.body.trim() : '';
+  if (!body) return res.status(400).json({ error: 'Comment body required' });
+  if (body.length > COMMENT_MAX) {
+    return res.status(400).json({ error: `Comments can be at most ${COMMENT_MAX} characters.` });
+  }
 
-  const result = db.prepare('INSERT INTO comments (shop_id, author, body) VALUES (?, ?, ?)')
-    .run(shop.id, author?.trim() || null, body.trim());
+  const result = db.prepare(`
+    INSERT INTO comments (shop_id, account_id, author, body, status) VALUES (?, ?, ?, ?, 'approved')
+  `).run(shop.id, req.account.id, req.account.name, body);
 
-  res.status(201).json({ id: result.lastInsertRowid, status: 'pending' });
+  res.status(201).json(getComment.get(result.lastInsertRowid));
+});
+
+// Deleting is only allowed for the comment's own account.
+app.delete('/api/comments/:id', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Log in to delete your comments.' });
+  const result = db.prepare('DELETE FROM comments WHERE id = ? AND account_id = ?')
+    .run(req.params.id, req.account.id);
+  if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
+  res.json({ deleted: true });
 });
 
 app.post('/api/plots/:id/report', (req, res) => {
