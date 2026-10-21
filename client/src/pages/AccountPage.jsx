@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { BadgeCheck } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAccount } from '../lib/account';
 import './AccountPage.css';
@@ -147,6 +148,44 @@ function LinkAccountForm({ resetting }) {
   );
 }
 
+function LoggedInView({ account }) {
+  const { logout } = useAccount();
+  const navigate = useNavigate();
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  const logOut = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  return (
+    <>
+      <h2>Account</h2>
+      <div className="account-identity">
+        <span className="account-identity__name">{account.name}</span>
+        <BadgeCheck size={18} className="account-identity__check" aria-label="Linked" />
+        {account.is_moderator && <span className="account-identity__role">Moderator</span>}
+      </div>
+      <p className="account-note">
+        Your Minecraft account is linked. Your comments show a ✓ next to your name and skip the approval queue.
+      </p>
+
+      <div className="account-actions">
+        <button type="button" onClick={() => setChangingPassword((v) => !v)} aria-expanded={changingPassword}>
+          {changingPassword ? 'Cancel' : 'Change password'}
+        </button>
+        <button type="button" onClick={logOut}>Log out</button>
+      </div>
+
+      {changingPassword && (
+        <div className="account-change-password">
+          <LinkAccountForm resetting />
+        </div>
+      )}
+    </>
+  );
+}
+
 const TABS = [
   { id: 'login', label: 'Log In' },
   { id: 'link', label: 'Link New Account' },
@@ -172,8 +211,7 @@ function AccountPage() {
       <Navbar />
       <main className="account-page">
         {account === undefined ? null : account ? (
-          // The logged-in view comes in step 2.4c.
-          <p>You're logged in as <strong>{account.name}</strong>.</p>
+          <LoggedInView account={account} />
         ) : (
           <>
             <h2>Account</h2>

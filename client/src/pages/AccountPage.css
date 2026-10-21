@@ -118,3 +118,40 @@
   overflow-x: auto;
   white-space: nowrap;
 }
+
+/* Logged-in view */
+.account-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.account-identity__name {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.account-identity__check {
+  color: var(--accent);
+}
+
+.account-identity__role {
+  margin-left: 0.3rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.account-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.account-change-password {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
