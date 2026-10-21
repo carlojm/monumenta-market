@@ -92,7 +92,12 @@ export function startVerifyServer(port, { onlineMode = true } = {}) {
     port,
     version: false, // accept any client version the library knows...
     fallbackVersion: mc.supportedVersions.at(-1), // ...and try the newest for ones it doesn't
-    motd: 'Monumenta Market Directory · join to get your verification code',
+    // Server list description: title, then a grey second line.
+    motd: 'Monumenta Market Directory',
+    motdMsg: {
+      text: 'Monumenta Market Directory\n',
+      extra: [{ text: 'Join to get your verification code', color: 'gray' }],
+    },
     maxPlayers: 1,
     hideErrors: true,
     // Runs right after Mojang confirms the player, while still in the login

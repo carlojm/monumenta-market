@@ -28,7 +28,7 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
               }}
               onClick={() => onSelectPlot(plot)}
               aria-label={`${displayName(plot.shop)} (${plot.id})`}
-              title={`${displayName(plot.shop)} · ${plot.id}`}
+              title={`${displayName(plot.shop)} (${plot.id})`}
             />
           );
         })}

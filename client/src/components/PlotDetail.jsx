@@ -47,7 +47,7 @@ function PastShop({ summary }) {
     <details className="plot-detail__past-shop" onToggle={load}>
       <summary>
         {displayName(summary)}
-        <span className="plot-detail__muted"> · closed {formatDate(summary.closed_at)}</span>
+        {' '}<span className="plot-detail__muted">closed {formatDate(summary.closed_at)}</span>
       </summary>
       {!shop ? (
         <p className="plot-detail__muted">Loading…</p>

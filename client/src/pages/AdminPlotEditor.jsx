@@ -115,7 +115,7 @@ function AdminPlotEditor() {
       {selectedId && (
         <div className="admin-editor__form">
           <h3>
-            <span className="coord">{selectedId}</span> · {shop ? displayName(shop) : 'Vacant'}
+            <span className="coord">{selectedId}</span> {shop ? displayName(shop) : 'Vacant'}
           </h3>
           {!shop && <p>This plot is vacant. Fill in an owner to open a shop.</p>}
 
