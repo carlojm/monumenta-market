@@ -103,5 +103,10 @@ export function loadAccount(req, res, next) {
 
 // What the client is allowed to see about an account.
 export function publicAccount(account) {
-  return { name: account.name, uuid: account.uuid, is_moderator: !!account.is_moderator };
+  return {
+    name: account.name,
+    uuid: account.uuid,
+    is_moderator: !!account.is_moderator,
+    created_at: account.created_at,
+  };
 }

@@ -24,6 +24,30 @@ const insertCode = db.prepare(`
 `);
 const deleteOldCodes = db.prepare("DELETE FROM verify_codes WHERE expires_at < datetime('now', '-1 day')");
 
+const findAccountByUuid = db.prepare('SELECT id, name FROM accounts WHERE uuid = ?');
+const findOtherAccountByName = db.prepare('SELECT id, uuid, name FROM accounts WHERE name = ? AND uuid != ?');
+const renameAccount = db.prepare('UPDATE accounts SET name = ? WHERE id = ?');
+
+// Mojang just told us this UUID currently owns this name, so make our accounts
+// agree. Exported for tests.
+export const syncAccountName = db.transaction((uuid, name) => {
+  // Another account still holding the name is stale: its owner renamed and
+  // someone else took the name. Park it under a placeholder ("~" can't appear
+  // in Minecraft names, so it never clashes); it's fixed when that owner rejoins.
+  const stale = findOtherAccountByName.get(name, uuid);
+  if (stale) {
+    renameAccount.run(`${stale.name}~${stale.uuid.slice(0, 8)}`, stale.id);
+    console.log(`verify: ${stale.name} now belongs to another player; parked the old account`);
+  }
+
+  // This player renamed in Minecraft (or changed capitalization): follow it.
+  const account = findAccountByUuid.get(uuid);
+  if (account && account.name !== name) {
+    renameAccount.run(name, account.id);
+    console.log(`verify: account renamed ${account.name} -> ${name}`);
+  }
+});
+
 function randomCode() {
   let code = '';
   for (let i = 0; i < CODE_LENGTH; i++) code += CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)];
@@ -75,6 +99,7 @@ export function startVerifyServer(port, { onlineMode = true } = {}) {
     // phase, so we can kick before any world data (which differs per version).
     beforeLogin: (client) => {
       try {
+        syncAccountName(client.uuid, client.username);
         const code = codeFor(client.uuid, client.username);
         console.log(`verify: issued a code to ${client.username}`);
         client.end('Verification code issued', kickMessage(code));

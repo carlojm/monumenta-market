@@ -155,3 +155,21 @@
   padding-top: 1.25rem;
   border-top: 1px solid var(--border);
 }
+
+.account-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.75rem;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+
+.account-meta dt {
+  color: var(--text-muted);
+}
+
+.account-meta dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere; /* long UUIDs wrap on phones instead of overflowing */
+}

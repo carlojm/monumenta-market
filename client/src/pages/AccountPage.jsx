@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BadgeCheck } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAccount } from '../lib/account';
+import { formatDate } from '../lib/reports';
 import './AccountPage.css';
 
 async function postJson(url, body) {
@@ -166,6 +167,16 @@ function LoggedInView({ account }) {
         <BadgeCheck size={18} className="account-identity__check" aria-label="Linked" />
         {account.is_moderator && <span className="account-identity__role">Moderator</span>}
       </div>
+      <dl className="account-meta">
+        <dt>UUID</dt>
+        <dd><span className="coord">{account.uuid}</span></dd>
+        {account.created_at && (
+          <>
+            <dt>Linked since</dt>
+            <dd>{formatDate(account.created_at)}</dd>
+          </>
+        )}
+      </dl>
       <p className="account-note">
         Your Minecraft account is linked. Your comments show a ✓ next to your name and skip the approval queue.
       </p>
