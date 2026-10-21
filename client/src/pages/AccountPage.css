@@ -1,0 +1,120 @@
+/* One centered column, like most login pages. */
+.account-page {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+/* Tabs: plain text with an underline on the active one. */
+.account-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.account-tabs button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.9rem;
+  color: var(--text-muted);
+}
+
+.account-tabs button[aria-selected='true'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.account-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.account-form__hint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.account-form__code {
+  font-family: var(--mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.account-form__error {
+  margin: 0;
+  color: #e08a8a;
+  font-size: 0.9rem;
+}
+
+/* The one main action on each form. */
+.account-form__submit {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+  padding: 0.6rem;
+}
+
+.account-form__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.account-form__link {
+  align-self: center;
+  background: none;
+  border: none;
+  padding: 0.2rem;
+  color: var(--link);
+  font-size: 0.9rem;
+}
+
+.account-note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.account-steps {
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.account-steps li::marker {
+  color: var(--text-muted);
+}
+
+.account-steps .account-form {
+  margin-top: 0.75rem;
+}
+
+.account-address {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.account-address code {
+  flex: 1;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow-x: auto;
+  white-space: nowrap;
+}

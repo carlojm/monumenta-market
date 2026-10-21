@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import MarketMap from './components/MarketMap';
 import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
@@ -63,10 +64,7 @@ function App() {
 
   return (
     <div>
-      <nav className="navbar">
-        <span className="navbar__logo">Market Directory</span>
-        <button className="navbar__menu-button" aria-label="Menu">☰</button>
-      </nav>
+      <Navbar />
       <main className="app-main">
         {error && <p className="app-error">{error}</p>}
         {/* On desktop these become two columns; on phones they stack.

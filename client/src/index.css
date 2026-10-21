@@ -106,7 +106,7 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-input[type="text"], textarea {
+input[type="text"], input[type="password"], textarea {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 3px;

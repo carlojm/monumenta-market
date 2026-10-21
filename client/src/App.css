@@ -14,7 +14,8 @@
   border-bottom: 1px solid var(--border);
 }
 
-.navbar__logo {
+.navbar__logo,
+.navbar__logo:visited {
   font-family: var(--sans);
   font-weight: 700;
   font-size: 1.1rem;
@@ -22,13 +23,35 @@
   text-decoration: none;
 }
 
-.navbar__menu-button {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  line-height: 1;
-  padding: 0.2rem 0.4rem;
+.navbar__account,
+.navbar__account:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 55%;
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
   color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.navbar__account:hover {
+  border-color: var(--accent);
+}
+
+/* Long Minecraft names get cut off with "…" instead of breaking the header. */
+.navbar__account-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar__account-check {
+  flex-shrink: 0;
+  color: var(--accent);
 }
 
 .app-main {
