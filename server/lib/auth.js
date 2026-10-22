@@ -101,12 +101,26 @@ export function loadAccount(req, res, next) {
   next();
 }
 
+// --- Roles: 'player' | 'moderator' | 'admin'. ---
+// Admins are listed by UUID in .env (ADMIN_UUIDS, comma-separated), so admin
+// can never be granted from the website. Moderators are a role in the database.
+const ADMIN_UUIDS = new Set(
+  (process.env.ADMIN_UUIDS ?? '').split(',').map((u) => u.trim().toLowerCase()).filter(Boolean)
+);
+
+export function roleOf(account) {
+  if (!account) return null;
+  if (ADMIN_UUIDS.has(account.uuid.toLowerCase())) return 'admin';
+  return account.role === 'moderator' ? 'moderator' : 'player';
+}
+
 // What the client is allowed to see about an account.
 export function publicAccount(account) {
+  const role = roleOf(account);
   return {
     name: account.name,
     uuid: account.uuid,
-    is_moderator: !!account.is_moderator,
+    role,
     created_at: account.created_at,
   };
 }

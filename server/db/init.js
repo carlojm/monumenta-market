@@ -80,7 +80,7 @@ export function createSchema() {
       uuid TEXT NOT NULL UNIQUE,                 -- Mojang UUID, never changes
       name TEXT NOT NULL UNIQUE COLLATE NOCASE,  -- current Minecraft name
       password_hash TEXT NOT NULL,               -- scrypt salt + hash, never the password
-      is_moderator INTEGER NOT NULL DEFAULT 0,
+      role TEXT NOT NULL DEFAULT 'player',      -- 'player' | 'moderator' (admins come from ADMIN_UUIDS in .env)
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -123,6 +123,9 @@ export function createSchema() {
   // Oct 2026: comments can belong to a linked account.
   addColumnIfMissing('comments', 'account_id', 'INTEGER REFERENCES accounts(id)');
   db.exec('CREATE INDEX IF NOT EXISTS comments_account ON comments(account_id)');
+
+  // Oct 2026: moderator is a role. (Older databases keep an unused is_moderator column.)
+  addColumnIfMissing('accounts', 'role', "TEXT NOT NULL DEFAULT 'player'");
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

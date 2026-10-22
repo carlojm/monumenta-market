@@ -166,7 +166,9 @@ function LoggedInView({ account }) {
       <div className="account-identity">
         <span className="account-identity__name">{account.name}</span>
         <BadgeCheck size={18} className="account-identity__check" aria-label="Linked" />
-        {account.is_moderator && <span className="account-identity__role">Moderator</span>}
+        {account.role !== 'player' && (
+          <span className="account-identity__role">{account.role === 'admin' ? 'Admin' : 'Moderator'}</span>
+        )}
       </div>
       <dl className="account-meta">
         <dt>UUID</dt>

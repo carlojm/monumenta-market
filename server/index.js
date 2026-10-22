@@ -8,7 +8,7 @@ import db from './db/init.js';
 import multer from 'multer';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
-import { adminAuth } from './middleware/adminAuth.js';
+import { requireModerator } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
@@ -239,7 +239,7 @@ app.post('/api/plots/:id/report', (req, res) => {
 //   one with the submitted fields. The old shop keeps its history.
 // - Otherwise: updates the current shop and logs each changed field.
 
-app.put('/api/plots/:id/shop', adminAuth, (req, res) => {
+app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
   const plot = getPlot.get(req.params.id);
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
   const fields = cleanShopFields(req.body);
@@ -276,7 +276,7 @@ app.put('/api/plots/:id/shop', adminAuth, (req, res) => {
   res.status(result.status).json(result.body);
 });
 
-app.post('/api/plots/:id/vacate', adminAuth, (req, res) => {
+app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
   const current = getCurrentShop.get(req.params.id);
   if (!current) return res.status(409).json({ error: 'Plot is already vacant' });
   db.transaction(() => {
@@ -288,7 +288,7 @@ app.post('/api/plots/:id/vacate', adminAuth, (req, res) => {
 
 // --- Admin: images (attached to the plot's current shop) ---
 
-app.post('/api/plots/:id/image', adminAuth, upload.single('image'), async (req, res) => {
+app.post('/api/plots/:id/image', requireModerator, upload.single('image'), async (req, res) => {
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to' });
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -312,7 +312,7 @@ app.post('/api/plots/:id/image', adminAuth, upload.single('image'), async (req, 
   res.status(201).json({ id: result.lastInsertRowid, url });
 });
 
-app.delete('/api/admin/images/:id', adminAuth, (req, res) => {
+app.delete('/api/admin/images/:id', requireModerator, (req, res) => {
   db.prepare('DELETE FROM images WHERE id = ?').run(req.params.id);
   res.json({ deleted: true });
 });
@@ -336,14 +336,14 @@ const searchAdminComments = db.prepare(`
 
 // Newest first. `q` matches comment text, author, plot id, or shop owner/name
 // (LIKE ignores capitalization). One extra row is fetched to know if there's more.
-app.get('/api/admin/comments', adminAuth, (req, res) => {
+app.get('/api/admin/comments', requireModerator, (req, res) => {
   const q = String(req.query.q ?? '').trim();
   const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
   const rows = searchAdminComments.all({ q, like: `%${q}%`, limit: ADMIN_COMMENTS_PAGE + 1, offset });
   res.json({ comments: rows.slice(0, ADMIN_COMMENTS_PAGE), hasMore: rows.length > ADMIN_COMMENTS_PAGE });
 });
 
-app.delete('/api/admin/comments/:id', adminAuth, (req, res) => {
+app.delete('/api/admin/comments/:id', requireModerator, (req, res) => {
   const result = db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
   if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
   res.json({ deleted: true });

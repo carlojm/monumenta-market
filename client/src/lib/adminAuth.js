@@ -1,24 +1,12 @@
-const TOKEN_KEY = 'admin_token';
-
-export function getAdminToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setAdminToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearAdminToken() {
-  localStorage.removeItem(TOKEN_KEY);
+// Admin requests are authorized by the logged-in account's role (moderator or
+// admin); the browser sends the login cookie automatically. The old shared
+// admin token is no longer used by the site, so clear any copy left behind.
+try {
+  localStorage.removeItem('admin_token');
+} catch {
+  // storage blocked: nothing to clear
 }
 
 export function adminFetch(url, options = {}) {
-  const token = getAdminToken();
-  return fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  return fetch(url, options);
 }
