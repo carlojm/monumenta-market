@@ -5,6 +5,7 @@ import { useAccount } from '../lib/account';
 import AdminPlotEditor from './AdminPlotEditor';
 import AdminComments from './AdminComments';
 import AdminAccounts from './AdminAccounts';
+import AdminModLog from './AdminModLog';
 
 // Staff only: moderators and admins. Access comes from the logged-in account.
 function AdminPage() {
@@ -27,14 +28,18 @@ function AdminPage() {
             <div className="admin-page__tabs">
               <button onClick={() => setTab('plots')} aria-pressed={tab === 'plots'}>Plots</button>
               <button onClick={() => setTab('comments')} aria-pressed={tab === 'comments'}>Comments</button>
-              {/* Accounts (making moderators) is for admins only. */}
+              {/* Accounts (making moderators) and the mod log are for admins only. */}
               {account.role === 'admin' && (
-                <button onClick={() => setTab('accounts')} aria-pressed={tab === 'accounts'}>Accounts</button>
+                <>
+                  <button onClick={() => setTab('accounts')} aria-pressed={tab === 'accounts'}>Accounts</button>
+                  <button onClick={() => setTab('modlog')} aria-pressed={tab === 'modlog'}>Mod log</button>
+                </>
               )}
             </div>
             {tab === 'plots' && <AdminPlotEditor />}
             {tab === 'comments' && <AdminComments />}
             {tab === 'accounts' && account.role === 'admin' && <AdminAccounts />}
+            {tab === 'modlog' && account.role === 'admin' && <AdminModLog />}
           </>
         )}
       </div>

@@ -52,7 +52,11 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   return (
     <li className={classes}>
       {c.is_system ? (
-        <span className="plot-detail__comment-tag">Update</span>
+        <span>
+          <span className="plot-detail__comment-tag">Update</span>
+          {/* Staff edits record who made them. */}
+          {c.author && <span className="plot-detail__muted"> by {c.author}</span>}
+        </span>
       ) : c.verified ? (
         // Linked accounts stand out by brightness rather than an icon.
         <strong className="plot-detail__author plot-detail__author--linked" title="Linked Minecraft account">

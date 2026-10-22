@@ -118,6 +118,19 @@ export function createSchema() {
     CREATE INDEX IF NOT EXISTS comment_votes_comment ON comment_votes(comment_id, created_at);
   `);
 
+  // Private record of staff actions (admin only). account_id is NULL when the
+  // emergency ADMIN_TOKEN was used. Not cleared by db:load.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS mod_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      account_id INTEGER REFERENCES accounts(id),
+      action TEXT NOT NULL,                      -- e.g. 'comment.delete', 'shop.edit', 'account.role'
+      target TEXT,                               -- e.g. 'plot:lime-3', 'account:4'
+      details TEXT,                              -- human-readable summary
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // --- Migrations: bring older databases up to date. Each runs once. ---
 
   // Oct 2026: comments can belong to a linked account.

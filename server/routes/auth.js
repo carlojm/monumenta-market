@@ -114,7 +114,7 @@ const myComments = db.prepare(`
     s.owner, s.shop_name, s.guild_name, s.closed_at AS shop_closed_at,
     ${ACCURACY_COLUMNS}
   FROM comments c JOIN shops s ON s.id = c.shop_id
-  WHERE c.account_id = ?
+  WHERE c.account_id = ? AND c.is_system = 0  -- not log entries from staff edits
   ORDER BY c.created_at DESC, c.id DESC
 `);
 

@@ -12,6 +12,7 @@ import { requireModerator } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
+import { logModAction } from './lib/modlog.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 
@@ -56,9 +57,14 @@ const getComment = db.prepare(`
 `);
 const COMMENT_MAX = 2000;
 const getImages = db.prepare('SELECT * FROM images WHERE shop_id = ? ORDER BY sort_order');
-const insertSystemComment = db.prepare(
-  "INSERT INTO comments (shop_id, author, body, is_system, status) VALUES (?, NULL, ?, 1, 'approved')"
-);
+// Log entries ("Update" on the card). `actor` is the staff account that made
+// the change (shown as "Update by …"), or null.
+const insertSystemComment = db.prepare(`
+  INSERT INTO comments (shop_id, account_id, author, body, is_system, status) VALUES (?, ?, ?, ?, 1, 'approved')
+`);
+function addLogEntry(shopId, actor, body) {
+  insertSystemComment.run(shopId, actor?.id ?? null, actor?.name ?? null, body);
+}
 
 // A plot's current status. Reports can leave out a part, so activity and lock
 // each come from the most recent report that has them. created_at is the time
@@ -103,10 +109,10 @@ const insertShop = db.prepare(`
 `);
 const closeShop = db.prepare('UPDATE shops SET closed_at = CURRENT_TIMESTAMP WHERE id = ?');
 
-function openShop(plotId, fields) {
+function openShop(plotId, fields, actor) {
   const row = Object.fromEntries(SHOP_FIELDS.map((f) => [f, fields[f] ?? null]));
   const { lastInsertRowid } = insertShop.run({ ...row, plot_id: plotId });
-  insertSystemComment.run(lastInsertRowid, `Shop opened by ${fields.owner}`);
+  addLogEntry(lastInsertRowid, actor, `Shop opened by ${fields.owner}`);
   return lastInsertRowid;
 }
 
@@ -211,7 +217,7 @@ app.post('/api/comments/:id/vote', (req, res) => {
 // Deleting is only allowed for the comment's own account.
 app.delete('/api/comments/:id', (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Log in to delete your comments.' });
-  const result = db.prepare('DELETE FROM comments WHERE id = ? AND account_id = ?')
+  const result = db.prepare('DELETE FROM comments WHERE id = ? AND account_id = ? AND is_system = 0')
     .run(req.params.id, req.account.id);
   if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
   res.json({ deleted: true });
@@ -250,7 +256,8 @@ app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
   const result = db.transaction(() => {
     if (!current) {
       if (!fields.owner) return { status: 400, body: { error: 'Owner is required to open a shop' } };
-      return { status: 201, body: { opened: openShop(plot.id, fields) } };
+      logModAction(req, 'shop.open', `plot:${plot.id}`, `Opened a shop for ${fields.owner}`);
+      return { status: 201, body: { opened: openShop(plot.id, fields, req.account) } };
     }
 
     if ('owner' in fields && !fields.owner) {
@@ -259,16 +266,19 @@ app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
 
     if (fields.owner && fields.owner !== current.owner && !req.body.rename) {
       closeShop.run(current.id);
-      insertSystemComment.run(current.id, `Shop closed, plot taken over by ${fields.owner}`);
-      return { status: 201, body: { closed: current.id, opened: openShop(plot.id, fields) } };
+      addLogEntry(current.id, req.account, `Shop closed, plot taken over by ${fields.owner}`);
+      logModAction(req, 'shop.open', `plot:${plot.id}`,
+        `Closed ${current.owner}'s shop and opened one for ${fields.owner}`);
+      return { status: 201, body: { closed: current.id, opened: openShop(plot.id, fields, req.account) } };
     }
 
     const changed = SHOP_FIELDS.filter((f) => f in fields && fields[f] !== current[f]);
     if (!changed.length) return { status: 200, body: { updated: false } };
     for (const f of changed) {
-      insertSystemComment.run(current.id,
+      addLogEntry(current.id, req.account,
         `${f} updated from "${current[f] ?? '(empty)'}" to "${fields[f] ?? '(empty)'}"`);
     }
+    logModAction(req, 'shop.edit', `plot:${plot.id}`, `Edited ${current.owner}'s shop: ${changed.join(', ')}`);
     const sets = changed.map((f) => `${f} = @${f}`).join(', ');
     db.prepare(`UPDATE shops SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = @id`)
       .run({ ...Object.fromEntries(changed.map((f) => [f, fields[f]])), id: current.id });
@@ -283,7 +293,8 @@ app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
   if (!current) return res.status(409).json({ error: 'Plot is already vacant' });
   db.transaction(() => {
     closeShop.run(current.id);
-    insertSystemComment.run(current.id, 'Shop closed, plot is now vacant');
+    addLogEntry(current.id, req.account, 'Shop closed, plot is now vacant');
+    logModAction(req, 'shop.vacate', `plot:${req.params.id}`, `Closed ${current.owner}'s shop; plot is now vacant`);
   })();
   res.json({ closed: current.id });
 });
@@ -311,11 +322,17 @@ app.post('/api/plots/:id/image', requireModerator, upload.single('image'), async
   const result = db.prepare('INSERT INTO images (shop_id, url, sort_order) VALUES (?, ?, ?)')
     .run(shop.id, url, maxOrder + 1);
 
+  logModAction(req, 'image.add', `plot:${req.params.id}`, `Added an image to ${shop.owner}'s shop`);
   res.status(201).json({ id: result.lastInsertRowid, url });
 });
 
 app.delete('/api/admin/images/:id', requireModerator, (req, res) => {
-  db.prepare('DELETE FROM images WHERE id = ?').run(req.params.id);
+  const image = db.prepare(
+    'SELECT i.id, s.plot_id, s.owner FROM images i JOIN shops s ON s.id = i.shop_id WHERE i.id = ?'
+  ).get(req.params.id);
+  if (!image) return res.status(404).json({ error: 'Image not found' });
+  db.prepare('DELETE FROM images WHERE id = ?').run(image.id);
+  logModAction(req, 'image.delete', `plot:${image.plot_id}`, `Deleted an image from ${image.owner}'s shop`);
   res.json({ deleted: true });
 });
 
@@ -346,8 +363,16 @@ app.get('/api/admin/comments', requireModerator, (req, res) => {
 });
 
 app.delete('/api/admin/comments/:id', requireModerator, (req, res) => {
-  const result = db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
-  if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
+  // Look it up first so the mod log keeps a copy of what was removed.
+  const comment = db.prepare(`
+    SELECT COALESCE(a.name, c.author, 'Anonymous') AS author, c.body, s.plot_id
+    FROM comments c JOIN shops s ON s.id = c.shop_id LEFT JOIN accounts a ON a.id = c.account_id
+    WHERE c.id = ?
+  `).get(req.params.id);
+  if (!comment) return res.status(404).json({ error: 'Comment not found' });
+  db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
+  logModAction(req, 'comment.delete', `plot:${comment.plot_id}`,
+    `Deleted ${comment.author}'s comment: "${comment.body.slice(0, 300)}"`);
   res.json({ deleted: true });
 });
 
