@@ -173,3 +173,82 @@
   min-width: 0;
   overflow-wrap: anywhere; /* long UUIDs wrap on phones instead of overflowing */
 }
+
+/* Your comments */
+.account-comments {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.account-comments ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.account-comments li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The whole entry links to the plot's card. */
+.account-comment,
+.account-comment:visited {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.account-comment:hover .account-comment__shop {
+  text-decoration: underline;
+}
+
+.account-comment__shop {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.account-comment__body {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  /* At most 3 lines; the full text is on the card. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.account-comment__muted {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.account-comment__delete {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.account-comment__confirm {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.account-comment__confirm button {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}

@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BadgeCheck } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAccount } from '../lib/account';
-import { formatDate } from '../lib/reports';
+import { formatDate, timeAgo } from '../lib/reports';
+import { displayName } from '../lib/plots';
 import './AccountPage.css';
 
 async function postJson(url, body) {
@@ -193,7 +194,76 @@ function LoggedInView({ account }) {
           <LinkAccountForm resetting />
         </div>
       )}
+
+      <YourComments />
     </>
+  );
+}
+
+const COMMENTS_PAGE = 20;
+
+// The logged-in account's comments. Each links to its plot's card; deleting
+// asks for confirmation inline.
+function YourComments() {
+  const [comments, setComments] = useState(null); // null while loading
+  const [shown, setShown] = useState(COMMENTS_PAGE);
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me/comments')
+      .then((res) => (res.ok ? res.json() : []))
+      .then(setComments)
+      .catch(() => setComments([]));
+  }, []);
+
+  const remove = async (id) => {
+    setError(null);
+    const res = await fetch(`/api/comments/${id}`, { method: 'DELETE' });
+    if (!res.ok) return setError('Could not delete that comment. Please try again.');
+    setComments((list) => list.filter((c) => c.id !== id));
+    setConfirmingId(null);
+  };
+
+  if (comments === null) return null;
+
+  return (
+    <section className="account-comments">
+      <h3>Your comments</h3>
+      {comments.length === 0 ? (
+        <p className="account-note">You haven't commented yet. Open a shop on the map to leave one.</p>
+      ) : (
+        <ul>
+          {comments.slice(0, shown).map((c) => (
+            <li key={c.id}>
+              <Link to={`/plot/${c.plot_id}`} className="account-comment">
+                <span className="account-comment__shop">
+                  {displayName(c)} <span className="coord">{c.plot_id}</span>
+                  {c.shop_closed_at && <span className="account-comment__muted"> shop closed</span>}
+                </span>
+                <span className="account-comment__body">{c.body}</span>
+                <span className="account-comment__muted">{timeAgo(c.created_at)}</span>
+              </Link>
+              {confirmingId === c.id ? (
+                <div className="account-comment__confirm">
+                  <span>Delete this comment?</span>
+                  <button type="button" onClick={() => remove(c.id)}>Yes</button>
+                  <button type="button" onClick={() => setConfirmingId(null)}>Cancel</button>
+                </div>
+              ) : (
+                <button type="button" className="account-comment__delete" onClick={() => setConfirmingId(c.id)}>
+                  Delete
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && <p className="account-form__error" role="alert">{error}</p>}
+      {comments.length > shown && (
+        <button type="button" onClick={() => setShown((n) => n + COMMENTS_PAGE)}>Show more</button>
+      )}
+    </section>
   );
 }
 

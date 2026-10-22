@@ -143,8 +143,25 @@
   font-style: italic;
 }
 
-.plot-detail__comment--pending {
-  opacity: 0.7;
+/* Comment names: linked accounts in full text color, typed/old names muted. */
+.plot-detail__author {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.plot-detail__author--linked {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.plot-detail__author--anonymous {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.plot-detail__link-prompt {
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 .plot-detail__comment-tag {

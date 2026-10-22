@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './PlotDetail.css';
+import { useAccount } from '../lib/account';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -18,16 +20,19 @@ function CommentList({ comments }) {
   return (
     <ul className="plot-detail__comments">
       {comments.map((c) => (
-        <li
-          key={c.id}
-          className={c.is_system ? 'plot-detail__comment--system' : c.pending ? 'plot-detail__comment--pending' : ''}
-        >
+        <li key={c.id} className={c.is_system ? 'plot-detail__comment--system' : ''}>
           {c.is_system ? (
             <span className="plot-detail__comment-tag">Update</span>
+          ) : c.verified ? (
+            // Linked accounts stand out by brightness rather than an icon.
+            <strong className="plot-detail__author plot-detail__author--linked" title="Linked Minecraft account">
+              {c.author}
+            </strong>
           ) : (
-            <strong>{c.author || 'Anonymous'}</strong>
+            <strong className={`plot-detail__author${c.author ? '' : ' plot-detail__author--anonymous'}`}>
+              {c.author || 'Anonymous'}
+            </strong>
           )}
-          {c.pending && <span className="plot-detail__comment-tag">Pending approval</span>}
           <p>{c.body}</p>
           <time>{formatDate(c.created_at)}</time>
         </li>
@@ -132,8 +137,8 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
+  const { account } = useAccount();
   const [commentBody, setCommentBody] = useState('');
-  const [commentAuthor, setCommentAuthor] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [myComments, setMyComments] = useState([]);
   const [myReports, setMyReports] = useState([]);
@@ -169,14 +174,10 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
     e.preventDefault();
     if (!commentBody.trim()) return;
     setSubmitting(true);
-    const body = commentBody.trim();
-    const author = commentAuthor.trim() || null;
     try {
-      await postJson(`/api/plots/${plot.id}/comments`, { body, author });
-      setMyComments((prev) => [
-        { id: `pending-${Date.now()}`, author, body, created_at: new Date().toISOString(), pending: true },
-        ...prev,
-      ]);
+      // The server returns the saved comment (already approved and linked).
+      const saved = await postJson(`/api/plots/${plot.id}/comments`, { body: commentBody.trim() });
+      setMyComments((prev) => [saved, ...prev]);
       setCommentBody('');
     } catch (err) {
       setError(`Could not submit comment: ${err.message}`);
@@ -297,26 +298,29 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             <h3>Comments</h3>
             <p className="plot-detail__comment-hint">
               Leave a comment if this shop is different from described.
-              Comments must be approved before they're shown to others.
             </p>
 
-            <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-              <input
-                type="text"
-                placeholder="Name (optional)"
-                value={commentAuthor}
-                onChange={(e) => setCommentAuthor(e.target.value)}
-              />
-              <textarea
-                placeholder="This shop has changed / is now selling..."
-                value={commentBody}
-                onChange={(e) => setCommentBody(e.target.value)}
-                required
-              />
-              <button type="submit" disabled={submitting}>
-                {submitting ? 'Posting…' : 'Post comment'}
-              </button>
-            </form>
+            {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
+            {account === undefined ? null : !account ? (
+              <p className="plot-detail__link-prompt">
+                <Link to="/account?tab=link">Link your Minecraft account</Link> to comment. It takes about a minute.
+              </p>
+            ) : (
+              <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
+                <span className="plot-detail__muted">
+                  Commenting as <strong className="plot-detail__author--linked">{account.name}</strong>
+                </span>
+                <textarea
+                  placeholder="This shop has changed / is now selling..."
+                  value={commentBody}
+                  onChange={(e) => setCommentBody(e.target.value)}
+                  required
+                />
+                <button type="submit" disabled={submitting}>
+                  {submitting ? 'Posting…' : 'Post comment'}
+                </button>
+              </form>
+            )}
 
             <CommentList comments={comments} />
           </>
