@@ -8,7 +8,10 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar__logo">Market Directory</Link>
+      <Link to="/" className="navbar__logo">
+        <span>Look out for yourself!</span>
+        <span className="navbar__subtitle">Monumenta Market Directory</span>
+      </Link>
       <div className="navbar__right">
         {isStaff && <Link to="/admin" className="navbar__admin">Admin</Link>}
         <Link to="/account" className="navbar__account" aria-label={account ? `Account: ${account.name}` : 'Log in'}>

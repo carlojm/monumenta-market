@@ -113,8 +113,8 @@ function LinkAccountForm({ resetting }) {
         </p>
       ) : (
         <p className="account-note">
-          Linking verifies you own your Minecraft account. Verified players get a ✓ next to their name, and their
-          comments skip the approval queue.
+          Linking verifies you own your Minecraft account. Verified players can contribute to the directory
+          through status voting, comments, and page revisions.
         </p>
       )}
 
@@ -123,9 +123,9 @@ function LinkAccountForm({ resetting }) {
           In Minecraft (Java 1.20.4+), go to <strong>Multiplayer → Add Server</strong> and enter this address:
           <ServerAddress />
         </li>
-        <li>Join the server to get a 5-character code.</li>
+        <li>You'll be kicked and given a verification code.</li>
         <li>
-          Enter the code below and choose a password.
+          Enter the code below and create a password to use for future logins.
           <form className="account-form" onSubmit={submit}>
             <label>
               Code

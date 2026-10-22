@@ -370,14 +370,14 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
           <>
             <hr />
             <h3>Comments</h3>
-            <p className="plot-detail__comment-hint">
+            {/* <p className="plot-detail__comment-hint">
               Leave a comment if this shop is different from described.
-            </p>
+            </p> */}
 
             {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
             {account === undefined ? null : !account ? (
               <p className="plot-detail__link-prompt">
-                <Link to="/account?tab=link">Link your Minecraft account</Link> to comment. It takes about a minute.
+                <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
               </p>
             ) : (
               <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>

@@ -40,10 +40,10 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
             {ACTIVITY_LABELS[key]}
           </li>
         ))}
-        <li>
+        {/* <li>
           <span className="market-map__swatch market-map__swatch--vacant" />
           Vacant
-        </li>
+        </li> */}
       </ul>
     </div>
   );

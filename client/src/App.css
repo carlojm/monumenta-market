@@ -24,6 +24,31 @@
   font-size: 1.1rem;
   color: var(--text);
   text-decoration: none;
+  /* Title and subtitle stack on phones... */
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.navbar__subtitle {
+  font-size: 0.75rem;
+  font-weight: 400;
+  /* font-style:italic; */
+  color: var(--text-muted);
+}
+
+/* ...and sit side by side once there's room for one line. */
+@media (min-width: 700px) {
+  .navbar__logo,
+  .navbar__logo:visited {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .navbar__subtitle {
+    font-size: 0.85rem;
+  }
 }
 
 /* Right side of the navbar: the Admin link (staff only) and the account button. */
