@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getAdminToken, clearAdminToken } from '../lib/adminAuth';
 import AdminLogin from './AdminLogin';
 import AdminPlotEditor from './AdminPlotEditor';
-import AdminCommentQueue from './AdminCommentQueue';
+import AdminComments from './AdminComments';
 
 function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(!!getAdminToken());
@@ -19,7 +19,7 @@ function AdminPage() {
         <button onClick={() => setTab('comments')}>Comments</button>
         <button onClick={() => { clearAdminToken(); setLoggedIn(false); }}>Log out</button>
       </div>
-      {tab === 'plots' ? <AdminPlotEditor /> : <AdminCommentQueue />}
+      {tab === 'plots' ? <AdminPlotEditor /> : <AdminComments />}
     </div>
   );
 }

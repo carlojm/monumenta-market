@@ -317,24 +317,36 @@ app.delete('/api/admin/images/:id', adminAuth, (req, res) => {
   res.json({ deleted: true });
 });
 
-// --- Admin: comment moderation ---
+// --- Admin: comment moderation (after the fact; comments aren't queued) ---
 
-app.get('/api/admin/comments/pending', adminAuth, (req, res) => {
-  const comments = db.prepare(`
-    SELECT c.*, s.plot_id, s.owner FROM comments c JOIN shops s ON s.id = c.shop_id
-    WHERE c.status = 'pending' ORDER BY c.created_at ASC
-  `).all();
-  res.json(comments);
+const ADMIN_COMMENTS_PAGE = 50;
+const searchAdminComments = db.prepare(`
+  SELECT ${COMMENT_COLUMNS},
+    s.plot_id, s.owner, s.shop_name, s.guild_name, s.closed_at AS shop_closed_at
+  FROM comments c
+  JOIN shops s ON s.id = c.shop_id
+  LEFT JOIN accounts a ON a.id = c.account_id
+  WHERE c.is_system = 0 AND (
+    @q = '' OR c.body LIKE @like OR COALESCE(a.name, c.author) LIKE @like
+    OR s.plot_id LIKE @like OR s.owner LIKE @like OR s.shop_name LIKE @like OR s.guild_name LIKE @like
+  )
+  ORDER BY c.created_at DESC, c.id DESC
+  LIMIT @limit OFFSET @offset
+`);
+
+// Newest first. `q` matches comment text, author, plot id, or shop owner/name
+// (LIKE ignores capitalization). One extra row is fetched to know if there's more.
+app.get('/api/admin/comments', adminAuth, (req, res) => {
+  const q = String(req.query.q ?? '').trim();
+  const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
+  const rows = searchAdminComments.all({ q, like: `%${q}%`, limit: ADMIN_COMMENTS_PAGE + 1, offset });
+  res.json({ comments: rows.slice(0, ADMIN_COMMENTS_PAGE), hasMore: rows.length > ADMIN_COMMENTS_PAGE });
 });
 
-app.post('/api/admin/comments/:id/approve', adminAuth, (req, res) => {
-  db.prepare("UPDATE comments SET status = 'approved' WHERE id = ?").run(req.params.id);
-  res.json({ approved: true });
-});
-
-app.post('/api/admin/comments/:id/reject', adminAuth, (req, res) => {
-  db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
-  res.json({ rejected: true });
+app.delete('/api/admin/comments/:id', adminAuth, (req, res) => {
+  const result = db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
+  if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
+  res.json({ deleted: true });
 });
 
 // --- Serve React build in production ---
