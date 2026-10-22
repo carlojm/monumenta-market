@@ -4,7 +4,7 @@ import { formatDate } from '../lib/reports';
 
 const ROLE_LABELS = { player: 'Player', moderator: 'Moderator', admin: 'Admin' };
 
-// Admin only: look up accounts and make or remove moderators. Admins
+// Admin only: look up accounts, make or remove moderators, and ban or unban. Admins
 // themselves are set in ADMIN_UUIDS in the server's .env.
 function AdminAccounts() {
   const [query, setQuery] = useState('');
@@ -12,6 +12,9 @@ function AdminAccounts() {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
+  const [banningId, setBanningId] = useState(null); // row with the ban form open
+  const [banReason, setBanReason] = useState('');
+  const [banDeleteComments, setBanDeleteComments] = useState(false);
   const [error, setError] = useState(null);
 
   const load = async (q, offset) => {
@@ -48,6 +51,30 @@ function AdminAccounts() {
     setAccounts((prev) => prev.map((a) => (a.id === data.id ? data : a)));
   };
 
+  // Ban (PUT) or unban (DELETE); the server returns the updated account.
+  const sendBan = async (account, ban) => {
+    setBusyId(account.id);
+    setError(null);
+    const res = await adminFetch(`/api/admin/accounts/${account.id}/ban`, ban
+      ? {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: banReason, delete_comments: banDeleteComments }),
+        }
+      : { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    setBusyId(null);
+    if (!res.ok) return setError(data.error || 'Could not change the ban.');
+    setAccounts((prev) => prev.map((a) => (a.id === data.id ? data : a)));
+    setBanningId(null);
+  };
+
+  const openBanForm = (account) => {
+    setBanningId(account.id);
+    setBanReason('');
+    setBanDeleteComments(false);
+  };
+
   return (
     <div className="admin-accounts">
       <input
@@ -65,10 +92,16 @@ function AdminAccounts() {
             <div className="admin-accounts__who">
               <strong>{a.name}</strong>
               <span className={`admin-accounts__role admin-accounts__role--${a.role}`}>{ROLE_LABELS[a.role]}</span>
+              {a.banned_at && <span className="admin-accounts__role admin-accounts__role--banned">Banned</span>}
               <span className="coord admin-accounts__uuid">{a.uuid}</span>
               <span className="admin-comments__muted">
                 linked {formatDate(a.created_at)}, {a.comment_count} comment{a.comment_count === 1 ? '' : 's'}
               </span>
+              {a.banned_at && (
+                <span className="admin-comments__muted">
+                  banned {formatDate(a.banned_at)}{a.ban_reason ? `: ${a.ban_reason}` : ''}
+                </span>
+              )}
             </div>
             <div className="admin-accounts__actions">
               {a.role === 'admin' ? (
@@ -82,7 +115,28 @@ function AdminAccounts() {
                   Make moderator
                 </button>
               )}
+              {a.role !== 'admin' && (a.banned_at ? (
+                <button type="button" disabled={busyId === a.id} onClick={() => sendBan(a, false)}>Unban</button>
+              ) : banningId !== a.id && (
+                <button type="button" className="admin-accounts__ban" onClick={() => openBanForm(a)}>Ban…</button>
+              ))}
             </div>
+            {banningId === a.id && (
+              <form className="admin-accounts__ban-form" onSubmit={(e) => { e.preventDefault(); sendBan(a, true); }}>
+                <span>Ban <strong>{a.name}</strong>? They'll be logged out and can't log in or relink.</span>
+                <input type="text" placeholder="Reason (only admins see this)" value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)} />
+                <label>
+                  <input type="checkbox" checked={banDeleteComments}
+                    onChange={(e) => setBanDeleteComments(e.target.checked)} />
+                  Also delete all their comments ({a.comment_count})
+                </label>
+                <div className="admin-accounts__ban-actions">
+                  <button type="submit" className="admin-accounts__ban" disabled={busyId === a.id}>Ban</button>
+                  <button type="button" onClick={() => setBanningId(null)}>Cancel</button>
+                </div>
+              </form>
+            )}
           </li>
         ))}
       </ul>

@@ -97,7 +97,8 @@ export function endAllSessions(accountId) {
 // Middleware: sets req.account to the logged-in account, or null.
 export function loadAccount(req, res, next) {
   const token = req.cookies?.[SESSION_COOKIE];
-  req.account = token ? findSessionAccount.get(hashToken(token)) ?? null : null;
+  const account = token ? findSessionAccount.get(hashToken(token)) ?? null : null;
+  req.account = account && !account.banned_at ? account : null; // banned accounts act logged out
   next();
 }
 

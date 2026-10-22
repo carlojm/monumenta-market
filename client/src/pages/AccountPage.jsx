@@ -198,7 +198,65 @@ function LoggedInView({ account }) {
       )}
 
       <YourComments />
+      <DeleteAccount account={account} />
     </>
+  );
+}
+
+// Asks for the Minecraft name to be typed before deleting, since it can't be undone.
+function DeleteAccount({ account }) {
+  const { setAccount } = useAccount();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [typed, setTyped] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const matches = typed.trim().toLowerCase() === account.name.toLowerCase();
+
+  const remove = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const res = await fetch('/api/auth/me', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ confirm_name: typed }),
+    });
+    if (!res.ok) {
+      setBusy(false);
+      return setError((await res.json().catch(() => ({}))).error || 'Could not delete your account.');
+    }
+    setAccount(null);
+    navigate('/');
+  };
+
+  return (
+    <section className="account-delete">
+      <h3>Delete account</h3>
+      {!open ? (
+        <button type="button" onClick={() => setOpen(true)}>Delete my account…</button>
+      ) : (
+        <form className="account-form" onSubmit={remove}>
+          <ul className="account-delete__effects">
+            <li>Your comments stay on the site but will show as <strong>Anonymous</strong>.</li>
+            <li>Your votes on comments are removed.</li>
+            <li>You're logged out everywhere, and this can't be undone.</li>
+            <li>You can link your Minecraft account again later as a new account.</li>
+          </ul>
+          <label>
+            <span>Type <strong>{account.name}</strong> to confirm</span>
+            <input type="text" autoComplete="off" value={typed} onChange={(e) => setTyped(e.target.value)} />
+          </label>
+          {error && <p className="account-form__error" role="alert">{error}</p>}
+          <div className="account-actions">
+            <button type="submit" className="account-delete__confirm" disabled={!matches || busy}>
+              {busy ? 'Deleting…' : 'Delete my account'}
+            </button>
+            <button type="button" onClick={() => { setOpen(false); setTyped(''); }}>Cancel</button>
+          </div>
+        </form>
+      )}
+    </section>
   );
 }
 

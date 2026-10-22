@@ -24,7 +24,7 @@ const insertCode = db.prepare(`
 `);
 const deleteOldCodes = db.prepare("DELETE FROM verify_codes WHERE expires_at < datetime('now', '-1 day')");
 
-const findAccountByUuid = db.prepare('SELECT id, name FROM accounts WHERE uuid = ?');
+const findAccountByUuid = db.prepare('SELECT id, name, banned_at FROM accounts WHERE uuid = ?');
 const findOtherAccountByName = db.prepare('SELECT id, uuid, name FROM accounts WHERE name = ? AND uuid != ?');
 const renameAccount = db.prepare('UPDATE accounts SET name = ? WHERE id = ?');
 
@@ -105,6 +105,13 @@ export function startVerifyServer(port, { onlineMode = true } = {}) {
     beforeLogin: (client) => {
       try {
         syncAccountName(client.uuid, client.username);
+        // A banned account gets no code (claiming one is refused anyway).
+        if (findAccountByUuid.get(client.uuid)?.banned_at) {
+          console.log(`verify: refused a code to banned account ${client.username}`);
+          return client.end('Banned', JSON.stringify({
+            text: 'This Minecraft account has been banned from the Monumenta Market Directory.', color: 'red',
+          }));
+        }
         const code = codeFor(client.uuid, client.username);
         console.log(`verify: issued a code to ${client.username}`);
         client.end('Verification code issued', kickMessage(code));

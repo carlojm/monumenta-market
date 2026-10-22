@@ -81,6 +81,8 @@ export function createSchema() {
       name TEXT NOT NULL UNIQUE COLLATE NOCASE,  -- current Minecraft name
       password_hash TEXT NOT NULL,               -- scrypt salt + hash, never the password
       role TEXT NOT NULL DEFAULT 'player',      -- 'player' | 'moderator' (admins come from ADMIN_UUIDS in .env)
+      banned_at TEXT,                            -- set when an admin bans the account
+      ban_reason TEXT,                           -- only shown to admins
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -124,6 +126,7 @@ export function createSchema() {
     CREATE TABLE IF NOT EXISTS mod_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       account_id INTEGER REFERENCES accounts(id),
+      actor_name TEXT,                           -- kept so entries still say who if the account is deleted
       action TEXT NOT NULL,                      -- e.g. 'comment.delete', 'shop.edit', 'account.role'
       target TEXT,                               -- e.g. 'plot:lime-3', 'account:4'
       details TEXT,                              -- human-readable summary
@@ -139,6 +142,13 @@ export function createSchema() {
 
   // Oct 2026: moderator is a role. (Older databases keep an unused is_moderator column.)
   addColumnIfMissing('accounts', 'role', "TEXT NOT NULL DEFAULT 'player'");
+
+  // Oct 2026: accounts can be banned.
+  addColumnIfMissing('accounts', 'banned_at', 'TEXT');
+  addColumnIfMissing('accounts', 'ban_reason', 'TEXT');
+
+  // Oct 2026: mod log entries keep the staff member's name.
+  addColumnIfMissing('mod_log', 'actor_name', 'TEXT');
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

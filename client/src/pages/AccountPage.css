@@ -268,3 +268,27 @@
 .account-comment__accuracy--outdated {
   color: #e0b87a;
 }
+
+/* Delete account */
+.account-delete {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.account-delete__effects {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.account-delete__confirm:not(:disabled) {
+  border-color: #e08a8a;
+  color: #e08a8a;
+}
+
+.account-delete__confirm:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

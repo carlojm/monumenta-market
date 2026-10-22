@@ -3,11 +3,13 @@
 // Admin-only account management, mounted at /api/admin.
 //   GET /accounts?q=&offset=     newest first, 50 per page; q matches name or UUID
 //   PUT /accounts/:id/role {role} 'player' | 'moderator' (admins come from .env)
+//   PUT /accounts/:id/ban {reason?, delete_comments?}   ban (logs them out everywhere)
+//   DELETE /accounts/:id/ban    unban
 //   GET /modlog?offset=          staff actions, newest first
 
 import express from 'express';
 import db from '../db/init.js';
-import { roleOf } from '../lib/auth.js';
+import { endAllSessions, roleOf } from '../lib/auth.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { logModAction } from '../lib/modlog.js';
 
@@ -18,7 +20,7 @@ const router = express.Router();
 const PAGE = 50;
 // Only these columns ever leave the server (never password_hash).
 const ACCOUNT_COLUMNS = `
-  a.id, a.uuid, a.name, a.role, a.created_at,
+  a.id, a.uuid, a.name, a.role, a.created_at, a.banned_at, a.ban_reason,
   (SELECT COUNT(*) FROM comments c WHERE c.account_id = a.id AND c.is_system = 0) AS comment_count
 `;
 const searchAccounts = db.prepare(`
@@ -61,9 +63,43 @@ router.put('/accounts/:id/role', requireAdmin, (req, res) => {
   res.json(withRole(getAccount.get(account.id)));
 });
 
+// Ban: they're logged out everywhere and can't log in or relink (the ban is on
+// the account, which is tied to their Minecraft UUID). Optionally removes all
+// their comments too (their votes go with them).
+router.put('/accounts/:id/ban', requireAdmin, (req, res) => {
+  const account = getAccount.get(req.params.id);
+  if (!account) return res.status(404).json({ error: 'Account not found' });
+  if (roleOf(account) === 'admin') return res.status(400).json({ error: "Admins can't be banned." });
+  const reason = String(req.body.reason ?? '').trim().slice(0, 500) || null;
+
+  const deleted = db.transaction(() => {
+    db.prepare('UPDATE accounts SET banned_at = CURRENT_TIMESTAMP, ban_reason = ? WHERE id = ?').run(reason, account.id);
+    endAllSessions(account.id);
+    const removed = req.body.delete_comments
+      ? db.prepare('DELETE FROM comments WHERE account_id = ? AND is_system = 0').run(account.id).changes
+      : 0;
+    logModAction(req, 'account.ban', `account:${account.id}`,
+      `Banned ${account.name}${reason ? ` (${reason})` : ''}${removed ? ` and deleted ${removed} comment${removed === 1 ? '' : 's'}` : ''}`);
+    return removed;
+  })();
+
+  res.json({ ...withRole(getAccount.get(account.id)), deleted_comments: deleted });
+});
+
+router.delete('/accounts/:id/ban', requireAdmin, (req, res) => {
+  const account = getAccount.get(req.params.id);
+  if (!account) return res.status(404).json({ error: 'Account not found' });
+  if (!account.banned_at) return res.status(400).json({ error: "This account isn't banned." });
+  db.prepare('UPDATE accounts SET banned_at = NULL, ban_reason = NULL WHERE id = ?').run(account.id);
+  logModAction(req, 'account.unban', `account:${account.id}`, `Unbanned ${account.name}`);
+  res.json(withRole(getAccount.get(account.id)));
+});
+
 // The mod log: every staff action, newest first, 50 per page.
 const modLogPage = db.prepare(`
-  SELECT m.id, m.action, m.target, m.details, m.created_at, a.name AS actor
+  SELECT m.id, m.action, m.target, m.details, m.created_at,
+    COALESCE(a.name, m.actor_name) AS actor,
+    (m.account_id IS NULL AND m.actor_name IS NOT NULL) AS actor_deleted
   FROM mod_log m LEFT JOIN accounts a ON a.id = m.account_id
   ORDER BY m.created_at DESC, m.id DESC
   LIMIT @limit OFFSET @offset

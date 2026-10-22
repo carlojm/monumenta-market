@@ -54,6 +54,7 @@ router.post('/claim', async (req, res) => {
     if (!markCodeUsed.run(code).changes) return { error: 'That code was already used.' };
 
     const existing = findAccountByUuid.get(verified.uuid);
+    if (existing?.banned_at) return { error: 'This Minecraft account has been banned from the directory.' };
     if (existing) {
       // Password reset: also logs out every other device.
       setPassword.run(passwordHash, existing.id);
@@ -90,6 +91,8 @@ router.post('/login', async (req, res) => {
   const account = findAccountByName.get(name);
   const ok = await checkPassword(password, account?.password_hash ?? DUMMY_HASH);
   if (!account || !ok) return fail();
+  // Checked only after the password, so it doesn't reveal which names exist.
+  if (account.banned_at) return res.status(403).json({ error: 'This account has been banned.' });
 
   startSession(res, account.id);
   res.json({ account: publicAccount(account) });
@@ -121,6 +124,30 @@ const myComments = db.prepare(`
 router.get('/me/comments', (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Not logged in' });
   res.json(myComments.all(req.account.id));
+});
+
+// Deletes the logged-in account. Body: { confirm_name } must match the
+// account's name. Their comments stay but become Anonymous; their votes and
+// sessions are removed. Staff log entries and mod log entries keep the name as
+// plain text, so history still says who made a change.
+const deleteAccount = db.transaction((accountId) => {
+  db.prepare('UPDATE comments SET account_id = NULL, author = NULL WHERE account_id = ? AND is_system = 0').run(accountId);
+  db.prepare('UPDATE comments SET account_id = NULL WHERE account_id = ? AND is_system = 1').run(accountId);
+  db.prepare('DELETE FROM comment_votes WHERE account_id = ?').run(accountId);
+  db.prepare('UPDATE mod_log SET account_id = NULL WHERE account_id = ?').run(accountId);
+  endAllSessions(accountId);
+  db.prepare('DELETE FROM accounts WHERE id = ?').run(accountId);
+});
+
+router.delete('/me', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Not logged in' });
+  const typed = String(req.body?.confirm_name ?? '').trim().toLowerCase();
+  if (typed !== req.account.name.toLowerCase()) {
+    return res.status(400).json({ error: 'Type your Minecraft name exactly to confirm.' });
+  }
+  deleteAccount(req.account.id);
+  endSession(req, res); // clears the cookie
+  res.json({ deleted: true });
 });
 
 export default router;

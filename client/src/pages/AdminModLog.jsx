@@ -59,6 +59,7 @@ function AdminModLog() {
           <li key={e.id}>
             <div className="admin-comments__meta">
               <strong>{e.actor ?? 'Admin token'}</strong>
+              {!!e.actor_deleted && <span className="admin-comments__muted">deleted account</span>}
               {targetLink(e.target)}
               <span className="admin-comments__muted" title={formatDate(e.created_at)}>{timeAgo(e.created_at)}</span>
             </div>
