@@ -13,6 +13,7 @@ import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import authRoutes from './routes/auth.js';
+import adminRoutes from './routes/admin.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(loadAccount); // sets req.account when logged in
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes); // admin-only account management
 
 const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
   'guild_color', 'primary_color', 'secondary_color'];

@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import { useAccount } from '../lib/account';
 import AdminPlotEditor from './AdminPlotEditor';
 import AdminComments from './AdminComments';
+import AdminAccounts from './AdminAccounts';
 
 // Staff only: moderators and admins. Access comes from the logged-in account.
 function AdminPage() {
@@ -26,8 +27,14 @@ function AdminPage() {
             <div className="admin-page__tabs">
               <button onClick={() => setTab('plots')} aria-pressed={tab === 'plots'}>Plots</button>
               <button onClick={() => setTab('comments')} aria-pressed={tab === 'comments'}>Comments</button>
+              {/* Accounts (making moderators) is for admins only. */}
+              {account.role === 'admin' && (
+                <button onClick={() => setTab('accounts')} aria-pressed={tab === 'accounts'}>Accounts</button>
+              )}
             </div>
-            {tab === 'plots' ? <AdminPlotEditor /> : <AdminComments />}
+            {tab === 'plots' && <AdminPlotEditor />}
+            {tab === 'comments' && <AdminComments />}
+            {tab === 'accounts' && account.role === 'admin' && <AdminAccounts />}
           </>
         )}
       </div>
