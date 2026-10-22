@@ -11,6 +11,7 @@ import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
 import { adminAuth } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
+import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import authRoutes from './routes/auth.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
@@ -41,7 +42,8 @@ const getShop = db.prepare('SELECT * FROM shops WHERE id = ?');
 const COMMENT_COLUMNS = `
   c.id, c.shop_id, c.body, c.is_system, c.status, c.created_at, c.account_id,
   COALESCE(a.name, c.author) AS author,
-  a.id IS NOT NULL AS verified
+  a.id IS NOT NULL AS verified,
+  ${ACCURACY_COLUMNS}
 `;
 const getApprovedComments = db.prepare(`
   SELECT ${COMMENT_COLUMNS} FROM comments c LEFT JOIN accounts a ON a.id = c.account_id
@@ -114,7 +116,8 @@ app.get('/api/plots', (req, res) => {
       s.id AS shop_id, s.owner, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
       s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
       (SELECT GROUP_CONCAT(body, ' ') FROM comments c
-       WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0) AS comment_text
+       WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0
+         AND ${NOT_OUTDATED}) AS comment_text
     FROM plots p
     LEFT JOIN shops s ON s.plot_id = p.id AND s.closed_at IS NULL
     ORDER BY p.id
@@ -182,6 +185,25 @@ app.post('/api/plots/:id/comments', (req, res) => {
   `).run(shop.id, req.account.id, req.account.name, body);
 
   res.status(201).json(getComment.get(result.lastInsertRowid));
+});
+
+// Accuracy vote from a linked account. The latest vote is the comment's status;
+// voting the same as the current status changes nothing.
+app.post('/api/comments/:id/vote', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to vote.' });
+  const { vote } = req.body;
+  if (!VOTES.includes(vote)) return res.status(400).json({ error: `vote must be one of ${VOTES.join(', ')}` });
+  const comment = db.prepare('SELECT id, is_system FROM comments WHERE id = ?').get(req.params.id);
+  if (!comment) return res.status(404).json({ error: 'Comment not found' });
+  if (comment.is_system) return res.status(400).json({ error: 'Log entries can\'t be voted on' });
+
+  const current = getComment.get(comment.id);
+  if (current.accuracy !== vote) {
+    db.prepare('INSERT INTO comment_votes (comment_id, account_id, vote) VALUES (?, ?, ?)')
+      .run(comment.id, req.account.id, vote);
+  }
+  const updated = getComment.get(comment.id);
+  res.json({ accuracy: updated.accuracy, accuracy_at: updated.accuracy_at });
 });
 
 // Deleting is only allowed for the comment's own account.

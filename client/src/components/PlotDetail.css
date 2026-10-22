@@ -298,3 +298,47 @@
   color: var(--text);
   font-size: 0.95rem;
 }
+
+/* Comment footer: date, then accuracy status ("Outdated 3d ago"). */
+.plot-detail__comment-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.plot-detail__accuracy {
+  font-size: 0.8rem;
+}
+
+.plot-detail__accuracy .plot-detail__muted {
+  font-size: 0.75rem;
+}
+
+/* Small vote/delete buttons under a comment. */
+.plot-detail__comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.plot-detail__comment-actions button {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  background: var(--code-bg);
+  color: var(--text-muted);
+}
+
+.plot-detail__comment-actions button[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* Outdated comments stay readable but clearly old. */
+.plot-detail__comment--outdated > strong,
+.plot-detail__comment--outdated > p {
+  opacity: 0.5;
+}

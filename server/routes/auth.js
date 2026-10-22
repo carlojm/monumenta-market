@@ -9,6 +9,7 @@
 
 import express from 'express';
 import db from '../db/init.js';
+import { ACCURACY_COLUMNS } from '../lib/comments.js';
 import {
   PASSWORD_MAX, checkPassword, endAllSessions, endSession, hashPassword,
   passwordProblem, publicAccount, refreshSession, startSession,
@@ -110,7 +111,8 @@ router.get('/me', (req, res) => {
 // (shop_closed_at is set if that shop has since closed).
 const myComments = db.prepare(`
   SELECT c.id, c.body, c.created_at, s.plot_id,
-    s.owner, s.shop_name, s.guild_name, s.closed_at AS shop_closed_at
+    s.owner, s.shop_name, s.guild_name, s.closed_at AS shop_closed_at,
+    ${ACCURACY_COLUMNS}
   FROM comments c JOIN shops s ON s.id = c.shop_id
   WHERE c.account_id = ?
   ORDER BY c.created_at DESC, c.id DESC

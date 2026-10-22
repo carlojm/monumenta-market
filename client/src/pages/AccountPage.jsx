@@ -242,7 +242,15 @@ function YourComments() {
                   {c.shop_closed_at && <span className="account-comment__muted"> shop closed</span>}
                 </span>
                 <span className="account-comment__body">{c.body}</span>
-                <span className="account-comment__muted">{timeAgo(c.created_at)}</span>
+                <span className="account-comment__footer">
+                  <span className="account-comment__muted">{timeAgo(c.created_at)}</span>
+                  {c.accuracy && (
+                    <span className={`account-comment__accuracy account-comment__accuracy--${c.accuracy}`}>
+                      {c.accuracy === 'outdated' ? 'Outdated' : 'Accurate'}{' '}
+                      <span className="account-comment__muted">{timeAgo(c.accuracy_at)}</span>
+                    </span>
+                  )}
+                </span>
               </Link>
               {confirmingId === c.id ? (
                 <div className="account-comment__confirm">

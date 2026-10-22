@@ -15,27 +15,96 @@ async function postJson(url, body) {
   return res.json();
 }
 
-function CommentList({ comments }) {
+const ACCURACY_LABELS = { accurate: 'Accurate', outdated: 'Outdated' };
+
+// One comment. With `interactive` (the current shop's comments), logged-in
+// players can vote on its accuracy, and delete it if it's theirs.
+function CommentItem({ comment: c, interactive, onDeleted }) {
+  const { account } = useAccount();
+  const [accuracy, setAccuracy] = useState({ value: c.accuracy, at: c.accuracy_at });
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [error, setError] = useState(null);
+  const isOwn = !!account && !!c.verified && c.author === account.name;
+  const canAct = interactive && !!account && !c.is_system;
+
+  const vote = async (value) => {
+    if (accuracy.value === value) return;
+    setError(null);
+    try {
+      const result = await postJson(`/api/comments/${c.id}/vote`, { vote: value });
+      setAccuracy({ value: result.accuracy, at: result.accuracy_at });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const remove = async () => {
+    const res = await fetch(`/api/comments/${c.id}`, { method: 'DELETE' });
+    if (!res.ok) return setError('Could not delete the comment. Please try again.');
+    onDeleted(c.id);
+  };
+
+  const classes = [
+    c.is_system && 'plot-detail__comment--system',
+    accuracy.value === 'outdated' && 'plot-detail__comment--outdated',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <li className={classes}>
+      {c.is_system ? (
+        <span className="plot-detail__comment-tag">Update</span>
+      ) : c.verified ? (
+        // Linked accounts stand out by brightness rather than an icon.
+        <strong className="plot-detail__author plot-detail__author--linked" title="Linked Minecraft account">
+          {c.author}
+        </strong>
+      ) : (
+        <strong className={`plot-detail__author${c.author ? '' : ' plot-detail__author--anonymous'}`}>
+          {c.author || 'Anonymous'}
+        </strong>
+      )}
+      <p>{c.body}</p>
+      <div className="plot-detail__comment-footer">
+        <time>{formatDate(c.created_at)}</time>
+        {accuracy.value && (
+          <span className="plot-detail__accuracy">
+            {ACCURACY_LABELS[accuracy.value]} <span className="plot-detail__muted">{timeAgo(accuracy.at)}</span>
+          </span>
+        )}
+      </div>
+
+      {canAct && (
+        confirmingDelete ? (
+          <div className="plot-detail__comment-actions">
+            <span className="plot-detail__muted">Delete this comment?</span>
+            <button type="button" onClick={remove}>Yes</button>
+            <button type="button" onClick={() => setConfirmingDelete(false)}>Cancel</button>
+          </div>
+        ) : (
+          <div className="plot-detail__comment-actions">
+            <button type="button" aria-pressed={accuracy.value === 'accurate'} onClick={() => vote('accurate')}>
+              Still accurate
+            </button>
+            <button type="button" aria-pressed={accuracy.value === 'outdated'} onClick={() => vote('outdated')}>
+              Outdated
+            </button>
+            {isOwn && (
+              <button type="button" onClick={() => setConfirmingDelete(true)}>Delete</button>
+            )}
+          </div>
+        )
+      )}
+      {error && <p className="plot-detail__error">{error}</p>}
+    </li>
+  );
+}
+
+function CommentList({ comments, interactive = false, onDeleted }) {
   if (!comments.length) return <p className="plot-detail__empty">No comments yet.</p>;
   return (
     <ul className="plot-detail__comments">
       {comments.map((c) => (
-        <li key={c.id} className={c.is_system ? 'plot-detail__comment--system' : ''}>
-          {c.is_system ? (
-            <span className="plot-detail__comment-tag">Update</span>
-          ) : c.verified ? (
-            // Linked accounts stand out by brightness rather than an icon.
-            <strong className="plot-detail__author plot-detail__author--linked" title="Linked Minecraft account">
-              {c.author}
-            </strong>
-          ) : (
-            <strong className={`plot-detail__author${c.author ? '' : ' plot-detail__author--anonymous'}`}>
-              {c.author || 'Anonymous'}
-            </strong>
-          )}
-          <p>{c.body}</p>
-          <time>{formatDate(c.created_at)}</time>
-        </li>
+        <CommentItem key={c.id} comment={c} interactive={interactive} onDeleted={onDeleted} />
       ))}
     </ul>
   );
@@ -141,6 +210,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [myComments, setMyComments] = useState([]);
+  const [deletedIds, setDeletedIds] = useState([]);
   const [myReports, setMyReports] = useState([]);
 
   useEffect(() => {
@@ -155,7 +225,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
 
   const shop = detail ? detail.shop : plot.shop;
   const images = shop?.images || [];
-  const comments = [...myComments, ...(shop?.comments || [])];
+  const comments = [...myComments, ...(shop?.comments || [])].filter((c) => !deletedIds.includes(c.id));
   const reports = [...myReports, ...(detail?.reports || [])];
   // The server's latest_report already fills in a missing part from earlier
   // reports. A report submitted here is merged on top the same way.
@@ -322,7 +392,11 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
               </form>
             )}
 
-            <CommentList comments={comments} />
+            <CommentList
+              comments={comments}
+              interactive
+              onDeleted={(id) => setDeletedIds((ids) => [...ids, id])}
+            />
           </>
         )}
 

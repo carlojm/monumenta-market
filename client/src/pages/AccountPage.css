@@ -252,3 +252,19 @@
   font-size: 0.8rem;
   padding: 0.2rem 0.5rem;
 }
+
+.account-comment__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.account-comment__accuracy {
+  font-size: 0.8rem;
+}
+
+/* Make "Outdated" stand out a little, since it's a nudge to update or delete. */
+.account-comment__accuracy--outdated {
+  color: #e0b87a;
+}

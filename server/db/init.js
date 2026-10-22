@@ -105,6 +105,19 @@ export function createSchema() {
     );
   `);
 
+  // Comment accuracy votes from linked accounts. A comment's status is its
+  // latest vote; every vote is kept. Deleting a comment deletes its votes.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS comment_votes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+      account_id INTEGER NOT NULL REFERENCES accounts(id),
+      vote TEXT NOT NULL,                        -- 'accurate' | 'outdated'
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS comment_votes_comment ON comment_votes(comment_id, created_at);
+  `);
+
   // --- Migrations: bring older databases up to date. Each runs once. ---
 
   // Oct 2026: comments can belong to a linked account.
@@ -126,6 +139,7 @@ function addColumnIfMissing(table, column, definition) {
 // sessions and verify codes are left alone so a reload doesn't wipe accounts.
 export function dropSchema() {
   db.exec(`
+    DROP TABLE IF EXISTS comment_votes;
     DROP TABLE IF EXISTS comments;
     DROP TABLE IF EXISTS images;
     DROP TABLE IF EXISTS reports;
