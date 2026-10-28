@@ -191,6 +191,8 @@ app.post('/api/plots/:id/comments', (req, res) => {
   const result = db.prepare(`
     INSERT INTO comments (shop_id, account_id, author, body, status) VALUES (?, ?, ?, ?, 'approved')
   `).run(shop.id, req.account.id, req.account.name, body);
+  logModAction(req, 'comment.create', `plot:${req.params.id}`,
+    `Commented on ${shop.owner}'s shop: "${body.slice(0, 300)}"`);
 
   res.status(201).json(getComment.get(result.lastInsertRowid));
 });
@@ -217,9 +219,15 @@ app.post('/api/comments/:id/vote', (req, res) => {
 // Deleting is only allowed for the comment's own account.
 app.delete('/api/comments/:id', (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Log in to delete your comments.' });
-  const result = db.prepare('DELETE FROM comments WHERE id = ? AND account_id = ? AND is_system = 0')
-    .run(req.params.id, req.account.id);
-  if (!result.changes) return res.status(404).json({ error: 'Comment not found' });
+  // Look it up first so the mod log keeps a copy of what was removed.
+  const comment = db.prepare(`
+    SELECT c.body, s.plot_id, s.owner FROM comments c JOIN shops s ON s.id = c.shop_id
+    WHERE c.id = ? AND c.account_id = ? AND c.is_system = 0
+  `).get(req.params.id, req.account.id);
+  if (!comment) return res.status(404).json({ error: 'Comment not found' });
+  db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
+  logModAction(req, 'comment.delete_own', `plot:${comment.plot_id}`,
+    `Deleted their own comment on ${comment.owner}'s shop: "${comment.body.slice(0, 300)}"`);
   res.json({ deleted: true });
 });
 
@@ -233,8 +241,9 @@ app.post('/api/plots/:id/report', (req, res) => {
   if (lock && !LOCK.includes(lock)) return res.status(400).json({ error: `lock must be one of ${LOCK.join(', ')}` });
 
   const shop = getCurrentShop.get(plot.id);
+  if (!shop) return res.status(409).json({ error: "This plot is vacant, so there's no shop to report on." });
   db.prepare('INSERT INTO reports (plot_id, shop_id, activity, lock) VALUES (?, ?, ?, ?)')
-    .run(plot.id, shop?.id ?? null, activity, lock);
+    .run(plot.id, shop.id, activity, lock);
 
   res.status(201).json({ recorded: true });
 });

@@ -25,7 +25,10 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState(null);
   const isOwn = !!account && !!c.verified && c.author === account.name;
+  const isStaff = account?.role === 'moderator' || account?.role === 'admin';
   const canAct = interactive && !!account && !c.is_system;
+  // Players can delete their own comments; staff can delete anyone's.
+  const canDelete = isOwn || isStaff;
 
   const vote = async (value) => {
     if (accuracy.value === value) return;
@@ -39,7 +42,10 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   };
 
   const remove = async () => {
-    const res = await fetch(`/api/comments/${c.id}`, { method: 'DELETE' });
+    // Staff removing someone else's comment go through the admin route, so it's
+    // recorded in the mod log.
+    const url = isOwn ? `/api/comments/${c.id}` : `/api/admin/comments/${c.id}`;
+    const res = await fetch(url, { method: 'DELETE' });
     if (!res.ok) return setError('Could not delete the comment. Please try again.');
     onDeleted(c.id);
   };
@@ -80,7 +86,9 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
       {canAct && (
         confirmingDelete ? (
           <div className="plot-detail__comment-actions">
-            <span className="plot-detail__muted">Delete this comment?</span>
+            <span className="plot-detail__muted">
+              {isOwn ? 'Delete this comment?' : `Delete ${c.author || 'Anonymous'}'s comment?`}
+            </span>
             <button type="button" onClick={remove}>Yes</button>
             <button type="button" onClick={() => setConfirmingDelete(false)}>Cancel</button>
           </div>
@@ -92,7 +100,7 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
             <button type="button" aria-pressed={accuracy.value === 'outdated'} onClick={() => vote('outdated')}>
               Outdated
             </button>
-            {isOwn && (
+            {canDelete && (
               <button type="button" onClick={() => setConfirmingDelete(true)}>Delete</button>
             )}
           </div>
@@ -328,7 +336,10 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
           )}
           <dt>Status</dt>
           <dd className="plot-detail__status">
-            {latestReport ? (
+            {/* A vacant plot has no shop to report on: no history, no report form. */}
+            {!shop ? (
+              <span>Vacant</span>
+            ) : latestReport ? (
               <span>
                 {reportLabel(latestReport)}{' '}
                 <span className="plot-detail__muted">{timeAgo(latestReport.created_at)}</span>
@@ -336,7 +347,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             ) : (
               <span className="plot-detail__muted">No reports yet</span>
             )}
-            {reports.length > 1 && (
+            {shop && reports.length > 1 && (
               <details className="plot-detail__history">
                 <summary>History ({reports.length})</summary>
                 <ul>
@@ -348,7 +359,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
                 </ul>
               </details>
             )}
-            <ReportForm plotId={plot.id} onReported={handleReported} />
+            {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
           </dd>
         </dl>
 

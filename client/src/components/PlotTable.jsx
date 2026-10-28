@@ -42,7 +42,7 @@ function PlotTable({ plots, searchResults, onSelectPlot }) {
               <td className="plot-table__shop">{displayName(plot.shop)}</td>
               {!searchResults && <td>{plot.zone}</td>}
               <td>
-                {report ? (
+                {!plot.shop ? 'Vacant' : report ? (
                   <>
                     {reportLabel(report)}{' '}
                     <span className="plot-table__age">{timeAgo(report.created_at)}</span>

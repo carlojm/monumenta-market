@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import { formatDate, timeAgo } from '../lib/reports';
 
-// Admin only: every staff action, newest first.
+// Admin only: every staff action plus all comment activity (new comments and
+// deletions), newest first.
 function AdminModLog() {
   const [entries, setEntries] = useState([]);
   const [hasMore, setHasMore] = useState(false);
