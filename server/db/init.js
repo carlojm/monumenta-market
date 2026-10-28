@@ -134,6 +134,40 @@ export function createSchema() {
     );
   `);
 
+  // Tags (see server/data/tags.json). Categories describe what kind of shop it
+  // is; stock tags (in groups) describe what it sells. sort_order is the order
+  // tags are shown in (from their position in tags.json), not alphabetical.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS tag_groups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      color TEXT,                                -- fallback for its tags without a color
+      sort_order INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL,                        -- 'category' | 'stock'
+      name TEXT NOT NULL COLLATE NOCASE,
+      aliases TEXT NOT NULL DEFAULT '[]',        -- JSON list, e.g. ["White"]; searched like the name
+      group_id INTEGER REFERENCES tag_groups(id),  -- stock tags only
+      color TEXT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'approved',   -- 'approved' | 'pending' (a suggestion)
+      suggested_by INTEGER REFERENCES accounts(id),
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (kind, name)
+    );
+
+    -- Tags belong to a shop (like comments), so a closed shop keeps its tags.
+    CREATE TABLE IF NOT EXISTS shop_tags (
+      shop_id INTEGER NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
+      tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+      PRIMARY KEY (shop_id, tag_id)
+    );
+    CREATE INDEX IF NOT EXISTS shop_tags_tag ON shop_tags(tag_id);
+  `);
+
   // --- Migrations: bring older databases up to date. Each runs once. ---
 
   // Oct 2026: comments can belong to a linked account.
@@ -162,10 +196,12 @@ function addColumnIfMissing(table, column, definition) {
 }
 
 // Drops the plot data tables. Only used by the plots.json loader. Accounts,
-// sessions and verify codes are left alone so a reload doesn't wipe accounts.
+// sessions, verify codes and the tag lists are left alone so a reload doesn't
+// wipe them (shops' tag links go, since the shops are rebuilt).
 export function dropSchema() {
   db.exec(`
     DROP TABLE IF EXISTS comment_votes;
+    DROP TABLE IF EXISTS shop_tags;
     DROP TABLE IF EXISTS comments;
     DROP TABLE IF EXISTS images;
     DROP TABLE IF EXISTS reports;

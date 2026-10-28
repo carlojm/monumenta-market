@@ -11,6 +11,7 @@
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "db:load": "node db/load_plots.js",
+    "tags:load": "node db/load_tags.js",
     "plots": "node scripts/plots.js"
   },
   "author": "carlo",

@@ -1,5 +1,5 @@
 {
-  "_readme": "Draft tag lists, generated 10/28 from current shop descriptions and stock. Edit names, aliases, groups and colors freely; delete tags you don't want. seen_in = roughly how many current shops mention the tag or an alias today (for prioritizing; not stored). color: a hex like \"#7bb0e0\", or null for the default.",
+  "_readme": "Tag lists. ORDER MATTERS: tags are shown in the order listed here (e.g. progression order), and groups in the order of the groups list. To reorder, move entries. color: a hex like \"#7bb0e0\", or null. A stock tag with no color uses its group's color; categories have their own. seen_in = rough count of shops mentioning the tag on 10/28 (not stored).",
   "categories": [
     {
       "name": "Region 1 Equipment",
@@ -67,13 +67,67 @@
       "color": null
     }
   ],
+  "groups": [
+    {
+      "name": "Dungeons",
+      "color": null
+    },
+    {
+      "name": "Strikes",
+      "color": null
+    },
+    {
+      "name": "Bosses",
+      "color": null
+    },
+    {
+      "name": "Overworld",
+      "color": null
+    },
+    {
+      "name": "Content",
+      "color": null
+    },
+    {
+      "name": "Items",
+      "color": null
+    },
+    {
+      "name": "Charms",
+      "color": null
+    },
+    {
+      "name": "Currency & materials",
+      "color": null
+    },
+    {
+      "name": "Consumables",
+      "color": null
+    },
+    {
+      "name": "Blocks & utility",
+      "color": null
+    },
+    {
+      "name": "Collectibles",
+      "color": null
+    },
+    {
+      "name": "Rentals",
+      "color": null
+    },
+    {
+      "name": "Services",
+      "color": null
+    }
+  ],
   "stock": [
     {
       "name": "Halls of Wind and Blood",
       "aliases": [
         "White"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -82,7 +136,7 @@
       "aliases": [
         "Orange"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -91,7 +145,7 @@
       "aliases": [
         "Magenta"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -100,7 +154,7 @@
       "aliases": [
         "Light Blue"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -109,7 +163,7 @@
       "aliases": [
         "Yellow"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 3
     },
@@ -119,7 +173,7 @@
         "Willows",
         "Willow"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 1
     },
@@ -128,7 +182,7 @@
       "aliases": [
         "Labs"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -139,7 +193,7 @@
         "Corrupted",
         "MR"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 4
     },
@@ -148,118 +202,7 @@
       "aliases": [
         "VR"
       ],
-      "group": "R1 dungeons",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "Kaul",
-      "aliases": [],
-      "group": "R1 bosses",
-      "color": null,
-      "seen_in": 0
-    },
-    {
-      "name": "Valley Overworld",
-      "aliases": [
-        "Valley",
-        "King's Valley",
-        "R1 overworld"
-      ],
-      "group": "R1 overworld",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "Valley Explorer",
-      "aliases": [],
-      "group": "R1 overworld",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "Salazar's Folly",
-      "aliases": [
-        "Lime"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "Harmonic Arboretum",
-      "aliases": [
-        "Pink"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 1
-    },
-    {
-      "name": "Valley of the Forgotten Pharaohs",
-      "aliases": [
-        "Gray",
-        "Grey"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "Palace of Mirrors",
-      "aliases": [
-        "Light Gray",
-        "Light Grey"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "The Scourge of Lunacy",
-      "aliases": [
-        "Cyan"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 1
-    },
-    {
-      "name": "The Grasp of Avarice",
-      "aliases": [
-        "Purple"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 1
-    },
-    {
-      "name": "The Echoes of Oblivion",
-      "aliases": [
-        "Teal"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "City of Shifting Waters",
-      "aliases": [
-        "Shifting",
-        "Shifting City",
-        "Fred"
-      ],
-      "group": "R2 dungeons",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "Fallen Forum",
-      "aliases": [
-        "Forum",
-        "TFF"
-      ],
-      "group": "R2 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 2
     },
@@ -270,9 +213,95 @@
         "Corridors",
         "Roguelike"
       ],
-      "group": "R1 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 9
+    },
+    {
+      "name": "Salazar's Folly",
+      "aliases": [
+        "Lime"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Harmonic Arboretum",
+      "aliases": [
+        "Pink"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Valley of the Forgotten Pharaohs",
+      "aliases": [
+        "Gray",
+        "Grey"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Palace of Mirrors",
+      "aliases": [
+        "Light Gray",
+        "Light Grey"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "The Scourge of Lunacy",
+      "aliases": [
+        "Cyan"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "The Grasp of Avarice",
+      "aliases": [
+        "Purple"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "The Echoes of Oblivion",
+      "aliases": [
+        "Teal"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "City of Shifting Waters",
+      "aliases": [
+        "Shifting",
+        "Shifting City",
+        "Fred"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Fallen Forum",
+      "aliases": [
+        "Forum",
+        "TFF"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 2
     },
     {
       "name": "Darkest Depths",
@@ -282,37 +311,9 @@
         "EDD",
         "Endless Darkest Depths"
       ],
-      "group": "R2 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 7
-    },
-    {
-      "name": "Eldrask",
-      "aliases": [
-        "Frost Giant",
-        "FG"
-      ],
-      "group": "R2 bosses",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "Isles Overworld",
-      "aliases": [
-        "Isles",
-        "Celsian Isles",
-        "R2 overworld"
-      ],
-      "group": "R2 overworld",
-      "color": null,
-      "seen_in": 2
-    },
-    {
-      "name": "Isles Explorer",
-      "aliases": [],
-      "group": "R2 overworld",
-      "color": null,
-      "seen_in": 1
     },
     {
       "name": "Celestial Zenith",
@@ -320,7 +321,7 @@
         "Zenith",
         "CZ"
       ],
-      "group": "R3 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 21
     },
@@ -329,7 +330,7 @@
       "aliases": [
         "SKT"
       ],
-      "group": "R3 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 5
     },
@@ -338,7 +339,7 @@
       "aliases": [
         "Blue"
       ],
-      "group": "R3 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 8
     },
@@ -347,7 +348,7 @@
       "aliases": [
         "Brown"
       ],
-      "group": "R3 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 6
     },
@@ -357,16 +358,54 @@
         "Indigo",
         "Phyrrys"
       ],
-      "group": "R3 dungeons",
+      "group": "Dungeons",
       "color": null,
       "seen_in": 6
+    },
+    {
+      "name": "Wanderer's Fortune",
+      "aliases": [
+        "Fortune"
+      ],
+      "group": "Dungeons",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Forsworn Sanctum",
+      "aliases": [
+        "FS",
+        "Sanctum"
+      ],
+      "group": "Strikes",
+      "color": null,
+      "seen_in": 0
+    },
+    {
+      "name": "Sealed Remorse",
+      "aliases": [
+        "Shard of Remorse",
+        "SR"
+      ],
+      "group": "Strikes",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Black Mist",
+      "aliases": [
+        "BM"
+      ],
+      "group": "Strikes",
+      "color": null,
+      "seen_in": 0
     },
     {
       "name": "P.O.R.T.A.L.",
       "aliases": [
         "Portal"
       ],
-      "group": "R3 strikes",
+      "group": "Strikes",
       "color": null,
       "seen_in": 4
     },
@@ -376,7 +415,7 @@
         "MR",
         "Masqueraders Ruin"
       ],
-      "group": "R3 strikes",
+      "group": "Strikes",
       "color": null,
       "seen_in": 4
     },
@@ -387,7 +426,7 @@
         "SH",
         "Gallery"
       ],
-      "group": "R3 strikes",
+      "group": "Strikes",
       "color": null,
       "seen_in": 5
     },
@@ -397,7 +436,7 @@
         "MN",
         "Gallery"
       ],
-      "group": "R3 strikes",
+      "group": "Strikes",
       "color": null,
       "seen_in": 1
     },
@@ -406,110 +445,24 @@
       "aliases": [
         "Gallery"
       ],
-      "group": "R3 strikes",
+      "group": "Strikes",
       "color": null,
       "seen_in": 1
     },
     {
-      "name": "Forsworn Sanctum",
-      "aliases": [
-        "FS",
-        "Sanctum"
-      ],
-      "group": "R1 strikes",
-      "color": null,
-      "seen_in": 0
-    },
-    {
-      "name": "Sealed Remorse",
-      "aliases": [
-        "Shard of Remorse",
-        "SR"
-      ],
-      "group": "R2 strikes",
-      "color": null,
-      "seen_in": 1
-    },
-    {
-      "name": "Black Mist",
-      "aliases": [
-        "BM"
-      ],
-      "group": "R2 strikes",
-      "color": null,
-      "seen_in": 0
-    },
-    {
-      "name": "Wanderer's Fortune",
-      "aliases": [
-        "Fortune"
-      ],
-      "group": "R3 dungeons",
-      "color": null,
-      "seen_in": 5
-    },
-    {
-      "name": "Silver Knight's Remnants",
-      "aliases": [
-        "SKR"
-      ],
-      "group": "R3 content",
-      "color": null,
-      "seen_in": 10
-    },
-    {
-      "name": "Diamenean Hunts",
-      "aliases": [
-        "Hunts",
-        "Hunt"
-      ],
-      "group": "R3 content",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "Ring Fishing",
-      "aliases": [
-        "Fishing",
-        "R3 Fishing",
-        "Fish"
-      ],
-      "group": "R3 content",
-      "color": null,
-      "seen_in": 3
-    },
-    {
-      "name": "Wolfswood",
+      "name": "Kaul",
       "aliases": [],
-      "group": "R3 overworld",
+      "group": "Bosses",
       "color": null,
-      "seen_in": 9
+      "seen_in": 0
     },
     {
-      "name": "Pelias' Keep",
+      "name": "Eldrask",
       "aliases": [
-        "Keep",
-        "Pelias"
+        "Frost Giant",
+        "FG"
       ],
-      "group": "R3 overworld",
-      "color": null,
-      "seen_in": 8
-    },
-    {
-      "name": "Star Point",
-      "aliases": [
-        "Starpoint"
-      ],
-      "group": "R3 overworld",
-      "color": null,
-      "seen_in": 7
-    },
-    {
-      "name": "Architect's Ring",
-      "aliases": [
-        "R3 overworld"
-      ],
-      "group": "R3 overworld",
+      "group": "Bosses",
       "color": null,
       "seen_in": 2
     },
@@ -520,7 +473,7 @@
         "Ru'Ten",
         "HF"
       ],
-      "group": "R3 bosses",
+      "group": "Bosses",
       "color": null,
       "seen_in": 10
     },
@@ -529,7 +482,7 @@
       "aliases": [
         "GS"
       ],
-      "group": "R3 bosses",
+      "group": "Bosses",
       "color": null,
       "seen_in": 3
     },
@@ -538,7 +491,7 @@
       "aliases": [
         "Sirius, The Final Herald"
       ],
-      "group": "R3 bosses",
+      "group": "Bosses",
       "color": null,
       "seen_in": 2
     },
@@ -547,9 +500,110 @@
       "aliases": [
         "Aurora's Endgame"
       ],
-      "group": "R3 bosses",
+      "group": "Bosses",
       "color": null,
       "seen_in": 11
+    },
+    {
+      "name": "Valley Overworld",
+      "aliases": [
+        "Valley",
+        "King's Valley",
+        "R1 overworld"
+      ],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Valley Explorer",
+      "aliases": [],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Isles Overworld",
+      "aliases": [
+        "Isles",
+        "Celsian Isles",
+        "R2 overworld"
+      ],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Isles Explorer",
+      "aliases": [],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Wolfswood",
+      "aliases": [],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Pelias' Keep",
+      "aliases": [
+        "Keep",
+        "Pelias"
+      ],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 8
+    },
+    {
+      "name": "Star Point",
+      "aliases": [
+        "Starpoint"
+      ],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 7
+    },
+    {
+      "name": "Architect's Ring",
+      "aliases": [
+        "R3 overworld"
+      ],
+      "group": "Overworld",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Silver Knight's Remnants",
+      "aliases": [
+        "SKR"
+      ],
+      "group": "Content",
+      "color": null,
+      "seen_in": 10
+    },
+    {
+      "name": "Diamenean Hunts",
+      "aliases": [
+        "Hunts",
+        "Hunt"
+      ],
+      "group": "Content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Ring Fishing",
+      "aliases": [
+        "Fishing",
+        "R3 Fishing",
+        "Fish"
+      ],
+      "group": "Content",
+      "color": null,
+      "seen_in": 3
     },
     {
       "name": "Twisted Intruder",
@@ -557,7 +611,7 @@
         "Intruder",
         "Jeremy"
       ],
-      "group": "R3 content",
+      "group": "Content",
       "color": null,
       "seen_in": 3
     },
@@ -568,7 +622,7 @@
         "Sticks and Stones Tavern",
         "GPT"
       ],
-      "group": "R3 content",
+      "group": "Content",
       "color": null,
       "seen_in": 7
     },
@@ -577,7 +631,7 @@
       "aliases": [
         "Delve"
       ],
-      "group": "Other content",
+      "group": "Content",
       "color": null,
       "seen_in": 3
     },
@@ -587,7 +641,7 @@
         "Season Pass",
         "SP"
       ],
-      "group": "Other content",
+      "group": "Content",
       "color": null,
       "seen_in": 9
     },
@@ -598,7 +652,7 @@
         "Speedrun",
         "Speed set"
       ],
-      "group": "Other content",
+      "group": "Content",
       "color": null,
       "seen_in": 4
     },
@@ -608,7 +662,7 @@
         "Quest",
         "Quest items"
       ],
-      "group": "Other content",
+      "group": "Content",
       "color": null,
       "seen_in": 3
     },
@@ -618,7 +672,7 @@
         "Advancement",
         "Progression"
       ],
-      "group": "Other content",
+      "group": "Content",
       "color": null,
       "seen_in": 1
     },
