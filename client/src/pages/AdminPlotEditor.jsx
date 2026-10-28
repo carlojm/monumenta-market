@@ -4,7 +4,11 @@ import { displayName } from '../lib/plots';
 
 const FIELDS = [
   { key: 'owner', label: 'Owner (player name, or guild tag without brackets)' },
-  { key: 'shop_name', label: 'Shop name' },
+  {
+    key: 'shop_name',
+    label: 'Shop name',
+    hint: "Leave blank to use the owner's name. Only fill this in if the shop has its own name.",
+  },
   { key: 'guild_name', label: 'Guild name (guild shops only)' },
   { key: 'description', label: 'Description', multiline: true },
   { key: 'stock', label: 'Stock (search keywords)', multiline: true },
@@ -127,8 +131,11 @@ function AdminPlotEditor() {
                   onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
               ) : (
                 <input type="text" value={form[f.key]}
+                  // An empty shop name shows the name the site will use instead.
+                  placeholder={f.key === 'shop_name' ? form.guild_name || form.owner : undefined}
                   onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
               )}
+              {f.hint && <span className="admin-editor__hint">{f.hint}</span>}
               {f.key === 'owner' && ownerChanged && (
                 <span className="admin-editor__rename">
                   <input type="checkbox" checked={rename} onChange={(e) => setRename(e.target.checked)} />

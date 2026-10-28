@@ -246,6 +246,12 @@
   color: var(--text-muted);
 }
 
+.admin-editor__hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
 .admin-editor__form textarea {
   font-family: inherit;
 }
