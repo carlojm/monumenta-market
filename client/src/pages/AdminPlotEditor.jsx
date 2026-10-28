@@ -13,12 +13,41 @@ const FIELDS = [
   { key: 'description', label: 'Description', multiline: true },
   { key: 'stock', label: 'Stock (search keywords)', multiline: true },
   { key: 'palette', label: 'Block palette' },
-  { key: 'guild_color', label: 'Guild color' },
-  { key: 'primary_color', label: 'Primary color' },
-  { key: 'secondary_color', label: 'Secondary color' },
+  { key: 'guild_color', label: 'Guild color', color: true },
+  { key: 'primary_color', label: 'Primary color', color: true },
+  { key: 'secondary_color', label: 'Secondary color', color: true },
 ];
 
 const emptyForm = () => Object.fromEntries(FIELDS.map((f) => [f.key, '']));
+
+// "#7bb0e0" or "#7be". Some guild colors are still words from the old notes.
+const isHexColor = (v) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim());
+// <input type="color"> only takes the 6-digit form.
+const toSixDigitHex = (v) => {
+  const hex = v.trim();
+  return hex.length === 4 ? `#${[...hex.slice(1)].map((c) => c + c).join('')}` : hex;
+};
+
+// A color field: a swatch that opens the system color picker, plus the text box.
+function ColorInput({ value, onChange }) {
+  const valid = isHexColor(value);
+  return (
+    <>
+      <span className="admin-editor__color">
+        {/* A color picker can't be blank, so it's faded when there's no valid color yet. */}
+        <input type="color" aria-label="Pick a color" value={valid ? toSixDigitHex(value) : '#000000'}
+          className={valid ? undefined : 'admin-editor__color-empty'}
+          onChange={(e) => onChange(e.target.value)} />
+        <input type="text" placeholder="#rrggbb" value={value} onChange={(e) => onChange(e.target.value)} />
+      </span>
+      {value.trim() && !valid && (
+        <span className="admin-editor__hint admin-editor__hint--warn">
+          Not a hex color (like #7bb0e0), so it won't show as a color on the site.
+        </span>
+      )}
+    </>
+  );
+}
 
 function AdminPlotEditor() {
   const [plots, setPlots] = useState([]);
@@ -26,6 +55,8 @@ function AdminPlotEditor() {
   const [selectedId, setSelectedId] = useState(null);
   const [shop, setShop] = useState(null);
   const [form, setForm] = useState(emptyForm());
+  const [original, setOriginal] = useState(emptyForm()); // the values as loaded, to spot edits
+  const [pendingSwitch, setPendingSwitch] = useState(null); // plot to open after discarding edits
   const [rename, setRename] = useState(false);
   const [confirming, setConfirming] = useState(null); // 'owner' | 'vacate' | null
   const [message, setMessage] = useState(null);
@@ -35,14 +66,44 @@ function AdminPlotEditor() {
     loadPlots();
   }, []);
 
-  const selectPlot = async (id) => {
+  const changedFields = FIELDS.filter((f) => form[f.key] !== original[f.key]).map((f) => f.key);
+  const dirty = changedFields.length > 0;
+
+  // Closing or reloading the tab with unsaved edits asks the browser to confirm.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = ''; // some browsers only prompt when this is set
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+
+  const loadPlot = async (id) => {
     setSelectedId(id);
     setMessage(null);
     setConfirming(null);
     setRename(false);
+    setPendingSwitch(null);
     const detail = await fetch(`/api/plots/${id}`).then((res) => res.json());
+    const values = Object.fromEntries(FIELDS.map((f) => [f.key, detail.shop?.[f.key] ?? '']));
     setShop(detail.shop);
-    setForm(Object.fromEntries(FIELDS.map((f) => [f.key, detail.shop?.[f.key] ?? ''])));
+    setForm(values);
+    setOriginal(values);
+  };
+
+  // Switching plots with unsaved edits asks first instead of throwing them away.
+  const selectPlot = (id) => {
+    if (id === selectedId) return;
+    if (dirty) setPendingSwitch(id);
+    else loadPlot(id);
+  };
+
+  const discardChanges = () => {
+    setForm(original);
+    setRename(false);
+    setConfirming(null);
   };
 
   const ownerChanged = shop && form.owner.trim() !== shop.owner;
@@ -57,8 +118,8 @@ function AdminPlotEditor() {
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return setMessage(`Save failed: ${body.error || res.statusText}`);
+    await Promise.all([loadPlots(), loadPlot(selectedId)]);
     setMessage(body.opened ? 'Saved. A new shop was opened on this plot.' : 'Saved.');
-    await Promise.all([loadPlots(), selectPlot(selectedId)]);
   };
 
   const handleSave = () => {
@@ -70,8 +131,8 @@ function AdminPlotEditor() {
     setConfirming(null);
     const res = await adminFetch(`/api/plots/${selectedId}/vacate`, { method: 'POST' });
     if (!res.ok) return setMessage('Vacate failed.');
+    await Promise.all([loadPlots(), loadPlot(selectedId)]);
     setMessage('Plot is now vacant. The old shop was archived.');
-    await Promise.all([loadPlots(), selectPlot(selectedId)]);
   };
 
   const handleUpload = async (e) => {
@@ -122,11 +183,26 @@ function AdminPlotEditor() {
             <span className="coord">{selectedId}</span> {shop ? displayName(shop) : 'Vacant'}
           </h3>
           {!shop && <p>This plot is vacant. Fill in an owner to open a shop.</p>}
+          {pendingSwitch && (
+            <div className="admin-editor__confirm">
+              <p>
+                You have unsaved changes to <strong>{selectedId}</strong>. Switch to{' '}
+                <strong>{pendingSwitch}</strong> and lose them?
+              </p>
+              <button onClick={() => loadPlot(pendingSwitch)}>Discard and switch</button>
+              <button onClick={() => setPendingSwitch(null)}>Keep editing</button>
+            </div>
+          )}
 
           {FIELDS.map((f) => (
-            <label key={f.key}>
-              {f.label}
-              {f.multiline ? (
+            <label key={f.key} className={changedFields.includes(f.key) ? 'admin-editor__field--changed' : undefined}>
+              <span>
+                {f.label}
+                {changedFields.includes(f.key) && <span className="admin-editor__edited"> edited</span>}
+              </span>
+              {f.color ? (
+                <ColorInput value={form[f.key]} onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))} />
+              ) : f.multiline ? (
                 <textarea rows={f.key === 'description' ? 6 : 3} value={form[f.key]}
                   onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
               ) : (
@@ -163,7 +239,8 @@ function AdminPlotEditor() {
             </div>
           ) : (
             <div className="admin-editor__actions">
-              <button onClick={handleSave}>{shop ? 'Save changes' : 'Open shop'}</button>
+              <button onClick={handleSave} disabled={!dirty}>{shop ? 'Save changes' : 'Open shop'}</button>
+              {dirty && <button onClick={discardChanges}>Discard changes</button>}
               {shop && <button onClick={() => setConfirming('vacate')}>Vacate plot</button>}
             </div>
           )}
