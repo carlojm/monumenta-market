@@ -5,6 +5,9 @@
 // never deletes anything, so shops keep their tags and tags added from the
 // admin page survive. The order in the file becomes the display order.
 //
+// Once tags are being edited on the site (Admin → Tags), the site is the real
+// list: running this again overwrites those edits with the file's values.
+//
 // Usage (from server/): npm run tags:load
 // On Fly:               fly ssh console -C "npm run tags:load"
 

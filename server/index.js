@@ -16,6 +16,7 @@ import { logModAction } from './lib/modlog.js';
 import { checkTagIds, listTags, setShopTags, tagsByShop, tagsForShop } from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
+import adminTagRoutes from './routes/adminTags.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
@@ -29,6 +30,7 @@ app.use(cookieParser());
 app.use(loadAccount); // sets req.account when logged in
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes); // admin-only account management
+app.use('/api/admin', adminTagRoutes); // tag management (moderators and admins)
 
 const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
   'guild_color', 'primary_color', 'secondary_color'];

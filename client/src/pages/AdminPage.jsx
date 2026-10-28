@@ -6,6 +6,7 @@ import AdminPlotEditor from './AdminPlotEditor';
 import AdminComments from './AdminComments';
 import AdminAccounts from './AdminAccounts';
 import AdminModLog from './AdminModLog';
+import AdminTags from './AdminTags';
 
 // Staff only: moderators and admins. Access comes from the logged-in account.
 function AdminPage() {
@@ -28,6 +29,7 @@ function AdminPage() {
             <div className="admin-page__tabs">
               <button onClick={() => setTab('plots')} aria-pressed={tab === 'plots'}>Plots</button>
               <button onClick={() => setTab('comments')} aria-pressed={tab === 'comments'}>Comments</button>
+              <button onClick={() => setTab('tags')} aria-pressed={tab === 'tags'}>Tags</button>
               {/* Accounts (making moderators) and the mod log are for admins only. */}
               {account.role === 'admin' && (
                 <>
@@ -38,6 +40,7 @@ function AdminPage() {
             </div>
             {tab === 'plots' && <AdminPlotEditor />}
             {tab === 'comments' && <AdminComments />}
+            {tab === 'tags' && <AdminTags />}
             {tab === 'accounts' && account.role === 'admin' && <AdminAccounts />}
             {tab === 'modlog' && account.role === 'admin' && <AdminModLog />}
           </>
