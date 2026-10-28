@@ -13,7 +13,7 @@ import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import { logModAction } from './lib/modlog.js';
-import { tagsByShop, tagsForShop } from './lib/tags.js';
+import { checkTagIds, listTags, setShopTags, tagsByShop, tagsForShop } from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 
@@ -178,6 +178,11 @@ app.get('/api/plots/:id', (req, res) => {
   });
 });
 
+// Every approved tag and group, in display order (for the tag picker).
+app.get('/api/tags', (req, res) => {
+  res.json(listTags());
+});
+
 // A single shop, current or past (for viewing a plot's history).
 app.get('/api/shops/:id', (req, res) => {
   const shop = getShop.get(req.params.id);
@@ -269,12 +274,27 @@ app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
   const fields = cleanShopFields(req.body);
   const current = getCurrentShop.get(plot.id);
+  // Optional: the shop's complete tag list (replaces its current tags).
+  let tagIds;
+  if ('tag_ids' in req.body) {
+    const checked = checkTagIds(req.body.tag_ids);
+    if (checked.error) return res.status(400).json({ error: checked.error });
+    tagIds = checked.ids;
+  }
+  // Tags for a newly opened shop: logged together with the opening.
+  const tagNewShop = (shopId) => {
+    if (!tagIds?.length) return;
+    const { added } = setShopTags(shopId, tagIds);
+    addLogEntry(shopId, req.account, `tags set: ${added.join(', ')}`);
+  };
 
   const result = db.transaction(() => {
     if (!current) {
       if (!fields.owner) return { status: 400, body: { error: 'Owner is required to open a shop' } };
       logModAction(req, 'shop.open', `plot:${plot.id}`, `Opened a shop for ${fields.owner}`);
-      return { status: 201, body: { opened: openShop(plot.id, fields, req.account) } };
+      const opened = openShop(plot.id, fields, req.account);
+      tagNewShop(opened);
+      return { status: 201, body: { opened } };
     }
 
     if ('owner' in fields && !fields.owner) {
@@ -286,19 +306,30 @@ app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
       addLogEntry(current.id, req.account, `Shop closed, plot taken over by ${fields.owner}`);
       logModAction(req, 'shop.open', `plot:${plot.id}`,
         `Closed ${current.owner}'s shop and opened one for ${fields.owner}`);
-      return { status: 201, body: { closed: current.id, opened: openShop(plot.id, fields, req.account) } };
+      const opened = openShop(plot.id, fields, req.account);
+      tagNewShop(opened);
+      return { status: 201, body: { closed: current.id, opened } };
     }
 
     const changed = SHOP_FIELDS.filter((f) => f in fields && fields[f] !== current[f]);
-    if (!changed.length) return { status: 200, body: { updated: false } };
     for (const f of changed) {
       addLogEntry(current.id, req.account,
         `${f} updated from "${current[f] ?? '(empty)'}" to "${fields[f] ?? '(empty)'}"`);
     }
+    if (tagIds) {
+      const { added, removed } = setShopTags(current.id, tagIds);
+      if (added.length || removed.length) {
+        const parts = [added.length && `added ${added.join(', ')}`, removed.length && `removed ${removed.join(', ')}`];
+        addLogEntry(current.id, req.account, `tags updated: ${parts.filter(Boolean).join('; ')}`);
+        changed.push('tags');
+      }
+    }
+    if (!changed.length) return { status: 200, body: { updated: false } };
     logModAction(req, 'shop.edit', `plot:${plot.id}`, `Edited ${current.owner}'s shop: ${changed.join(', ')}`);
-    const sets = changed.map((f) => `${f} = @${f}`).join(', ');
-    db.prepare(`UPDATE shops SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = @id`)
-      .run({ ...Object.fromEntries(changed.map((f) => [f, fields[f]])), id: current.id });
+    const fieldChanges = changed.filter((f) => f !== 'tags');
+    const sets = [...fieldChanges.map((f) => `${f} = @${f}`), 'updated_at = CURRENT_TIMESTAMP'].join(', ');
+    db.prepare(`UPDATE shops SET ${sets} WHERE id = @id`)
+      .run({ ...Object.fromEntries(fieldChanges.map((f) => [f, fields[f]])), id: current.id });
     return { status: 200, body: { updated: changed } };
   })();
 

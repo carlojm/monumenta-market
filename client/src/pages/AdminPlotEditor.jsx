@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import { displayName } from '../lib/plots';
+import TagPicker from '../components/TagPicker';
 
 const FIELDS = [
   { key: 'owner', label: 'Owner (player name, or guild tag without brackets)' },
@@ -61,13 +62,21 @@ function AdminPlotEditor() {
   const [confirming, setConfirming] = useState(null); // 'owner' | 'vacate' | null
   const [message, setMessage] = useState(null);
 
+  // Tags are kept apart from the text fields: a list of tag ids.
+  const [tagCatalog, setTagCatalog] = useState(null);
+  const [tagIds, setTagIds] = useState([]);
+  const [originalTagIds, setOriginalTagIds] = useState([]);
+
   const loadPlots = () => fetch('/api/plots').then((res) => res.json()).then(setPlots);
   useEffect(() => {
     loadPlots();
+    fetch('/api/tags').then((res) => res.json()).then(setTagCatalog);
   }, []);
 
+  const sameIds = (a, b) => a.length === b.length && a.every((id) => b.includes(id));
+  const tagsChanged = !sameIds(tagIds, originalTagIds);
   const changedFields = FIELDS.filter((f) => form[f.key] !== original[f.key]).map((f) => f.key);
-  const dirty = changedFields.length > 0;
+  const dirty = changedFields.length > 0 || tagsChanged;
 
   // Closing or reloading the tab with unsaved edits asks the browser to confirm.
   useEffect(() => {
@@ -91,6 +100,9 @@ function AdminPlotEditor() {
     setShop(detail.shop);
     setForm(values);
     setOriginal(values);
+    const ids = (detail.shop?.tags ?? []).map((t) => t.id);
+    setTagIds(ids);
+    setOriginalTagIds(ids);
   };
 
   // Switching plots with unsaved edits asks first instead of throwing them away.
@@ -102,6 +114,7 @@ function AdminPlotEditor() {
 
   const discardChanges = () => {
     setForm(original);
+    setTagIds(originalTagIds);
     setRename(false);
     setConfirming(null);
   };
@@ -114,7 +127,7 @@ function AdminPlotEditor() {
     const res = await adminFetch(`/api/plots/${selectedId}/shop`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, owner: form.owner.trim(), rename: ownerChanged && rename }),
+      body: JSON.stringify({ ...form, owner: form.owner.trim(), rename: ownerChanged && rename, tag_ids: tagIds }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return setMessage(`Save failed: ${body.error || res.statusText}`);
@@ -195,30 +208,42 @@ function AdminPlotEditor() {
           )}
 
           {FIELDS.map((f) => (
-            <label key={f.key} className={changedFields.includes(f.key) ? 'admin-editor__field--changed' : undefined}>
-              <span>
-                {f.label}
-                {changedFields.includes(f.key) && <span className="admin-editor__edited"> edited</span>}
-              </span>
-              {f.color ? (
-                <ColorInput value={form[f.key]} onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))} />
-              ) : f.multiline ? (
-                <textarea rows={f.key === 'description' ? 6 : 3} value={form[f.key]}
-                  onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
-              ) : (
-                <input type="text" value={form[f.key]}
-                  // An empty shop name shows the name the site will use instead.
-                  placeholder={f.key === 'shop_name' ? form.guild_name || form.owner : undefined}
-                  onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
-              )}
-              {f.hint && <span className="admin-editor__hint">{f.hint}</span>}
-              {f.key === 'owner' && ownerChanged && (
-                <span className="admin-editor__rename">
-                  <input type="checkbox" checked={rename} onChange={(e) => setRename(e.target.checked)} />
-                  This is a typo fix or name change, not a new shop
+            <Fragment key={f.key}>
+              <label className={changedFields.includes(f.key) ? 'admin-editor__field--changed' : undefined}>
+                <span>
+                  {f.label}
+                  {changedFields.includes(f.key) && <span className="admin-editor__edited"> edited</span>}
                 </span>
+                {f.color ? (
+                  <ColorInput value={form[f.key]} onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))} />
+                ) : f.multiline ? (
+                  <textarea rows={f.key === 'description' ? 6 : 3} value={form[f.key]}
+                    onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
+                ) : (
+                  <input type="text" value={form[f.key]}
+                    // An empty shop name shows the name the site will use instead.
+                    placeholder={f.key === 'shop_name' ? form.guild_name || form.owner : undefined}
+                    onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))} />
+                )}
+                {f.hint && <span className="admin-editor__hint">{f.hint}</span>}
+                {f.key === 'owner' && ownerChanged && (
+                  <span className="admin-editor__rename">
+                    <input type="checkbox" checked={rename} onChange={(e) => setRename(e.target.checked)} />
+                    This is a typo fix or name change, not a new shop
+                  </span>
+                )}
+              </label>
+              {/* The tag picker sits right after the Stock field. */}
+              {f.key === 'stock' && (
+                <div className={`admin-editor__tags${tagsChanged ? ' admin-editor__field--changed' : ''}`}>
+                  <span>
+                    Tags
+                    {tagsChanged && <span className="admin-editor__edited"> edited</span>}
+                  </span>
+                  <TagPicker catalog={tagCatalog} value={tagIds} onChange={setTagIds} />
+                </div>
               )}
-            </label>
+            </Fragment>
           ))}
 
           {confirming === 'owner' ? (

@@ -1,0 +1,54 @@
+.tag-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tag-picker__muted {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* Chips are buttons here; keep the chip look. */
+.tag-picker button.tag-chip {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.tag-picker__remove span {
+  margin-left: 0.15rem;
+  opacity: 0.7;
+}
+
+/* The full list scrolls inside a fixed height, so the form stays manageable. */
+.tag-picker__sections {
+  max-height: 18rem;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.tag-picker__sections section + section {
+  margin-top: 0.6rem;
+}
+
+.tag-picker__sections h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Not chosen: faded. Chosen: full color with an outline. */
+.tag-picker__option[aria-pressed='false'] {
+  opacity: 0.55;
+}
+
+.tag-picker__option[aria-pressed='false']:hover {
+  opacity: 0.9;
+}
+
+.tag-picker__option[aria-pressed='true'] {
+  box-shadow: 0 0 0 1px var(--text);
+}
