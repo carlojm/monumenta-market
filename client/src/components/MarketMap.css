@@ -76,3 +76,22 @@
   border-radius: 1px;
 }
 
+
+/* Squares hidden: dim the color key, since nothing on the map uses it. */
+.market-map__legend--off .market-map__legend-item {
+  opacity: 0.4;
+}
+
+.market-map__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: none;
+}
+
+.market-map__toggle:hover {
+  color: var(--text);
+}

@@ -1,14 +1,39 @@
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import mapImage from '../assets/market_map.png';
 import { plotRect } from '../lib/coordTransform';
 import { displayName, statusColor, MAP_CATEGORIES } from '../lib/plots';
 import './MarketMap.css';
 
+// Remembered per browser, so someone who prefers the plain map keeps it.
+const OVERLAY_KEY = 'map_overlay';
+
+function readOverlaySetting() {
+  try {
+    return localStorage.getItem(OVERLAY_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
 function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
+  const [showSquares, setShowSquares] = useState(readOverlaySetting);
+
+  const toggleSquares = () => {
+    const next = !showSquares;
+    setShowSquares(next);
+    try {
+      localStorage.setItem(OVERLAY_KEY, next ? 'on' : 'off');
+    } catch {
+      // storage blocked: the setting just won't be remembered
+    }
+  };
+
   return (
     <div>
       <div className="market-map">
         <img src={mapImage} alt="Market island map" className="market-map__image" />
-        {plots.map((plot) => {
+        {showSquares && plots.map((plot) => {
           const dimmed = searchResults && !searchResults.matchedIds.has(plot.id);
           const color = statusColor(plot);
           return (
@@ -30,13 +55,19 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
           );
         })}
       </div>
-      <ul className="market-map__legend">
+      <ul className={`market-map__legend${showSquares ? '' : ' market-map__legend--off'}`}>
         {MAP_CATEGORIES.map((c) => (
-          <li key={c.key}>
+          <li key={c.key} className="market-map__legend-item">
             <span className="market-map__swatch" style={{ background: c.color }} />
             {c.label}
           </li>
         ))}
+        <li>
+          <button type="button" className="market-map__toggle" onClick={toggleSquares} aria-pressed={!showSquares}>
+            {showSquares ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
+            {showSquares ? 'Hide squares' : 'Show squares'}
+          </button>
+        </li>
       </ul>
     </div>
   );
