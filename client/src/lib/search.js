@@ -1,9 +1,25 @@
 import Fuse from 'fuse.js';
 
+// Weights rank what a shop *sells* above what it's called, and both above where
+// it is, so "shifting" finds shops selling Shifting items before the shops in
+// the Shifting zone.
 const FUSE_OPTIONS = {
-  keys: ['owner', 'shop_name', 'guild_name', 'zone', 'id', 'description', 'stock', 'palette', 'comment_text'],
+  keys: [
+    { name: 'stock', weight: 3 },
+    { name: 'description', weight: 3 },
+    { name: 'comment_text', weight: 2 },
+    { name: 'shop_name', weight: 1.5 },
+    { name: 'guild_name', weight: 1.5 },
+    { name: 'owner', weight: 1.5 },
+    { name: 'palette', weight: 1 },
+    { name: 'id', weight: 0.5 },
+    { name: 'zone', weight: 0.3 },
+  ],
   threshold: 0.35,
   ignoreLocation: true,
+  // By default Fuse favors matches in short fields, which made a 1-word zone
+  // name outrank the same word in a long description.
+  ignoreFieldNorm: true,
   includeMatches: true,
 };
 
@@ -21,7 +37,7 @@ const FIELD_LABELS = {
 
 // Prefer showing a match from stock/description/comments over owner/zone,
 // since those are more informative as "why did this match."
-const FIELD_PRIORITY = ['stock', 'description', 'comment_text', 'palette', 'shop_name', 'guild_name', 'owner', 'zone', 'id'];
+const FIELD_PRIORITY = ['stock', 'description', 'comment_text', 'palette', 'shop_name', 'guild_name', 'owner', 'id', 'zone'];
 
 function buildSnippet(matches) {
   if (!matches || matches.length === 0) return null;
