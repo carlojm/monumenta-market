@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
+import TagChips from './TagChips';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -141,6 +142,7 @@ function PastShop({ summary }) {
         <>
           {shop.description && <p className="plot-detail__description">{shop.description}</p>}
           {shop.stock && <p><span className="plot-detail__label">Stock:</span> {shop.stock}</p>}
+          <TagChips tags={shop.tags} className="plot-detail__stock-tags" />
           <CommentList comments={shop.comments} />
         </>
       )}
@@ -251,6 +253,8 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
       }
     : serverReport;
   const pastShops = detail?.past_shops || [];
+  const categoryTags = (shop?.tags ?? []).filter((t) => t.kind === 'category');
+  const stockTags = (shop?.tags ?? []).filter((t) => t.kind === 'stock');
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -324,6 +328,12 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
               <dd>{ownerLabel(shop)}</dd>
             </>
           )}
+          {categoryTags.length > 0 && (
+            <>
+              <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>
+              <dd><TagChips tags={categoryTags} /></dd>
+            </>
+          )}
           <dt>Plot</dt>
           <dd><span className="coord">{plot.id}</span></dd>
           <dt>Coords</dt>
@@ -373,6 +383,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             <span className="plot-detail__label">Keywords:</span> {shop.stock}
           </p>
         )}
+        <TagChips tags={stockTags} className="plot-detail__stock-tags" />
         {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
 
         {error && <p className="plot-detail__error">{error}</p>}

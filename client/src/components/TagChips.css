@@ -1,0 +1,27 @@
+.tag-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Colored chips: a tinted background and border in the tag's color. */
+.tag-chip {
+  font-size: 0.78rem;
+  line-height: 1.3;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  border: 1px solid color-mix(in srgb, var(--tag-color) 60%, transparent);
+  background: color-mix(in srgb, var(--tag-color) 16%, transparent);
+  color: color-mix(in srgb, var(--tag-color) 35%, var(--text));
+}
+
+/* Tags without a color yet. (A full border, not just a color: the colored
+   border above is invalid without --tag-color, so the browser drops it.) */
+.tag-chip--plain {
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text);
+}

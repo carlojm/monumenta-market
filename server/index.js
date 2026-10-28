@@ -13,6 +13,7 @@ import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import { logModAction } from './lib/modlog.js';
+import { tagsByShop, tagsForShop } from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 
@@ -89,7 +90,12 @@ function latestStatus(plotId) {
 
 function shopWithDetails(shop) {
   if (!shop) return null;
-  return { ...shop, comments: getApprovedComments.all(shop.id), images: getImages.all(shop.id) };
+  return {
+    ...shop,
+    tags: tagsForShop(shop.id),
+    comments: getApprovedComments.all(shop.id),
+    images: getImages.all(shop.id),
+  };
 }
 
 // Blank strings from forms mean "not set".
@@ -130,6 +136,7 @@ app.get('/api/plots', (req, res) => {
     LEFT JOIN shops s ON s.plot_id = p.id AND s.closed_at IS NULL
     ORDER BY p.id
   `).all();
+  const shopTags = tagsByShop(); // one query for every shop's tags
 
   res.json(rows.map((r) => ({
     id: r.id,
@@ -142,6 +149,7 @@ app.get('/api/plots', (req, res) => {
       ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, r[f]])),
       updated_at: r.updated_at,
       comment_text: r.comment_text,
+      tags: shopTags.get(r.shop_id) ?? [],
     } : null,
     latest_report: latestStatus(r.id),
   })));

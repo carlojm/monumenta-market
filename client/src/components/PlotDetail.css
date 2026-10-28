@@ -342,3 +342,8 @@
 .plot-detail__comment--outdated > p {
   opacity: 0.5;
 }
+
+/* Stock tag chips sit under the description and keywords. */
+.plot-detail__stock-tags {
+  margin: -0.25rem 0 0.75rem;
+}
