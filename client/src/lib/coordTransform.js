@@ -8,13 +8,18 @@ const IMG_HEIGHT = 256;
 export const PLOT_SIZE = 8;
 export const GUILD_PLOT_SIZE = 13;
 
+// Guild squares line up better drawn one block up and left of their recorded
+// NW corner
+const GUILD_DRAW_OFFSET = -1;
+
 // Position and size of a plot (x, z = its NW corner) as CSS percentages
 // of the map image.
 export function plotRect(x, z, isGuild) {
   const size = isGuild ? GUILD_PLOT_SIZE : PLOT_SIZE;
+  const offset = isGuild ? GUILD_DRAW_OFFSET : 0;
   return {
-    left: `${((x - ORIGIN.x) / IMG_WIDTH) * 100}%`,
-    top: `${((z - ORIGIN.z) / IMG_HEIGHT) * 100}%`,
+    left: `${((x + offset - ORIGIN.x) / IMG_WIDTH) * 100}%`,
+    top: `${((z + offset - ORIGIN.z) / IMG_HEIGHT) * 100}%`,
     width: `${(size / IMG_WIDTH) * 100}%`,
     height: `${(size / IMG_HEIGHT) * 100}%`,
   };

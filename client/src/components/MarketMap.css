@@ -34,10 +34,6 @@
   cursor: pointer;
 }
 
-.market-map__plot--vacant {
-  border: 1px dashed var(--text-muted);
-}
-
 .market-map__plot--dimmed {
   opacity: 0.15;
 }
@@ -80,7 +76,3 @@
   border-radius: 1px;
 }
 
-.market-map__swatch--vacant {
-  border: 1px dashed var(--text-muted);
-  box-sizing: border-box;
-}

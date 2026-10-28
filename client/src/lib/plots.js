@@ -9,15 +9,15 @@ export const ACTIVITY_LABELS = {
   unclear: 'Unclear',
 };
 
-// Map square colors, keyed by latest reported activity.
-export const STATUS_COLORS = {
-  active: '#6fa37a',
-  inactive: '#9a5f50',
-  wip: '#b0902a',
-  unclear: '#7d7a9e',
-  vacant: '#55574c',
-  unknown: '#55574c',
-};
+// Map square colors. Each plot falls into one category from both parts of its
+// status (see mapCategory); the legend lists them in this order.
+export const MAP_CATEGORIES = [
+  { key: 'active', label: 'Active', color: '#6fa37a' },
+  { key: 'locked', label: 'Locked', color: '#c4a032' },
+  { key: 'inactive', label: 'Inactive', color: '#b0564a' },
+  { key: 'quiet', label: 'Vacant', color: '#d4d4d459' },
+];
+const MAP_COLORS = Object.fromEntries(MAP_CATEGORIES.map((c) => [c.key, c.color]));
 
 export function displayName(shop) {
   if (!shop) return 'Vacant plot';
@@ -38,6 +38,16 @@ export function reportLabel(report) {
     .join(', ');
 }
 
+// active + unlocked (or lock unknown) = active, active + locked = locked,
+// inactive = inactive; WIP, unclear, reported vacant, no report or no shop = quiet.
+export function mapCategory(plot) {
+  if (!plot.shop) return 'quiet';
+  const report = plot.latest_report;
+  if (report?.activity === 'inactive') return 'inactive';
+  if (report?.activity === 'active') return report.lock === 'locked' ? 'locked' : 'active';
+  return 'quiet';
+}
+
 export function statusColor(plot) {
-  return STATUS_COLORS[plot.latest_report?.activity] || STATUS_COLORS.unknown;
+  return MAP_COLORS[mapCategory(plot)];
 }

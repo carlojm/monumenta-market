@@ -1,9 +1,7 @@
 import mapImage from '../assets/market_map.png';
 import { plotRect } from '../lib/coordTransform';
-import { displayName, statusColor, STATUS_COLORS, ACTIVITY_LABELS } from '../lib/plots';
+import { displayName, statusColor, MAP_CATEGORIES } from '../lib/plots';
 import './MarketMap.css';
-
-const LEGEND = ['active', 'inactive', 'wip', 'unclear'];
 
 function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
   return (
@@ -18,13 +16,12 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
               key={plot.id}
               className={[
                 'market-map__plot',
-                !plot.shop && 'market-map__plot--vacant',
                 dimmed && 'market-map__plot--dimmed',
                 plot.id === selectedId && 'market-map__plot--selected',
               ].filter(Boolean).join(' ')}
               style={{
                 ...plotRect(plot.x, plot.z, plot.is_guild),
-                '--plot-color': plot.shop ? color : 'transparent',
+                '--plot-color': color,
               }}
               onClick={() => onSelectPlot(plot)}
               aria-label={`${displayName(plot.shop)} (${plot.id})`}
@@ -34,16 +31,12 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
         })}
       </div>
       <ul className="market-map__legend">
-        {LEGEND.map((key) => (
-          <li key={key}>
-            <span className="market-map__swatch" style={{ background: STATUS_COLORS[key] }} />
-            {ACTIVITY_LABELS[key]}
+        {MAP_CATEGORIES.map((c) => (
+          <li key={c.key}>
+            <span className="market-map__swatch" style={{ background: c.color }} />
+            {c.label}
           </li>
         ))}
-        {/* <li>
-          <span className="market-map__swatch market-map__swatch--vacant" />
-          Vacant
-        </li> */}
       </ul>
     </div>
   );
