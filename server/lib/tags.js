@@ -91,3 +91,34 @@ export function setShopTags(shopId, ids) {
   const names = (list) => list.map((id) => tagName.get(id)?.name).filter(Boolean);
   return { added: names(added), removed: names(removed) };
 }
+
+// --- Checking tags from requests (admin Tags tab and player suggestions). ---
+
+export const KINDS = ['category', 'stock'];
+export const isHex = (c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c);
+
+const groupById = db.prepare('SELECT id FROM tag_groups WHERE id = ?');
+// Another tag of the same kind with this name (name is NOCASE). Pass 0 as the id to exclude none.
+export const sameName = db.prepare('SELECT id FROM tags WHERE kind = ? AND name = ? AND id != ?');
+// The next position at the end of a kind + group (group_id is NULL for categories).
+export const endOfGroup = db.prepare(`
+  SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM tags WHERE kind = ? AND group_id IS ?
+`);
+
+// Checks and tidies a tag from a request. Returns { tag } or { error }.
+export function cleanTag(body, kind) {
+  const name = String(body.name ?? '').trim();
+  if (!name) return { error: 'A tag needs a name.' };
+  if (name.length > 60) return { error: 'Tag names can be at most 60 characters.' };
+  const aliases = Array.isArray(body.aliases) ? body.aliases : [];
+  const cleanAliases = [...new Set(aliases.map((a) => String(a).trim()).filter(Boolean))];
+  if (cleanAliases.some((a) => a.length > 60)) return { error: 'Aliases can be at most 60 characters.' };
+  const color = body.color ? String(body.color).trim() : null;
+  if (color && !isHex(color)) return { error: 'Color must be a hex like #7bb0e0, or empty.' };
+  let groupId = null;
+  if (kind === 'stock') {
+    groupId = Number(body.group_id);
+    if (!groupById.get(groupId)) return { error: 'Stock tags need a group.' };
+  }
+  return { tag: { name, aliases: JSON.stringify(cleanAliases), color, group_id: groupId } };
+}

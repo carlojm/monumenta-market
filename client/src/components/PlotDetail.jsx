@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
+import TagEditor from './TagEditor';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -221,6 +222,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
+  const [editingTags, setEditingTags] = useState(false);
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [myComments, setMyComments] = useState([]);
@@ -255,6 +257,15 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const pastShops = detail?.past_shops || [];
   const categoryTags = (shop?.tags ?? []).filter((t) => t.kind === 'category');
   const stockTags = (shop?.tags ?? []).filter((t) => t.kind === 'stock');
+  // Linked players can edit the shop's tags; the "+" ends each tag row.
+  const canEditTags = !!account && !!shop;
+  const editTagsButton = canEditTags ? (
+    <button type="button" className="tag-chip--add" onClick={() => setEditingTags(true)} aria-label="Edit tags">+</button>
+  ) : null;
+  const handleTagsSaved = (tags) => {
+    setDetail((d) => (d?.shop ? { ...d, shop: { ...d.shop, tags } } : d));
+    onReported?.(); // refresh the plot list so search sees the new tags
+  };
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -328,10 +339,10 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
               <dd>{ownerLabel(shop)}</dd>
             </>
           )}
-          {categoryTags.length > 0 && (
+          {(categoryTags.length > 0 || canEditTags) && (
             <>
               <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>
-              <dd><TagChips tags={categoryTags} /></dd>
+              <dd><TagChips tags={categoryTags} after={editTagsButton} /></dd>
             </>
           )}
           <dt>Plot</dt>
@@ -383,7 +394,11 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             <span className="plot-detail__label">Keywords:</span> {shop.stock}
           </p>
         )}
-        <TagChips tags={stockTags} className="plot-detail__stock-tags" />
+        <TagChips tags={stockTags} className="plot-detail__stock-tags" after={editTagsButton} />
+        {editingTags && (
+          <TagEditor plotId={plot.id} shopTags={shop.tags ?? []} onClose={() => setEditingTags(false)}
+            onSaved={handleTagsSaved} />
+        )}
         {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
 
         {error && <p className="plot-detail__error">{error}</p>}

@@ -1,0 +1,73 @@
+/* Above the card (which is itself a sheet on phones). */
+.tag-editor__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.tag-editor {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  background: var(--sheet-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.tag-editor h3 {
+  margin: 0;
+}
+
+.tag-editor__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tag-editor__summary {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  font-size: 0.9rem;
+}
+
+.tag-editor__summary p {
+  margin: 0;
+}
+
+.tag-editor__summary p + p {
+  margin-top: 0.25rem;
+}
+
+.tag-editor__error {
+  margin: 0;
+  color: #e08a8a;
+}
+
+.tag-editor__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tag-editor__save:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+.tag-editor__save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

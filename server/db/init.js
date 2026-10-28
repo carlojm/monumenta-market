@@ -155,6 +155,7 @@ export function createSchema() {
       sort_order INTEGER NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'approved',   -- 'approved' | 'pending' (a suggestion)
       suggested_by INTEGER REFERENCES accounts(id),
+      suggested_for_shop_id INTEGER REFERENCES shops(id) ON DELETE SET NULL,  -- the shop a suggestion came from
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       UNIQUE (kind, name)
     );
@@ -180,6 +181,9 @@ export function createSchema() {
   // Oct 2026: accounts can be banned.
   addColumnIfMissing('accounts', 'banned_at', 'TEXT');
   addColumnIfMissing('accounts', 'ban_reason', 'TEXT');
+
+  // Oct 2026: a suggested tag remembers which shop it was suggested for.
+  addColumnIfMissing('tags', 'suggested_for_shop_id', 'INTEGER REFERENCES shops(id) ON DELETE SET NULL');
 
   // Oct 2026: mod log entries keep the staff member's name.
   addColumnIfMissing('mod_log', 'actor_name', 'TEXT');

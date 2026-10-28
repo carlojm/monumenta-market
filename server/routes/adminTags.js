@@ -6,6 +6,8 @@
 //   PUT  /tags/:id {name, aliases, group_id, color}        edit (a new group puts it at the end)
 //   POST /tags/:id/move {direction: up|down}               swap with its neighbour in the group
 //   PUT  /tag-groups/:id {color}                           a group's fallback color
+//   POST /tags/:id/approve {add_to_shop?}                  approve a suggestion (to the end of its group)
+//   POST /tags/:id/reject                                  reject (delete) a suggestion
 //
 // Once tags are edited here, the site is the real list: rerunning tags:load
 // would overwrite these edits with tags.json.
@@ -14,45 +16,26 @@ import express from 'express';
 import db from '../db/init.js';
 import { requireModerator } from '../middleware/adminAuth.js';
 import { logModAction } from '../lib/modlog.js';
+import { KINDS, cleanTag, endOfGroup, isHex, sameName } from '../lib/tags.js';
+import { addLogEntry } from '../lib/shopLog.js';
 
 // requireModerator goes on each route: other /api/admin routes have their own checks.
 const router = express.Router();
 
-const KINDS = ['category', 'stock'];
-const isHex = (c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c);
-
 const getTag = db.prepare('SELECT * FROM tags WHERE id = ?');
 const getGroup = db.prepare('SELECT * FROM tag_groups WHERE id = ?');
-const sameName = db.prepare('SELECT id FROM tags WHERE kind = ? AND name = ? AND id != ?'); // name is NOCASE
-// The next position at the end of a kind + group (group_id is NULL for categories).
-const endOfGroup = db.prepare(`
-  SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM tags WHERE kind = ? AND group_id IS ?
-`);
-
-// Checks and tidies a tag from a request. Returns { tag } or { error }.
-function cleanTag(body, kind) {
-  const name = String(body.name ?? '').trim();
-  if (!name) return { error: 'A tag needs a name.' };
-  if (name.length > 60) return { error: 'Tag names can be at most 60 characters.' };
-  const aliases = Array.isArray(body.aliases) ? body.aliases : [];
-  const cleanAliases = [...new Set(aliases.map((a) => String(a).trim()).filter(Boolean))];
-  if (cleanAliases.some((a) => a.length > 60)) return { error: 'Aliases can be at most 60 characters.' };
-  const color = body.color ? String(body.color).trim() : null;
-  if (color && !isHex(color)) return { error: 'Color must be a hex like #7bb0e0, or empty.' };
-  let groupId = null;
-  if (kind === 'stock') {
-    groupId = Number(body.group_id);
-    if (!getGroup.get(groupId)) return { error: 'Stock tags need a group.' };
-  }
-  return { tag: { name, aliases: JSON.stringify(cleanAliases), color, group_id: groupId } };
-}
 
 const listTags = db.prepare(`
-  SELECT t.id, t.kind, t.name, t.aliases, t.color, t.group_id, t.sort_order, t.status,
+  SELECT t.id, t.kind, t.name, t.aliases, t.color, t.group_id, t.sort_order, t.status, t.created_at,
     COALESCE(t.color, g.color) AS effective_color,
+    a.name AS suggested_by_name, sp.plot_id AS suggested_for_plot, sp.owner AS suggested_for_owner,
+    (sp.id IS NOT NULL AND sp.closed_at IS NULL) AS suggested_for_shop_open,
     (SELECT COUNT(*) FROM shop_tags st JOIN shops s ON s.id = st.shop_id
      WHERE st.tag_id = t.id AND s.closed_at IS NULL) AS shop_count
-  FROM tags t LEFT JOIN tag_groups g ON g.id = t.group_id
+  FROM tags t
+  LEFT JOIN tag_groups g ON g.id = t.group_id
+  LEFT JOIN accounts a ON a.id = t.suggested_by
+  LEFT JOIN shops sp ON sp.id = t.suggested_for_shop_id
   ORDER BY t.kind = 'stock', COALESCE(g.sort_order, 0), t.sort_order
 `);
 const listGroups = db.prepare('SELECT id, name, color, sort_order FROM tag_groups ORDER BY sort_order');
@@ -130,6 +113,40 @@ router.post('/tags/:id/move', requireModerator, (req, res) => {
     list.forEach((id, n) => setSortOrder.run(n, id));
   })();
   res.json({ moved: true });
+});
+
+// Approving a suggestion puts it at the end of its group. With add_to_shop, it's
+// also added to the shop it was suggested for (if that shop is still open),
+// logged on the card as added by the player who suggested it.
+router.post('/tags/:id/approve', requireModerator, (req, res) => {
+  const tag = getTag.get(req.params.id);
+  if (!tag || tag.status !== 'pending') return res.status(404).json({ error: 'Suggestion not found' });
+
+  const addedTo = db.transaction(() => {
+    db.prepare("UPDATE tags SET status = 'approved', sort_order = ? WHERE id = ?")
+      .run(endOfGroup.get(tag.kind, tag.group_id).next, tag.id);
+    let shop = null;
+    if (req.body.add_to_shop && tag.suggested_for_shop_id) {
+      shop = db.prepare('SELECT * FROM shops WHERE id = ? AND closed_at IS NULL').get(tag.suggested_for_shop_id);
+      if (shop) {
+        db.prepare('INSERT OR IGNORE INTO shop_tags (shop_id, tag_id) VALUES (?, ?)').run(shop.id, tag.id);
+        const suggester = tag.suggested_by ? db.prepare('SELECT id, name FROM accounts WHERE id = ?').get(tag.suggested_by) : null;
+        addLogEntry(shop.id, suggester, `tag added: ${tag.name}`);
+      }
+    }
+    logModAction(req, 'tag.approve', `tag:${tag.id}`,
+      `Approved suggested ${tag.kind === 'category' ? 'category' : 'tag'} "${tag.name}"${shop ? ` and added it to ${shop.owner}'s shop` : ''}`);
+    return shop?.plot_id ?? null;
+  })();
+  res.json({ approved: true, added_to: addedTo });
+});
+
+router.post('/tags/:id/reject', requireModerator, (req, res) => {
+  const tag = getTag.get(req.params.id);
+  if (!tag || tag.status !== 'pending') return res.status(404).json({ error: 'Suggestion not found' });
+  db.prepare('DELETE FROM tags WHERE id = ?').run(tag.id);
+  logModAction(req, 'tag.reject', `tag:${tag.id}`, `Rejected suggested tag "${tag.name}"`);
+  res.json({ rejected: true });
 });
 
 router.put('/tag-groups/:id', requireModerator, (req, res) => {

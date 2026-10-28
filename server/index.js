@@ -13,7 +13,10 @@ import { startVerifyServer } from './lib/verifyServer.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import { logModAction } from './lib/modlog.js';
-import { checkTagIds, listTags, setShopTags, tagsByShop, tagsForShop } from './lib/tags.js';
+import { addLogEntry } from './lib/shopLog.js';
+import {
+  KINDS, checkTagIds, cleanTag, listTags, sameName, setShopTags, tagsByShop, tagsForShop,
+} from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import adminTagRoutes from './routes/adminTags.js';
@@ -60,14 +63,6 @@ const getComment = db.prepare(`
 `);
 const COMMENT_MAX = 2000;
 const getImages = db.prepare('SELECT * FROM images WHERE shop_id = ? ORDER BY sort_order');
-// Log entries ("Update" on the card). `actor` is the staff account that made
-// the change (shown as "Update by …"), or null.
-const insertSystemComment = db.prepare(`
-  INSERT INTO comments (shop_id, account_id, author, body, is_system, status) VALUES (?, ?, ?, ?, 1, 'approved')
-`);
-function addLogEntry(shopId, actor, body) {
-  insertSystemComment.run(shopId, actor?.id ?? null, actor?.name ?? null, body);
-}
 
 // A plot's current status. Reports can leave out a part, so activity and lock
 // each come from the most recent report that has them. created_at is the time
@@ -183,6 +178,62 @@ app.get('/api/plots/:id', (req, res) => {
 // Every approved tag and group, in display order (for the tag picker).
 app.get('/api/tags', (req, res) => {
   res.json(listTags());
+});
+
+// Any linked player can change a shop's tags (add or remove existing tags),
+// instantly. Body: { tag_ids } = the shop's full tag list. Logged on the card
+// ("Update by …") and in the mod log, so mistakes are easy to see and undo.
+app.put('/api/plots/:id/tags', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to edit tags.' });
+  const shop = getCurrentShop.get(req.params.id);
+  if (!shop) return res.status(409).json({ error: 'This plot has no shop to tag.' });
+  const checked = checkTagIds(req.body.tag_ids);
+  if (checked.error) return res.status(400).json({ error: checked.error });
+
+  const changes = db.transaction(() => {
+    const { added, removed } = setShopTags(shop.id, checked.ids);
+    if (!added.length && !removed.length) return null;
+    const parts = [added.length && `added ${added.join(', ')}`, removed.length && `removed ${removed.join(', ')}`]
+      .filter(Boolean).join('; ');
+    db.prepare('UPDATE shops SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(shop.id);
+    addLogEntry(shop.id, req.account, `tags updated: ${parts}`);
+    logModAction(req, 'tag.shop_edit', `plot:${req.params.id}`, `Changed ${shop.owner}'s shop tags: ${parts}`);
+    return { added, removed };
+  })();
+  res.json({ updated: !!changes, ...(changes ?? { added: [], removed: [] }), tags: tagsForShop(shop.id) });
+});
+
+// Suggest a tag that isn't in the list yet. It's pending (hidden) until staff
+// approve it in Admin → Tags; approving can also add it to the shop it came from.
+const MAX_PENDING_SUGGESTIONS = 5;
+const pendingByAccount = db.prepare("SELECT COUNT(*) AS n FROM tags WHERE status = 'pending' AND suggested_by = ?");
+
+app.post('/api/tags/suggest', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to suggest tags.' });
+  const kind = req.body.kind;
+  if (!KINDS.includes(kind)) return res.status(400).json({ error: 'kind must be category or stock' });
+  const { tag, error } = cleanTag(req.body, kind);
+  if (error) return res.status(400).json({ error });
+  if (sameName.get(kind, tag.name, 0)) {
+    return res.status(400).json({ error: `"${tag.name}" is already a tag, or has already been suggested.` });
+  }
+  if (pendingByAccount.get(req.account.id).n >= MAX_PENDING_SUGGESTIONS) {
+    return res.status(400).json({
+      error: `You already have ${MAX_PENDING_SUGGESTIONS} suggestions waiting for review. Please wait for those first.`,
+    });
+  }
+  const shop = req.body.plot_id ? getCurrentShop.get(String(req.body.plot_id)) : null;
+
+  const id = db.transaction(() => {
+    const { lastInsertRowid } = db.prepare(`
+      INSERT INTO tags (kind, name, aliases, group_id, color, status, suggested_by, suggested_for_shop_id)
+      VALUES (@kind, @name, @aliases, @group_id, @color, 'pending', @by, @shop)
+    `).run({ ...tag, kind, by: req.account.id, shop: shop?.id ?? null });
+    logModAction(req, 'tag.suggest', `tag:${lastInsertRowid}`,
+      `Suggested ${kind === 'category' ? 'category' : 'tag'} "${tag.name}"${shop ? ` for ${shop.owner}'s shop` : ''}`);
+    return lastInsertRowid;
+  })();
+  res.status(201).json({ id, status: 'pending' });
 });
 
 // A single shop, current or past (for viewing a plot's history).
