@@ -1,0 +1,1108 @@
+{
+  "_readme": "Draft tag lists, generated 10/28 from current shop descriptions and stock. Edit names, aliases, groups and colors freely; delete tags you don't want. seen_in = roughly how many current shops mention the tag or an alias today (for prioritizing; not stored). color: a hex like \"#7bb0e0\", or null for the default.",
+  "categories": [
+    {
+      "name": "Region 1 Equipment",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Region 2 Equipment",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Region 3 Equipment",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Currency Exchange",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Stonk Market",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Rental",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Exchange",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Service",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Giveaway",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Freebie",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Utility",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Non-Commerce",
+      "aliases": [],
+      "color": null
+    },
+    {
+      "name": "Event",
+      "aliases": [],
+      "color": null
+    }
+  ],
+  "stock": [
+    {
+      "name": "Halls of Wind and Blood",
+      "aliases": [
+        "White"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Fallen Menagerie",
+      "aliases": [
+        "Orange"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Plagueroot Temple",
+      "aliases": [
+        "Magenta"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Arcane Rivalry",
+      "aliases": [
+        "Light Blue"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Vernal Nightmare",
+      "aliases": [
+        "Yellow"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Black Willows",
+      "aliases": [
+        "Willows",
+        "Willow"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Alchemy Labs",
+      "aliases": [
+        "Labs"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Malevolent Reverie",
+      "aliases": [
+        "Reverie",
+        "Corrupted",
+        "MR"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Verdant Remnants",
+      "aliases": [
+        "VR"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Kaul",
+      "aliases": [],
+      "group": "R1 bosses",
+      "color": null,
+      "seen_in": 0
+    },
+    {
+      "name": "Valley Overworld",
+      "aliases": [
+        "Valley",
+        "King's Valley",
+        "R1 overworld"
+      ],
+      "group": "R1 overworld",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Valley Explorer",
+      "aliases": [],
+      "group": "R1 overworld",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Salazar's Folly",
+      "aliases": [
+        "Lime"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Harmonic Arboretum",
+      "aliases": [
+        "Pink"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Valley of the Forgotten Pharaohs",
+      "aliases": [
+        "Gray",
+        "Grey"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Palace of Mirrors",
+      "aliases": [
+        "Light Gray",
+        "Light Grey"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "The Scourge of Lunacy",
+      "aliases": [
+        "Cyan"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "The Grasp of Avarice",
+      "aliases": [
+        "Purple"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "The Echoes of Oblivion",
+      "aliases": [
+        "Teal"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "City of Shifting Waters",
+      "aliases": [
+        "Shifting",
+        "Shifting City",
+        "Fred"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Fallen Forum",
+      "aliases": [
+        "Forum",
+        "TFF"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Ephemeral Corridors",
+      "aliases": [
+        "EC",
+        "Corridors",
+        "Roguelike"
+      ],
+      "group": "R1 dungeons",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Darkest Depths",
+      "aliases": [
+        "DD",
+        "Depths",
+        "EDD",
+        "Endless Darkest Depths"
+      ],
+      "group": "R2 dungeons",
+      "color": null,
+      "seen_in": 7
+    },
+    {
+      "name": "Eldrask",
+      "aliases": [
+        "Frost Giant",
+        "FG"
+      ],
+      "group": "R2 bosses",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Isles Overworld",
+      "aliases": [
+        "Isles",
+        "Celsian Isles",
+        "R2 overworld"
+      ],
+      "group": "R2 overworld",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Isles Explorer",
+      "aliases": [],
+      "group": "R2 overworld",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Celestial Zenith",
+      "aliases": [
+        "Zenith",
+        "CZ"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 21
+    },
+    {
+      "name": "Silver Knight's Tomb",
+      "aliases": [
+        "SKT"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Coven's Gambit",
+      "aliases": [
+        "Blue"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 8
+    },
+    {
+      "name": "Cradle of the Broken God",
+      "aliases": [
+        "Brown"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 6
+    },
+    {
+      "name": "Phyrrys, City of Fallen Stars",
+      "aliases": [
+        "Indigo",
+        "Phyrrys"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 6
+    },
+    {
+      "name": "P.O.R.T.A.L.",
+      "aliases": [
+        "Portal"
+      ],
+      "group": "R3 strikes",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Masquerader's Ruin",
+      "aliases": [
+        "MR",
+        "Masqueraders Ruin"
+      ],
+      "group": "R3 strikes",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Sanguine Halls",
+      "aliases": [
+        "Sanguine Hall",
+        "SH",
+        "Gallery"
+      ],
+      "group": "R3 strikes",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Marina Noir",
+      "aliases": [
+        "MN",
+        "Gallery"
+      ],
+      "group": "R3 strikes",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Gallery of Fear",
+      "aliases": [
+        "Gallery"
+      ],
+      "group": "R3 strikes",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Forsworn Sanctum",
+      "aliases": [
+        "FS",
+        "Sanctum"
+      ],
+      "group": "R1 strikes",
+      "color": null,
+      "seen_in": 0
+    },
+    {
+      "name": "Sealed Remorse",
+      "aliases": [
+        "Shard of Remorse",
+        "SR"
+      ],
+      "group": "R2 strikes",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Black Mist",
+      "aliases": [
+        "BM"
+      ],
+      "group": "R2 strikes",
+      "color": null,
+      "seen_in": 0
+    },
+    {
+      "name": "Wanderer's Fortune",
+      "aliases": [
+        "Fortune"
+      ],
+      "group": "R3 dungeons",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Silver Knight's Remnants",
+      "aliases": [
+        "SKR"
+      ],
+      "group": "R3 content",
+      "color": null,
+      "seen_in": 10
+    },
+    {
+      "name": "Diamenean Hunts",
+      "aliases": [
+        "Hunts",
+        "Hunt"
+      ],
+      "group": "R3 content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Ring Fishing",
+      "aliases": [
+        "Fishing",
+        "R3 Fishing",
+        "Fish"
+      ],
+      "group": "R3 content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Wolfswood",
+      "aliases": [],
+      "group": "R3 overworld",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Pelias' Keep",
+      "aliases": [
+        "Keep",
+        "Pelias"
+      ],
+      "group": "R3 overworld",
+      "color": null,
+      "seen_in": 8
+    },
+    {
+      "name": "Star Point",
+      "aliases": [
+        "Starpoint"
+      ],
+      "group": "R3 overworld",
+      "color": null,
+      "seen_in": 7
+    },
+    {
+      "name": "Architect's Ring",
+      "aliases": [
+        "R3 overworld"
+      ],
+      "group": "R3 overworld",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Hexfall",
+      "aliases": [
+        "Hycenea",
+        "Ru'Ten",
+        "HF"
+      ],
+      "group": "R3 bosses",
+      "color": null,
+      "seen_in": 10
+    },
+    {
+      "name": "Godspore",
+      "aliases": [
+        "GS"
+      ],
+      "group": "R3 bosses",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Sirius",
+      "aliases": [
+        "Sirius, The Final Herald"
+      ],
+      "group": "R3 bosses",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Aurora",
+      "aliases": [
+        "Aurora's Endgame"
+      ],
+      "group": "R3 bosses",
+      "color": null,
+      "seen_in": 11
+    },
+    {
+      "name": "Twisted Intruder",
+      "aliases": [
+        "Intruder",
+        "Jeremy"
+      ],
+      "group": "R3 content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Casino",
+      "aliases": [
+        "R3 casino",
+        "Sticks and Stones Tavern",
+        "GPT"
+      ],
+      "group": "R3 content",
+      "color": null,
+      "seen_in": 7
+    },
+    {
+      "name": "Delves",
+      "aliases": [
+        "Delve"
+      ],
+      "group": "Other content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Seasonal Pass",
+      "aliases": [
+        "Season Pass",
+        "SP"
+      ],
+      "group": "Other content",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Races",
+      "aliases": [
+        "Race",
+        "Speedrun",
+        "Speed set"
+      ],
+      "group": "Other content",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Quests",
+      "aliases": [
+        "Quest",
+        "Quest items"
+      ],
+      "group": "Other content",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Advancements",
+      "aliases": [
+        "Advancement",
+        "Progression"
+      ],
+      "group": "Other content",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Rares",
+      "aliases": [
+        "Rare"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 44
+    },
+    {
+      "name": "Epics",
+      "aliases": [
+        "Epic"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Uncommons",
+      "aliases": [
+        "Uncommon"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Artifacts",
+      "aliases": [
+        "Arti",
+        "Artis",
+        "Artifact"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 27
+    },
+    {
+      "name": "Patron Items",
+      "aliases": [
+        "Patron"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 6
+    },
+    {
+      "name": "Tiered Gear",
+      "aliases": [
+        "Tier 5",
+        "Tiered"
+      ],
+      "group": "Items",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Lesser Charms",
+      "aliases": [
+        "Lesser Charm"
+      ],
+      "group": "Charms",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Rare Charms",
+      "aliases": [
+        "Rare Charm"
+      ],
+      "group": "Charms",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Epic Charms",
+      "aliases": [
+        "Epic Charm"
+      ],
+      "group": "Charms",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Legendary Charms",
+      "aliases": [
+        "Legendary Charm"
+      ],
+      "group": "Charms",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Zenith Charms",
+      "aliases": [
+        "CZ Charms",
+        "CZ Charm"
+      ],
+      "group": "Charms",
+      "color": null,
+      "seen_in": 6
+    },
+    {
+      "name": "Fragments",
+      "aliases": [
+        "Frags",
+        "Frag",
+        "Fragment"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 21
+    },
+    {
+      "name": "Materials",
+      "aliases": [
+        "Mats",
+        "Mat"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 15
+    },
+    {
+      "name": "Currencies",
+      "aliases": [
+        "HXP",
+        "HCS",
+        "HAR",
+        "AR",
+        "Currency"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 11
+    },
+    {
+      "name": "Keys",
+      "aliases": [
+        "Key",
+        "Key Fragments"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 7
+    },
+    {
+      "name": "Scrolls",
+      "aliases": [
+        "Combat Scroll",
+        "Puzzle Scroll",
+        "Remnant Scroll"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 8
+    },
+    {
+      "name": "Experience",
+      "aliases": [
+        "Experience Stash",
+        "Condensed Experience",
+        "XP"
+      ],
+      "group": "Currency & materials",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Potions",
+      "aliases": [
+        "Potion",
+        "Pots",
+        "Pot"
+      ],
+      "group": "Consumables",
+      "color": null,
+      "seen_in": 22
+    },
+    {
+      "name": "Casino Potions",
+      "aliases": [
+        "R3 casino pots",
+        "Casino pots"
+      ],
+      "group": "Consumables",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Food",
+      "aliases": [],
+      "group": "Consumables",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Arrows",
+      "aliases": [
+        "Arrow"
+      ],
+      "group": "Consumables",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Augments",
+      "aliases": [
+        "Augment",
+        "Augment Potions"
+      ],
+      "group": "Consumables",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Blocks",
+      "aliases": [
+        "Block",
+        "Building blocks"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 13
+    },
+    {
+      "name": "Carriers",
+      "aliases": [
+        "Carrier"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 11
+    },
+    {
+      "name": "TNT",
+      "aliases": [
+        "Creeper eggs"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Shulker Boxes",
+      "aliases": [
+        "Shulker",
+        "Shulkers"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Repair Anvils",
+      "aliases": [
+        "Anvil",
+        "Anvils"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Totems of Undying",
+      "aliases": [
+        "Totem"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Dummy Eggs",
+      "aliases": [
+        "Dummy",
+        "Delve dummy",
+        "Twisted dummy"
+      ],
+      "group": "Blocks & utility",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Discs",
+      "aliases": [
+        "Disc",
+        "Disks",
+        "Music discs"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Fish",
+      "aliases": [
+        "Mungfish",
+        "T5 fish",
+        "5 star fish",
+        "Tier 5 fish"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 9
+    },
+    {
+      "name": "Aurora Map Tiles",
+      "aliases": [
+        "Map tiles",
+        "Aurora map",
+        "Aurora tiles"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Player Heads",
+      "aliases": [
+        "Playerheads",
+        "Heads"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Trophies",
+      "aliases": [
+        "Trophy"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Lore Books",
+      "aliases": [
+        "Lore book",
+        "Library"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Bouquet Flowers",
+      "aliases": [
+        "Sea Daffodil",
+        "Gladiolus",
+        "Nightshade",
+        "Twisted Luciae",
+        "Bouquet of Gold",
+        "Flowers"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Pottery Sherds",
+      "aliases": [
+        "Sherds",
+        "Versatile Vase"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 5
+    },
+    {
+      "name": "Vanity",
+      "aliases": [
+        "Hope skinned",
+        "Hexed skins",
+        "Transmogrifier",
+        "Mog"
+      ],
+      "group": "Collectibles",
+      "color": null,
+      "seen_in": 8
+    },
+    {
+      "name": "Rental Sets",
+      "aliases": [
+        "Gear sets",
+        "Rental set",
+        "Loadouts"
+      ],
+      "group": "Rentals",
+      "color": null,
+      "seen_in": 15
+    },
+    {
+      "name": "Lootrun Sets",
+      "aliases": [
+        "Lootrun"
+      ],
+      "group": "Rentals",
+      "color": null,
+      "seen_in": 3
+    },
+    {
+      "name": "Speed Sets",
+      "aliases": [
+        "Speed set",
+        "Race sets"
+      ],
+      "group": "Rentals",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Max Infused Items",
+      "aliases": [
+        "Infused",
+        "Max infused"
+      ],
+      "group": "Rentals",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Infusion Service",
+      "aliases": [
+        "Infusion"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Patron Ordering",
+      "aliases": [
+        "Patron service",
+        "Patron request"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "NPC Trade Service",
+      "aliases": [
+        "NPC trades",
+        "Pocket Trader"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 2
+    },
+    {
+      "name": "Carry Service",
+      "aliases": [
+        "Carry",
+        "Carries"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 1
+    },
+    {
+      "name": "Auctions",
+      "aliases": [
+        "Auction",
+        "BIN"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 4
+    },
+    {
+      "name": "Utility Rental",
+      "aliases": [
+        "Furnace",
+        "Smelting"
+      ],
+      "group": "Services",
+      "color": null,
+      "seen_in": 1
+    }
+  ]
+}
