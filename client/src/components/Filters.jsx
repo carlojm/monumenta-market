@@ -1,24 +1,70 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ListFilter, X } from 'lucide-react';
 import TagPicker from './TagPicker';
-import { TAG_MODES, filterLabel, isActive } from '../lib/filters';
+import { FILTER_TYPES, STATUS_OPTIONS, TAG_MODES, filterLabel, isActive } from '../lib/filters';
 import { useDismiss } from '../lib/useDismiss';
 import './Toolbar.css';
 
-// "Filter" button in the toolbar: adds a tag filter and opens it.
-export function FilterButton({ onAdd }) {
+// "Filter" button in the toolbar: a menu of what to filter by. Picking one
+// adds that filter and opens it; "Hide vacant plots" is added as it is.
+export function FilterButton({ filters, onAdd }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(ref, open, close);
+  const hidingVacant = filters.some((f) => f.type === 'occupied');
+
+  const add = (type) => {
+    setOpen(false);
+    onAdd(type);
+  };
+
   return (
-    <button type="button" className="toolbar__button" onClick={onAdd}>
-      <ListFilter size={14} aria-hidden="true" />
-      Filter
-    </button>
+    <div className="toolbar__menu-wrap" ref={ref}>
+      <button type="button" className="toolbar__button" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <ListFilter size={14} aria-hidden="true" />
+        Filter
+      </button>
+      {open && (
+        <div className="toolbar__menu" role="menu">
+          <p className="toolbar__menu-heading">Filter by</p>
+          {FILTER_TYPES.map((t) => (
+            <button key={t.type} type="button" role="menuitem" className="toolbar__menu-item" onClick={() => add(t.type)}>
+              {t.label}
+            </button>
+          ))}
+          <div className="toolbar__menu-divider" />
+          <button type="button" role="menuitem" className="toolbar__menu-item" disabled={hidingVacant}
+            onClick={() => add('occupied')}>
+            Hide vacant plots
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Toggle buttons for a status or zone filter ("is any of").
+function OptionList({ options, values, onChange }) {
+  const toggle = (key) => onChange(values.includes(key) ? values.filter((v) => v !== key) : [...values, key]);
+  return (
+    <ul className="filters__options">
+      {options.map((o) => (
+        <li key={o.key}>
+          <button type="button" aria-pressed={values.includes(o.key)} onClick={() => toggle(o.key)}>
+            {o.color && <span className="filters__swatch" style={{ background: o.color }} aria-hidden="true" />}
+            {o.label}
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 // The row of filter chips under the search bar. Clicking a chip opens its
-// popup: any / all / none, then the tags. Closing a filter with no tags chosen
-// removes it.
-export function FilterChips({ filters, catalog, openId, onOpen, onChange, onRemove, onClear }) {
+// popup; closing a filter with nothing chosen removes it. "Vacant plots
+// hidden" has nothing to choose, so its chip just removes it.
+export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange, onRemove, onClear }) {
   const ref = useRef(null);
   const open = filters.find((f) => f.id === openId);
 
@@ -30,16 +76,27 @@ export function FilterChips({ filters, catalog, openId, onOpen, onChange, onRemo
 
   if (filters.length === 0) return null;
   const update = (changes) => onChange({ ...open, ...changes });
+  const remove = () => {
+    onRemove(open.id);
+    onOpen(null);
+  };
 
   return (
     <div className="filters" ref={ref}>
       <ul className="filters__chips">
         {filters.map((f) => (
           <li key={f.id}>
-            <button type="button" className="filters__chip" aria-expanded={f.id === openId}
-              onClick={() => (f.id === openId ? close() : onOpen(f.id))}>
-              {filterLabel(f, catalog)}
-            </button>
+            {f.type === 'occupied' ? (
+              <button type="button" className="filters__chip" onClick={() => onRemove(f.id)}
+                title="Show vacant plots again">
+                {filterLabel(f)} <X size={12} aria-hidden="true" />
+              </button>
+            ) : (
+              <button type="button" className="filters__chip" aria-expanded={f.id === openId}
+                onClick={() => (f.id === openId ? close() : onOpen(f.id))}>
+                {filterLabel(f, catalog)}
+              </button>
+            )}
           </li>
         ))}
         {filters.length > 1 && (
@@ -50,21 +107,33 @@ export function FilterChips({ filters, catalog, openId, onOpen, onChange, onRemo
       </ul>
 
       {open && (
-        <div className="filters__popup" role="dialog" aria-label="Tag filter">
+        <div className="filters__popup" role="dialog" aria-label={`${open.type} filter`}>
           <div className="filters__popup-head">
-            <div className="toolbar__directions filters__modes">
-              {TAG_MODES.map((m) => (
-                <button key={m.key} type="button" aria-pressed={open.mode === m.key} onClick={() => update({ mode: m.key })}>
-                  {m.label}
-                </button>
-              ))}
-            </div>
-            <button type="button" className="filters__remove" onClick={() => { onRemove(open.id); onOpen(null); }}
-              aria-label="Remove filter" title="Remove filter">
+            {open.type === 'tags' ? (
+              <div className="toolbar__directions filters__modes">
+                {TAG_MODES.map((m) => (
+                  <button key={m.key} type="button" aria-pressed={open.mode === m.key} onClick={() => update({ mode: m.key })}>
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span className="filters__popup-title">{open.type === 'status' ? 'Status' : 'Zone'} is any of</span>
+            )}
+            <button type="button" className="filters__remove" onClick={remove} aria-label="Remove filter" title="Remove filter">
               <X size={16} aria-hidden="true" />
             </button>
           </div>
-          <TagPicker catalog={catalog} value={open.tagIds} onChange={(tagIds) => update({ tagIds })} />
+          {open.type === 'tags' && (
+            <TagPicker catalog={catalog} value={open.tagIds} onChange={(tagIds) => update({ tagIds })} />
+          )}
+          {open.type === 'status' && (
+            <OptionList options={STATUS_OPTIONS} values={open.values} onChange={(values) => update({ values })} />
+          )}
+          {open.type === 'zone' && (
+            <OptionList options={zones.map((z) => ({ key: z, label: z }))} values={open.values}
+              onChange={(values) => update({ values })} />
+          )}
         </div>
       )}
     </div>

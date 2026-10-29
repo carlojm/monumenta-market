@@ -7,7 +7,7 @@ import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
 import { FilterButton, FilterChips } from './components/Filters';
-import { filterMatches, filterPlots, isActive, newTagFilter } from './lib/filters';
+import { filterMatches, filterPlots, isActive, newFilter } from './lib/filters';
 import { getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
@@ -64,11 +64,12 @@ function App() {
   // The map dims everything outside both.
   const [filters, setFilters] = useState([]);
   const [openFilterId, setOpenFilterId] = useState(null);
-  const addFilter = () => {
-    const filter = newTagFilter();
+  const addFilter = (type) => {
+    const filter = newFilter(type);
     setFilters((list) => [...list, filter]);
-    setOpenFilterId(filter.id);
+    if (type !== 'occupied') setOpenFilterId(filter.id); // nothing to choose for "hide vacant"
   };
+  const zones = useMemo(() => [...new Set(plots.map((p) => p.zone))].sort((a, b) => a.localeCompare(b)), [plots]);
   const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
   const removeFilter = useCallback((id) => setFilters((list) => list.filter((f) => f.id !== id)), []);
   const filtering = filters.some(isActive);
@@ -91,10 +92,10 @@ function App() {
       <div className="app-main__search">
         <div className="toolbar">
           <SearchBar value={query} onChange={setQuery} />
-          <FilterButton onAdd={addFilter} />
+          <FilterButton filters={filters} onAdd={addFilter} />
           <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
         </div>
-        <FilterChips filters={filters} catalog={catalog} openId={openFilterId} onOpen={setOpenFilterId}
+        <FilterChips filters={filters} catalog={catalog} zones={zones} openId={openFilterId} onOpen={setOpenFilterId}
           onChange={updateFilter} onRemove={removeFilter} onClear={() => setFilters([])} />
       </div>
       {filtering && rows.length === 0 ? (
