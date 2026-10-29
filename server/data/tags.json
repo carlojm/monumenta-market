@@ -3,17 +3,32 @@
   "categories": [
     {
       "name": "Region 1 Equipment",
-      "aliases": [],
+      "aliases": [
+        "R1",
+        "Valley",
+        "King's Valley",
+        "Region 1"
+      ],
       "color": null
     },
     {
       "name": "Region 2 Equipment",
-      "aliases": [],
+      "aliases": [
+        "R2",
+        "Isles",
+        "Celsian Isles",
+        "Region 2"
+      ],
       "color": null
     },
     {
       "name": "Region 3 Equipment",
-      "aliases": [],
+      "aliases": [
+        "R3",
+        "Ring",
+        "Architect's Ring",
+        "Region 3"
+      ],
       "color": null
     },
     {
@@ -23,7 +38,11 @@
     },
     {
       "name": "Stonk Market",
-      "aliases": [],
+      "aliases": [
+        "stonk",
+        "stonks",
+        "stonkco"
+      ],
       "color": null
     },
     {

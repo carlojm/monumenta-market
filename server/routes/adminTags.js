@@ -8,6 +8,7 @@
 //   PUT  /tag-groups/:id {color}                           a group's fallback color
 //   POST /tags/:id/approve {add_to_shop?}                  approve a suggestion (to the end of its group)
 //   POST /tags/:id/reject                                  reject (delete) a suggestion
+//   POST /tags/auto-apply {shops: [{plot_id, tag_ids}]}    add tags to many shops (never removes)
 //
 // Once tags are edited here, the site is the real list: rerunning tags:load
 // would overwrite these edits with tags.json.
@@ -16,7 +17,7 @@ import express from 'express';
 import db from '../db/init.js';
 import { requireModerator } from '../middleware/adminAuth.js';
 import { logModAction } from '../lib/modlog.js';
-import { KINDS, cleanTag, endOfGroup, isHex, sameName } from '../lib/tags.js';
+import { KINDS, checkTagIds, cleanTag, endOfGroup, isHex, sameName, setShopTags } from '../lib/tags.js';
 import { addLogEntry } from '../lib/shopLog.js';
 
 // requireModerator goes on each route: other /api/admin routes have their own checks.
@@ -147,6 +148,46 @@ router.post('/tags/:id/reject', requireModerator, (req, res) => {
   db.prepare('DELETE FROM tags WHERE id = ?').run(tag.id);
   logModAction(req, 'tag.reject', `tag:${tag.id}`, `Rejected suggested tag "${tag.name}"`);
   res.json({ rejected: true });
+});
+
+// Auto-tagging from descriptions: the matching runs in the browser (the same
+// as the Edit tags popup's suggestions) and staff tick which ones to keep.
+// This only adds tags, never removes them. Each shop gets a log line on its
+// card; the mod log gets one summary. updated_at isn't touched, since nothing
+// about the shop itself changed.
+const MAX_AUTO_TAG_SHOPS = 500;
+const currentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL');
+const shopTagIds = db.prepare('SELECT tag_id FROM shop_tags WHERE shop_id = ?');
+
+router.post('/tags/auto-apply', requireModerator, (req, res) => {
+  const list = req.body.shops;
+  if (!Array.isArray(list) || list.length > MAX_AUTO_TAG_SHOPS) {
+    return res.status(400).json({ error: `shops must be a list of at most ${MAX_AUTO_TAG_SHOPS}` });
+  }
+  const work = [];
+  for (const item of list) {
+    const shop = currentShop.get(String(item?.plot_id));
+    if (!shop) return res.status(400).json({ error: `No current shop on plot ${item?.plot_id}` });
+    const checked = checkTagIds(item.tag_ids);
+    if (checked.error) return res.status(400).json({ error: checked.error });
+    work.push({ shop, ids: checked.ids });
+  }
+
+  const result = db.transaction(() => {
+    let shops = 0;
+    let tags = 0;
+    for (const { shop, ids } of work) {
+      const current = shopTagIds.all(shop.id).map((r) => r.tag_id);
+      const { added } = setShopTags(shop.id, [...new Set([...current, ...ids])]);
+      if (!added.length) continue;
+      addLogEntry(shop.id, req.account, `tags added: ${added.join(', ')}`);
+      shops++;
+      tags += added.length;
+    }
+    if (shops) logModAction(req, 'tag.auto', 'tags', `Auto-tagged ${shops} shops from their descriptions (${tags} tags)`);
+    return { shops, tags };
+  })();
+  res.json(result);
 });
 
 router.put('/tag-groups/:id', requireModerator, (req, res) => {

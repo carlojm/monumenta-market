@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import ColorInput from '../components/ColorInput';
+import AdminAutoTag from './AdminAutoTag';
 import { timeAgo } from '../lib/reports';
 import '../components/TagChips.css';
 
@@ -267,6 +268,7 @@ function AdminTags() {
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState(null); // the "Add a tag" draft, or null when closed
   const [addError, setAddError] = useState(null);
+  const [autoTagOpen, setAutoTagOpen] = useState(false); // only load it when opened
 
   const reload = () => getTags().then(setData).catch((err) => setError(err.message));
   useEffect(() => {
@@ -314,6 +316,11 @@ function AdminTags() {
         <ul>
           {data.groups.map((g) => <GroupColor key={g.id} group={g} onChanged={reload} />)}
         </ul>
+      </details>
+
+      <details className="admin-tags__groups" onToggle={(e) => setAutoTagOpen(e.currentTarget.open)}>
+        <summary>Auto-tag shops from their descriptions</summary>
+        {autoTagOpen && <AdminAutoTag />}
       </details>
 
       {adding ? (

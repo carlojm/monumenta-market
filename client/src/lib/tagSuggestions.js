@@ -14,6 +14,12 @@ function termScore(term, tag) {
 }
 
 export function suggestTags(text, tags, skipIds = []) {
+  return matchTags(text, tags, skipIds).map((m) => m.tag);
+}
+
+// The same, with what matched: [{ tag, term, score }]. Score 3 is the tag's
+// full name, 2 a long alias, 1 a short alias.
+export function matchTags(text, tags, skipIds = []) {
   if (!text?.trim()) return [];
   const skip = new Set(skipIds);
   const found = [];
@@ -31,5 +37,5 @@ export function suggestTags(text, tags, skipIds = []) {
     if (best) found.push({ tag, ...best });
   }
   found.sort((a, b) => b.score - a.score || b.term.length - a.term.length);
-  return found.map((f) => f.tag);
+  return found;
 }
