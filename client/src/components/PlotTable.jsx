@@ -2,23 +2,40 @@ import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
 
-// `rows` arrive already sorted (see lib/sort.js).
-function PlotTable({ rows, searchResults, onSelectPlot }) {
+function Snippet({ snippet }) {
+  return (
+    <div>
+      <span className="plot-table__match-field">{snippet.field}: </span>
+      {snippet.before}
+      <mark>{snippet.highlight}</mark>
+      {snippet.after}
+    </div>
+  );
+}
+
+// `rows` arrive already sorted (see lib/sort.js). `tagMatches` (plot id ->
+// { names, context }) is set while a tag filter is on; the Match column shows
+// the matching tags, then where they appear in the shop's text. A search
+// snippet, if any, comes first instead.
+function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
+  const showMatch = !!(searchResults || tagMatches);
   return (
     <table className="plot-table">
       <thead>
         <tr>
           <th className="plot-table__shop">Shop</th>
-          {/* Zone only without a search, so the Match column gets the room. */}
-          {!searchResults && <th>Zone</th>}
+          {/* Zone only without a search or filter, so the Match column gets the room. */}
+          {!showMatch && <th>Zone</th>}
           <th>Status</th>
-          {searchResults && <th>Match</th>}
+          {showMatch && <th>Match</th>}
         </tr>
       </thead>
       <tbody>
         {rows.map((plot) => {
           const isMatch = searchResults ? searchResults.matchedIds.has(plot.id) : true;
           const snippet = searchResults?.snippets[plot.id];
+          const tagNames = tagMatches?.[plot.id]?.names ?? [];
+          const context = snippet ? null : tagMatches?.[plot.id]?.context;
           const report = plot.latest_report;
 
           return (
@@ -31,7 +48,7 @@ function PlotTable({ rows, searchResults, onSelectPlot }) {
               ].filter(Boolean).join(' ')}
             >
               <td className="plot-table__shop">{displayName(plot.shop)}</td>
-              {!searchResults && <td>{plot.zone}</td>}
+              {!showMatch && <td>{plot.zone}</td>}
               <td>
                 {!plot.shop ? 'Vacant' : report ? (
                   <>
@@ -40,18 +57,19 @@ function PlotTable({ rows, searchResults, onSelectPlot }) {
                   </>
                 ) : '—'}
               </td>
-              {searchResults && (
+              {showMatch && (
                 <td className="plot-table__match">
-                  {snippet ? (
-                    <>
-                      <span className="plot-table__match-field">{snippet.field}: </span>
-                      {snippet.before}
-                      <mark>{snippet.highlight}</mark>
-                      {snippet.after}
-                    </>
-                  ) : (
-                    '—'
+                  {snippet && <Snippet snippet={snippet} />}
+                  {tagNames.length > 0 && (
+                    <div>
+                      <span className="plot-table__match-field">Tags: </span>
+                      {tagNames.map((name, i) => (
+                        <span key={name}>{i > 0 && ', '}<mark>{name}</mark></span>
+                      ))}
+                    </div>
                   )}
+                  {context && <Snippet snippet={context} />}
+                  {!snippet && tagNames.length === 0 && '—'}
                 </td>
               )}
             </tr>

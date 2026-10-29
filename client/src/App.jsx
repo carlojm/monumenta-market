@@ -7,7 +7,7 @@ import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
 import { FilterButton, FilterChips } from './components/Filters';
-import { filterPlots, isActive, newTagFilter } from './lib/filters';
+import { filterMatches, filterPlots, isActive, newTagFilter } from './lib/filters';
 import { getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
@@ -100,7 +100,8 @@ function App() {
       {filtering && rows.length === 0 ? (
         <p className="app-main__empty">No shops match these filters.</p>
       ) : (
-        <PlotTable rows={rows} searchResults={searchResults} onSelectPlot={openPlot} />
+        <PlotTable rows={rows} searchResults={searchResults} tagMatches={filterMatches(filteredPlots, filters)}
+          onSelectPlot={openPlot} />
       )}
     </div>
   );

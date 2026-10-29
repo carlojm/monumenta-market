@@ -62,16 +62,19 @@ function buildSnippet(matches, record) {
   }
 
   const [start, end] = match.indices[0];
-  const value = match.value;
+  return textSnippet(match.key, match.value, start, end + 1);
+}
+
+// A few words either side of value[start, end), for the table's Match column.
+export function textSnippet(key, value, start, end) {
   const CONTEXT = 40;
   const snippetStart = Math.max(0, start - CONTEXT);
-  const snippetEnd = Math.min(value.length, end + 1 + CONTEXT);
-
+  const snippetEnd = Math.min(value.length, end + CONTEXT);
   return {
-    field: FIELD_LABELS[match.key] || match.key,
+    field: FIELD_LABELS[key] || key,
     before: (snippetStart > 0 ? '…' : '') + value.slice(snippetStart, start),
-    highlight: value.slice(start, end + 1),
-    after: value.slice(end + 1, snippetEnd) + (snippetEnd < value.length ? '…' : ''),
+    highlight: value.slice(start, end),
+    after: value.slice(end, snippetEnd) + (snippetEnd < value.length ? '…' : ''),
   };
 }
 

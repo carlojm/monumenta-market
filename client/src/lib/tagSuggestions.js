@@ -7,6 +7,8 @@
 
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const isShortCaps = (term) => term.length <= 3 && term === term.toUpperCase();
+const termPattern = (term) =>
+  new RegExp(`(^|[^A-Za-z0-9])${escape(term)}(s|es)?($|[^A-Za-z0-9])`, isShortCaps(term) ? '' : 'i');
 
 function termScore(term, tag) {
   if (term === tag.name) return 3;
@@ -27,8 +29,7 @@ export function matchTags(text, tags, skipIds = []) {
     if (skip.has(tag.id)) continue;
     let best = null;
     for (const term of [tag.name, ...tag.aliases]) {
-      const pattern = new RegExp(`(^|[^A-Za-z0-9])${escape(term)}(s|es)?($|[^A-Za-z0-9])`, isShortCaps(term) ? '' : 'i');
-      if (!pattern.test(text)) continue;
+      if (!termPattern(term).test(text)) continue;
       const score = termScore(term, tag);
       if (!best || score > best.score || (score === best.score && term.length > best.term.length)) {
         best = { score, term };
@@ -38,4 +39,17 @@ export function matchTags(text, tags, skipIds = []) {
   }
   found.sort((a, b) => b.score - a.score || b.term.length - a.term.length);
   return found;
+}
+
+// Where a tag's name or alias first appears in `text`: { start, end } or null.
+export function findTerm(text, tag) {
+  if (!text) return null;
+  let first = null;
+  for (const term of [tag.name, ...tag.aliases]) {
+    const m = termPattern(term).exec(text);
+    if (!m) continue;
+    const start = m.index + m[1].length;
+    if (!first || start < first.start) first = { start, end: start + term.length + (m[2]?.length ?? 0) };
+  }
+  return first;
 }
