@@ -5,7 +5,9 @@ import MarketMap from './components/MarketMap';
 import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
+import SortMenu from './components/SortMenu';
 import { getSearchResults } from './lib/search';
+import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
 
 function App() {
@@ -52,13 +54,21 @@ function App() {
 
   const searchResults = useMemo(() => getSearchResults(plots, query), [plots, query]);
 
+  // A sort the player picked stays while they search; otherwise it's newest
+  // update first, or best match while searching.
+  const [pickedSort, setPickedSort] = useState(null);
+  const searching = !!searchResults;
+  const sort = pickedSort && (searching || pickedSort.key !== 'best') ? pickedSort : defaultSort(searching);
+  const rows = sortPlots(plots, searchResults, sort);
+
   const cardOpenOnDesktop = isDesktop && !!selectedPlot;
   const list = (
     <div className="app-main__list-body">
-      <div className="app-main__search">
+      <div className="app-main__search toolbar">
         <SearchBar value={query} onChange={setQuery} />
+        <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
       </div>
-      <PlotTable plots={plots} searchResults={searchResults} onSelectPlot={openPlot} />
+      <PlotTable rows={rows} searchResults={searchResults} onSelectPlot={openPlot} />
     </div>
   );
 

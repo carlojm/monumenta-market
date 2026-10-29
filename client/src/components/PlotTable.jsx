@@ -2,17 +2,8 @@ import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
 
-function PlotTable({ plots, searchResults, onSelectPlot }) {
-  const rows = searchResults
-    ? [...plots].sort((a, b) => {
-        const aIndex = searchResults.orderedIds.indexOf(a.id);
-        const bIndex = searchResults.orderedIds.indexOf(b.id);
-        const aRank = aIndex === -1 ? Infinity : aIndex;
-        const bRank = bIndex === -1 ? Infinity : bIndex;
-        return aRank - bRank;
-      })
-    : plots;
-
+// `rows` arrive already sorted (see lib/sort.js).
+function PlotTable({ rows, searchResults, onSelectPlot }) {
   return (
     <table className="plot-table">
       <thead>
