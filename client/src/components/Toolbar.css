@@ -5,9 +5,38 @@
   gap: 0.5rem;
 }
 
-.toolbar .search-bar {
+.toolbar .search-bar__wrap {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+/* Tag suggestions under the search box: the full width of the box. */
+.search-bar__options {
+  left: 0;
+  right: 0;
+  min-width: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.search-bar__option {
+  cursor: pointer;
+}
+
+.search-bar__option[aria-selected='true'] {
+  background: var(--code-bg);
+}
+
+.search-bar__alias {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.search-bar__kind {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .toolbar__menu-wrap {

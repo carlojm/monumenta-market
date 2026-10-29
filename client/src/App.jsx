@@ -69,6 +69,9 @@ function App() {
     setFilters((list) => [...list, filter]);
     if (type !== 'occupied') setOpenFilterId(filter.id); // nothing to choose for "hide vacant"
   };
+  // A tag picked from the search bar's suggestions becomes its own filter.
+  const addTagFilter = (tagId) => setFilters((list) => [...list, { ...newFilter('tags'), tagIds: [tagId] }]);
+  const filteredTagIds = filters.flatMap((f) => (f.type === 'tags' ? f.tagIds : []));
   const zones = useMemo(() => [...new Set(plots.map((p) => p.zone))].sort((a, b) => a.localeCompare(b)), [plots]);
   const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
   const removeFilter = useCallback((id) => setFilters((list) => list.filter((f) => f.id !== id)), []);
@@ -91,7 +94,8 @@ function App() {
     <div className="app-main__list-body">
       <div className="app-main__search">
         <div className="toolbar">
-          <SearchBar value={query} onChange={setQuery} />
+          <SearchBar value={query} onChange={setQuery} catalog={catalog} skipTagIds={filteredTagIds}
+            onPickTag={addTagFilter} />
           <FilterButton filters={filters} onAdd={addFilter} />
           <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
         </div>
