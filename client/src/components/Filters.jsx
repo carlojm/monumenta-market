@@ -62,8 +62,9 @@ function OptionList({ options, values, onChange }) {
 }
 
 // The row of filter chips under the search bar. Clicking a chip opens its
-// popup; closing a filter with nothing chosen removes it. "Vacant plots
-// hidden" has nothing to choose, so its chip just removes it.
+// popup (its ✕ just closes it); each chip's own × removes the filter.
+// Closing a filter with nothing chosen removes it too. "Vacant plots hidden"
+// has nothing to choose, so it only has the ×.
 export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange, onRemove, onClear }) {
   const ref = useRef(null);
   const open = filters.find((f) => f.id === openId);
@@ -76,27 +77,24 @@ export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange,
 
   if (filters.length === 0) return null;
   const update = (changes) => onChange({ ...open, ...changes });
-  const remove = () => {
-    onRemove(open.id);
-    onOpen(null);
-  };
 
   return (
     <div className="filters" ref={ref}>
       <ul className="filters__chips">
         {filters.map((f) => (
-          <li key={f.id}>
+          <li key={f.id} className={`filters__chip${f.id === openId ? ' filters__chip--open' : ''}`}>
             {f.type === 'occupied' ? (
-              <button type="button" className="filters__chip" onClick={() => onRemove(f.id)}
-                title="Show vacant plots again">
-                {filterLabel(f)} <X size={12} aria-hidden="true" />
-              </button>
+              <span className="filters__chip-label">{filterLabel(f)}</span>
             ) : (
-              <button type="button" className="filters__chip" aria-expanded={f.id === openId}
+              <button type="button" className="filters__chip-label" aria-expanded={f.id === openId}
                 onClick={() => (f.id === openId ? close() : onOpen(f.id))}>
                 {filterLabel(f, catalog)}
               </button>
             )}
+            <button type="button" className="filters__chip-remove" aria-label={`Remove filter ${filterLabel(f, catalog)}`}
+              title="Remove filter" onClick={() => { onRemove(f.id); if (f.id === openId) onOpen(null); }}>
+              <X size={12} aria-hidden="true" />
+            </button>
           </li>
         ))}
         {filters.length > 1 && (
@@ -120,7 +118,7 @@ export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange,
             ) : (
               <span className="filters__popup-title">{open.type === 'status' ? 'Status' : 'Zone'} is any of</span>
             )}
-            <button type="button" className="filters__remove" onClick={remove} aria-label="Remove filter" title="Remove filter">
+            <button type="button" className="filters__remove" onClick={close} aria-label="Close" title="Close">
               <X size={16} aria-hidden="true" />
             </button>
           </div>

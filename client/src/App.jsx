@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MarketMap from './components/MarketMap';
-import SearchBar from './components/SearchBar';
+import SearchBar, { SearchTagSuggestions } from './components/SearchBar';
 import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
@@ -69,8 +69,13 @@ function App() {
     setFilters((list) => [...list, filter]);
     if (type !== 'occupied') setOpenFilterId(filter.id); // nothing to choose for "hide vacant"
   };
-  // A tag picked from the search bar's suggestions becomes its own filter.
-  const addTagFilter = (tagId) => setFilters((list) => [...list, { ...newFilter('tags'), tagIds: [tagId] }]);
+  // A tag picked from the search bar's suggestions joins the first "has any of"
+  // tag filter (so picks are ORed), or starts one.
+  const addTagFilter = (tagId) => setFilters((list) => {
+    const anyFilter = list.find((f) => f.type === 'tags' && f.mode === 'any');
+    if (!anyFilter) return [...list, { ...newFilter('tags'), tagIds: [tagId] }];
+    return list.map((f) => (f === anyFilter ? { ...f, tagIds: [...f.tagIds, tagId] } : f));
+  });
   const filteredTagIds = filters.flatMap((f) => (f.type === 'tags' ? f.tagIds : []));
   const zones = useMemo(() => [...new Set(plots.map((p) => p.zone))].sort((a, b) => a.localeCompare(b)), [plots]);
   const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
@@ -94,11 +99,12 @@ function App() {
     <div className="app-main__list-body">
       <div className="app-main__search">
         <div className="toolbar">
-          <SearchBar value={query} onChange={setQuery} catalog={catalog} skipTagIds={filteredTagIds}
-            onPickTag={addTagFilter} />
+          <SearchBar value={query} onChange={setQuery} />
           <FilterButton filters={filters} onAdd={addFilter} />
           <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
         </div>
+        <SearchTagSuggestions query={query} catalog={catalog} skipTagIds={filteredTagIds}
+          onPick={addTagFilter} />
         <FilterChips filters={filters} catalog={catalog} zones={zones} openId={openFilterId} onOpen={setOpenFilterId}
           onChange={updateFilter} onRemove={removeFilter} onClear={() => setFilters([])} />
       </div>

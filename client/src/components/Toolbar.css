@@ -5,38 +5,9 @@
   gap: 0.5rem;
 }
 
-.toolbar .search-bar__wrap {
-  position: relative;
+.toolbar .search-bar {
   flex: 1;
   min-width: 0;
-}
-
-/* Tag suggestions under the search box: the full width of the box. */
-.search-bar__options {
-  left: 0;
-  right: 0;
-  min-width: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.search-bar__option {
-  cursor: pointer;
-}
-
-.search-bar__option[aria-selected='true'] {
-  background: var(--code-bg);
-}
-
-.search-bar__alias {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.search-bar__kind {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--text-muted);
 }
 
 .toolbar__menu-wrap {
@@ -161,16 +132,50 @@
 }
 
 .filters__chip {
-  font-size: 0.8rem;
-  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  border-color: var(--accent);
   background: var(--code-bg);
+  overflow: hidden;
+}
+
+.filters__chip--open {
+  background: var(--accent);
+}
+
+.filters__chip-label,
+.filters__chip-remove {
+  border: none;
+  border-radius: 0;
+  background: none;
+  font-size: 0.8rem;
   color: var(--text);
 }
 
-.filters__chip[aria-expanded='true'] {
-  background: var(--accent);
+.filters__chip-label {
+  padding: 0.2rem 0.3rem 0.2rem 0.6rem;
+}
+
+/* Keep the keyboard focus ring inside the rounded chip (it clips overflow). */
+.filters__chip-label:focus-visible,
+.filters__chip-remove:focus-visible {
+  outline-offset: -2px;
+}
+
+.filters__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.45rem 0 0.25rem;
+  color: var(--text-muted);
+}
+
+.filters__chip-remove:hover {
+  color: var(--text);
+}
+
+.filters__chip--open .filters__chip-label,
+.filters__chip--open .filters__chip-remove {
   color: var(--accent-contrast);
 }
 
@@ -239,10 +244,6 @@
   background: none;
 }
 
-.filters__chip svg {
-  vertical-align: -2px;
-}
-
 .filters__popup-title {
   flex: 1;
   font-size: 0.85rem;
@@ -280,4 +281,33 @@
   width: 0.65rem;
   height: 0.65rem;
   border-radius: 2px;
+}
+
+/* "Filter by tag:" line under the search bar while typing. */
+.search-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.search-tags__label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.search-tags__chip {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.search-tags__chip:hover {
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+.search-tags__alias {
+  margin-left: 0.3rem;
+  font-size: 0.7rem;
+  opacity: 0.75;
 }
