@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import ColorInput from '../components/ColorInput';
+import { timeAgo } from '../lib/reports';
 import '../components/TagChips.css';
 
 // Moderators and admins: manage the tag lists. Tags show in this order
@@ -143,6 +144,98 @@ function TagRow({ tag, groups, isFirst, isLast, onChanged }) {
   );
 }
 
+// A player's suggested tag, waiting for review.
+function SuggestionRow({ tag, groups, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(null);
+  const [addToShop, setAddToShop] = useState(!!tag.suggested_for_shop_open);
+  const [confirmingReject, setConfirmingReject] = useState(false);
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const groupName = groups.find((g) => g.id === tag.group_id)?.name;
+
+  const run = async (fn) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fn();
+      await onChanged();
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  };
+  const startEdit = () => {
+    setDraft({ kind: tag.kind, name: tag.name, aliases: tag.aliases.join(', '), group_id: tag.group_id ?? '', color: tag.color ?? '' });
+    setEditing(true);
+  };
+  const saveEdit = (e) => {
+    e.preventDefault();
+    run(async () => {
+      await send(`/api/admin/tags/${tag.id}`, 'PUT', toBody(draft));
+      setEditing(false);
+      setBusy(false);
+    });
+  };
+
+  return (
+    <li className="admin-tags__row admin-tags__suggestion">
+      <div className="admin-tags__summary">
+        <Chip tag={tag} />
+        <span className="admin-comments__muted">{tag.kind === 'category' ? 'category' : groupName}</span>
+        {tag.aliases.length > 0 && <span className="admin-comments__muted">also: {tag.aliases.join(', ')}</span>}
+      </div>
+      <p className="admin-tags__suggested-by">
+        Suggested by <strong>{tag.suggested_by_name ?? 'a deleted account'}</strong>
+        {tag.suggested_for_plot && (
+          <>
+            {' '}for{' '}
+            <a href={`/plot/${tag.suggested_for_plot}`} target="_blank" rel="noreferrer">
+              {tag.suggested_for_owner}'s shop <span className="coord">{tag.suggested_for_plot}</span>
+            </a>
+            {!tag.suggested_for_shop_open && <span className="admin-comments__muted"> (that shop has since closed)</span>}
+          </>
+        )}{' '}
+        <span className="admin-comments__muted">{timeAgo(tag.created_at)}</span>
+      </p>
+
+      {editing ? (
+        <form className="admin-tags__form" onSubmit={saveEdit}>
+          <TagFields draft={draft} setDraft={setDraft} groups={groups} />
+          <div className="admin-editor__actions">
+            <button type="submit" disabled={busy || !draft.name.trim()}>Save</button>
+            <button type="button" onClick={() => setEditing(false)}>Cancel</button>
+          </div>
+        </form>
+      ) : confirmingReject ? (
+        <div className="admin-tags__decide">
+          <span>Reject and delete this suggestion?</span>
+          <button type="button" disabled={busy} onClick={() => run(() => send(`/api/admin/tags/${tag.id}/reject`, 'POST'))}>
+            Yes, reject
+          </button>
+          <button type="button" onClick={() => setConfirmingReject(false)}>Cancel</button>
+        </div>
+      ) : (
+        <div className="admin-tags__decide">
+          {tag.suggested_for_shop_open ? (
+            <label>
+              <input type="checkbox" checked={addToShop} onChange={(e) => setAddToShop(e.target.checked)} />
+              Also add it to {tag.suggested_for_owner}'s shop
+            </label>
+          ) : null}
+          <button type="button" className="admin-tags__approve" disabled={busy}
+            onClick={() => run(() => send(`/api/admin/tags/${tag.id}/approve`, 'POST', { add_to_shop: addToShop }))}>
+            Approve
+          </button>
+          <button type="button" onClick={startEdit}>Edit</button>
+          <button type="button" onClick={() => setConfirmingReject(true)}>Reject</button>
+        </div>
+      )}
+      {error && <p className="admin-comments__error">{error}</p>}
+    </li>
+  );
+}
+
 function GroupColor({ group, onChanged }) {
   const [color, setColor] = useState(group.color ?? '');
   const [error, setError] = useState(null);
@@ -184,6 +277,7 @@ function AdminTags() {
   if (!data) return <p>Loading tags…</p>;
 
   const approved = data.tags.filter((t) => t.status === 'approved');
+  const pending = data.tags.filter((t) => t.status === 'pending');
   const q = query.trim().toLowerCase();
   const matches = (t) => !q || [t.name, ...t.aliases].some((term) => term.toLowerCase().includes(q));
   const sections = [
@@ -205,6 +299,15 @@ function AdminTags() {
 
   return (
     <div className="admin-tags">
+      {pending.length > 0 && (
+        <section className="admin-tags__section admin-tags__suggestions">
+          <h3>Suggestions to review ({pending.length})</h3>
+          <ul>
+            {pending.map((t) => <SuggestionRow key={t.id} tag={t} groups={data.groups} onChanged={reload} />)}
+          </ul>
+        </section>
+      )}
+
       <details className="admin-tags__groups">
         <summary>Group colors</summary>
         <p className="admin-editor__hint">Stock tags without their own color use their group's color.</p>

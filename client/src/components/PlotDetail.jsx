@@ -257,10 +257,14 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const pastShops = detail?.past_shops || [];
   const categoryTags = (shop?.tags ?? []).filter((t) => t.kind === 'category');
   const stockTags = (shop?.tags ?? []).filter((t) => t.kind === 'stock');
-  // Linked players can edit the shop's tags; the "+" ends each tag row.
+  // Linked players can edit the shop's tags from the end of the stock tag row:
+  // "+" when the shop has tags, "Add tags…" when it has none yet.
   const canEditTags = !!account && !!shop;
+  const hasTags = (shop?.tags ?? []).length > 0;
   const editTagsButton = canEditTags ? (
-    <button type="button" className="tag-chip--add" onClick={() => setEditingTags(true)} aria-label="Edit tags">+</button>
+    <button type="button" className="tag-chip--add" onClick={() => setEditingTags(true)} aria-label="Edit tags">
+      {hasTags ? '+' : 'Add tags…'}
+    </button>
   ) : null;
   const handleTagsSaved = (tags) => {
     setDetail((d) => (d?.shop ? { ...d, shop: { ...d.shop, tags } } : d));
@@ -339,10 +343,10 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
               <dd>{ownerLabel(shop)}</dd>
             </>
           )}
-          {(categoryTags.length > 0 || canEditTags) && (
+          {categoryTags.length > 0 && (
             <>
               <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>
-              <dd><TagChips tags={categoryTags} after={editTagsButton} /></dd>
+              <dd><TagChips tags={categoryTags} /></dd>
             </>
           )}
           <dt>Plot</dt>
@@ -396,7 +400,8 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
         )}
         <TagChips tags={stockTags} className="plot-detail__stock-tags" after={editTagsButton} />
         {editingTags && (
-          <TagEditor plotId={plot.id} shopTags={shop.tags ?? []} onClose={() => setEditingTags(false)}
+          <TagEditor plotId={plot.id} shopTags={shop.tags ?? []} shopText={`${shop.description ?? ''}\n${shop.stock ?? ''}`}
+            onClose={() => setEditingTags(false)}
             onSaved={handleTagsSaved} />
         )}
         {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
