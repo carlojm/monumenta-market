@@ -9,7 +9,7 @@
         "King's Valley",
         "Region 1"
       ],
-      "color": null
+      "color": "#f5fff5"
     },
     {
       "name": "Region 2 Equipment",
@@ -19,7 +19,7 @@
         "Celsian Isles",
         "Region 2"
       ],
-      "color": null
+      "color": "#f4f8ff"
     },
     {
       "name": "Region 3 Equipment",
@@ -29,7 +29,7 @@
         "Architect's Ring",
         "Region 3"
       ],
-      "color": null
+      "color": "#c7c9c9"
     },
     {
       "name": "Currency Exchange",
@@ -147,7 +147,7 @@
         "White"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fcfcfc",
       "seen_in": 2
     },
     {
@@ -156,7 +156,7 @@
         "Orange"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fca800",
       "seen_in": 2
     },
     {
@@ -165,7 +165,7 @@
         "Magenta"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fc54fc",
       "seen_in": 2
     },
     {
@@ -174,7 +174,7 @@
         "Light Blue"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#49c0e2",
       "seen_in": 2
     },
     {
@@ -183,7 +183,7 @@
         "Yellow"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fcfc54",
       "seen_in": 3
     },
     {
@@ -193,7 +193,7 @@
         "Willow"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#006300",
       "seen_in": 1
     },
     {
@@ -202,7 +202,7 @@
         "Labs"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#b2aac1",
       "seen_in": 2
     },
     {
@@ -213,7 +213,7 @@
         "MR"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#780e46",
       "seen_in": 4
     },
     {
@@ -222,7 +222,7 @@
         "VR"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#158115",
       "seen_in": 2
     },
     {
@@ -233,7 +233,7 @@
         "Roguelike"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#890000",
       "seen_in": 9
     },
     {
@@ -242,7 +242,7 @@
         "Lime"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#54fc54",
       "seen_in": 2
     },
     {
@@ -251,7 +251,7 @@
         "Pink"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fc68b2",
       "seen_in": 1
     },
     {
@@ -261,7 +261,7 @@
         "Grey"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#545454",
       "seen_in": 2
     },
     {
@@ -271,7 +271,7 @@
         "Light Grey"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#a8a8a8",
       "seen_in": 2
     },
     {
@@ -280,7 +280,7 @@
         "Cyan"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#00a8a8",
       "seen_in": 1
     },
     {
@@ -289,7 +289,7 @@
         "Purple"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#a800a8",
       "seen_in": 1
     },
     {
@@ -298,7 +298,7 @@
         "Teal"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#46b4b3",
       "seen_in": 3
     },
     {
@@ -309,7 +309,7 @@
         "Fred"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#7dfcd1",
       "seen_in": 3
     },
     {
@@ -319,7 +319,7 @@
         "TFF"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#7e7e00",
       "seen_in": 2
     },
     {
@@ -331,7 +331,7 @@
         "Endless Darkest Depths"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#5c2c85",
       "seen_in": 7
     },
     {
@@ -341,7 +341,7 @@
         "CZ"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#fca4f4",
       "seen_in": 21
     },
     {
@@ -350,7 +350,7 @@
         "SKT"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#bebebe",
       "seen_in": 5
     },
     {
@@ -359,7 +359,7 @@
         "Blue"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#0c2ba0",
       "seen_in": 8
     },
     {
@@ -368,7 +368,7 @@
         "Brown"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#6f3508",
       "seen_in": 6
     },
     {
@@ -378,7 +378,7 @@
         "Phyrrys"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#6f00ff",
       "seen_in": 6
     },
     {
@@ -387,7 +387,7 @@
         "Fortune"
       ],
       "group": "Dungeons",
-      "color": null,
+      "color": "#ffd700",
       "seen_in": 5
     },
     {
@@ -397,7 +397,7 @@
         "Sanctum"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#51a800",
       "seen_in": 0
     },
     {
@@ -407,7 +407,7 @@
         "SR"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#ebe3d3",
       "seen_in": 1
     },
     {
@@ -416,7 +416,7 @@
         "BM"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#664b5a",
       "seen_in": 0
     },
     {
@@ -425,7 +425,7 @@
         "Portal"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#d9e5e0",
       "seen_in": 4
     },
     {
@@ -435,7 +435,7 @@
         "Masqueraders Ruin"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#316ca6",
       "seen_in": 4
     },
     {
@@ -446,7 +446,7 @@
         "Gallery"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#a90000",
       "seen_in": 5
     },
     {
@@ -456,7 +456,7 @@
         "Gallery"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#37485a",
       "seen_in": 1
     },
     {
@@ -465,14 +465,14 @@
         "Gallery"
       ],
       "group": "Strikes",
-      "color": null,
+      "color": "#38af4d",
       "seen_in": 1
     },
     {
       "name": "Kaul",
       "aliases": [],
       "group": "Bosses",
-      "color": null,
+      "color": "#00a800",
       "seen_in": 0
     },
     {
@@ -482,7 +482,7 @@
         "FG"
       ],
       "group": "Bosses",
-      "color": null,
+      "color": "#85ccf7",
       "seen_in": 2
     },
     {
@@ -493,7 +493,7 @@
         "HF"
       ],
       "group": "Bosses",
-      "color": null,
+      "color": "#b131de",
       "seen_in": 10
     },
     {
@@ -502,7 +502,7 @@
         "GS"
       ],
       "group": "Bosses",
-      "color": null,
+      "color": "#416a28",
       "seen_in": 3
     },
     {
@@ -511,7 +511,7 @@
         "Sirius, The Final Herald"
       ],
       "group": "Bosses",
-      "color": null,
+      "color": "#2cd4c4",
       "seen_in": 2
     },
     {
@@ -531,7 +531,7 @@
         "R1 overworld"
       ],
       "group": "Overworld",
-      "color": null,
+      "color": "#d9ac31",
       "seen_in": 3
     },
     {
@@ -549,7 +549,7 @@
         "R2 overworld"
       ],
       "group": "Overworld",
-      "color": null,
+      "color": "#31d4d9",
       "seen_in": 2
     },
     {
@@ -563,7 +563,7 @@
       "name": "Wolfswood",
       "aliases": [],
       "group": "Overworld",
-      "color": null,
+      "color": "#4b8d4c",
       "seen_in": 9
     },
     {
@@ -573,7 +573,7 @@
         "Pelias"
       ],
       "group": "Overworld",
-      "color": null,
+      "color": "#c2b9a3",
       "seen_in": 8
     },
     {
@@ -582,7 +582,7 @@
         "Starpoint"
       ],
       "group": "Overworld",
-      "color": null,
+      "color": "#3c2c74",
       "seen_in": 7
     },
     {
@@ -591,7 +591,7 @@
         "R3 overworld"
       ],
       "group": "Overworld",
-      "color": null,
+      "color": "#c7c9c9",
       "seen_in": 2
     },
     {
@@ -600,7 +600,7 @@
         "SKR"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#eaca99",
       "seen_in": 10
     },
     {
@@ -610,7 +610,7 @@
         "Hunt"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#4c5b14",
       "seen_in": 3
     },
     {
@@ -621,7 +621,7 @@
         "Fish"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#acd4d4",
       "seen_in": 3
     },
     {
@@ -631,7 +631,7 @@
         "Jeremy"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#6b0000",
       "seen_in": 3
     },
     {
@@ -642,7 +642,7 @@
         "GPT"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#c4c0b4",
       "seen_in": 7
     },
     {
@@ -651,7 +651,7 @@
         "Delve"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#b26f27",
       "seen_in": 3
     },
     {
@@ -661,7 +661,7 @@
         "SP"
       ],
       "group": "Content",
-      "color": null,
+      "color": "#fcf33b",
       "seen_in": 9
     },
     {
@@ -739,7 +739,7 @@
         "Patron"
       ],
       "group": "Items",
-      "color": null,
+      "color": "#80d817",
       "seen_in": 6
     },
     {
@@ -1075,7 +1075,7 @@
         "Mog"
       ],
       "group": "Collectibles",
-      "color": null,
+      "color": "#6e2ca6",
       "seen_in": 8
     },
     {
@@ -1134,7 +1134,7 @@
         "Patron request"
       ],
       "group": "Services",
-      "color": null,
+      "color": "#80d817",
       "seen_in": 1
     },
     {

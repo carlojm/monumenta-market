@@ -10,6 +10,12 @@
 //
 // Usage (from server/): npm run tags:load
 // On Fly:               fly ssh console -C "npm run tags:load"
+//
+// Colors only:          npm run tags:load -- --colors-only
+// Copies just the colors from the file, and only where the file has one, onto
+// tags (and groups) that already exist. Nothing else changes, so it's safe
+// after tags have been edited on the site. It never clears a color, and tags
+// renamed on the site (so not found by name) are listed and skipped.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,6 +46,39 @@ for (const kind of ['categories', 'stock']) {
 if (problems.length) {
   console.error(`tags.json has problems, nothing was changed:\n  ${problems.join('\n  ')}`);
   process.exit(1);
+}
+
+if (process.argv.includes('--colors-only')) {
+  const setTagColor = db.prepare('UPDATE tags SET color = ? WHERE kind = ? AND name = ?');
+  const setGroupColor = db.prepare('UPDATE tag_groups SET color = ? WHERE name = ?');
+  const tagColor = db.prepare('SELECT color FROM tags WHERE kind = ? AND name = ?');
+  const groupColor = db.prepare('SELECT color FROM tag_groups WHERE name = ?');
+  const result = { changed: 0, same: 0, missing: [] };
+  // `current` is the row in the database (or undefined); `write` saves the color.
+  const apply = (label, current, color, write) => {
+    if (!current) result.missing.push(label);
+    else if (current.color === color) result.same++;
+    else {
+      write();
+      result.changed++;
+    }
+  };
+  db.transaction(() => {
+    for (const g of data.groups ?? []) {
+      if (g.color == null) continue;
+      apply(`group "${g.name}"`, groupColor.get(g.name), g.color, () => setGroupColor.run(g.color, g.name));
+    }
+    for (const [kind, list] of [['category', data.categories], ['stock', data.stock]]) {
+      for (const t of list ?? []) {
+        if (t.color == null) continue;
+        const name = t.name.trim();
+        apply(t.name, tagColor.get(kind, name), t.color, () => setTagColor.run(t.color, kind, name));
+      }
+    }
+  })();
+  console.log(`Colors: ${result.changed} changed, ${result.same} already set.`);
+  if (result.missing.length) console.log(`Not found by name (skipped): ${result.missing.join(', ')}`);
+  process.exit(0);
 }
 
 const upsertGroup = db.prepare(`
