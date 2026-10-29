@@ -114,6 +114,12 @@
   flex: 1;
 }
 
+.app-main__empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 .app-error {
   color: #e08a8a;
   border: 1px solid #e08a8a;

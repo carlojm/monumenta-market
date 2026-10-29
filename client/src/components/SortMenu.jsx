@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
 import { SORTS } from '../lib/sort';
+import { useDismiss } from '../lib/useDismiss';
 import './Toolbar.css';
 
 // "Sort" button above the plot list. Opens a small menu: what to sort by,
@@ -8,19 +9,8 @@ import './Toolbar.css';
 function SortMenu({ sort, onChange, searching }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-
-  // Close on a click outside the menu, or Escape.
-  useEffect(() => {
-    if (!open) return;
-    const onClick = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(ref, open, close);
 
   const options = SORTS.filter((s) => searching || !s.searchOnly);
   const current = SORTS.find((s) => s.key === sort.key);

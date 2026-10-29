@@ -16,7 +16,8 @@ function readOverlaySetting() {
   }
 }
 
-function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
+// `highlightIds`: the plots that match the search and filters (null = all).
+function MarketMap({ plots, highlightIds, selectedId, onSelectPlot }) {
   const [showSquares, setShowSquares] = useState(readOverlaySetting);
 
   const toggleSquares = () => {
@@ -34,7 +35,7 @@ function MarketMap({ plots, searchResults, selectedId, onSelectPlot }) {
       <div className="market-map">
         <img src={mapImage} alt="Market island map" className="market-map__image" />
         {showSquares && plots.map((plot) => {
-          const dimmed = searchResults && !searchResults.matchedIds.has(plot.id);
+          const dimmed = highlightIds && !highlightIds.has(plot.id);
           const color = statusColor(plot);
           return (
             <button

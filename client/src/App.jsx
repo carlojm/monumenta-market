@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MarketMap from './components/MarketMap';
@@ -6,6 +6,8 @@ import SearchBar from './components/SearchBar';
 import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
+import { FilterButton, FilterChips } from './components/Filters';
+import { filterPlots, isActive, newTagFilter } from './lib/filters';
 import { getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
@@ -52,23 +54,54 @@ function App() {
     loadPlots();
   }, []);
 
-  const searchResults = useMemo(() => getSearchResults(plots, query), [plots, query]);
+  // Tags, for the filter popup.
+  const [catalog, setCatalog] = useState(null);
+  useEffect(() => {
+    fetch('/api/tags').then((res) => res.json()).then(setCatalog).catch(() => {});
+  }, []);
+
+  // Filters hide plots from the list; search then ranks and dims what's left.
+  // The map dims everything outside both.
+  const [filters, setFilters] = useState([]);
+  const [openFilterId, setOpenFilterId] = useState(null);
+  const addFilter = () => {
+    const filter = newTagFilter();
+    setFilters((list) => [...list, filter]);
+    setOpenFilterId(filter.id);
+  };
+  const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
+  const removeFilter = useCallback((id) => setFilters((list) => list.filter((f) => f.id !== id)), []);
+  const filtering = filters.some(isActive);
+  const filteredPlots = useMemo(() => filterPlots(plots, filters), [plots, filters]);
+
+  const searchResults = useMemo(() => getSearchResults(filteredPlots, query), [filteredPlots, query]);
+  const highlightIds = searchResults ? searchResults.matchedIds
+    : filtering ? new Set(filteredPlots.map((p) => p.id)) : null;
 
   // A sort the player picked stays while they search; otherwise it's newest
   // update first, or best match while searching.
   const [pickedSort, setPickedSort] = useState(null);
   const searching = !!searchResults;
   const sort = pickedSort && (searching || pickedSort.key !== 'best') ? pickedSort : defaultSort(searching);
-  const rows = sortPlots(plots, searchResults, sort);
+  const rows = sortPlots(filteredPlots, searchResults, sort);
 
   const cardOpenOnDesktop = isDesktop && !!selectedPlot;
   const list = (
     <div className="app-main__list-body">
-      <div className="app-main__search toolbar">
-        <SearchBar value={query} onChange={setQuery} />
-        <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
+      <div className="app-main__search">
+        <div className="toolbar">
+          <SearchBar value={query} onChange={setQuery} />
+          <FilterButton onAdd={addFilter} />
+          <SortMenu sort={sort} onChange={setPickedSort} searching={searching} />
+        </div>
+        <FilterChips filters={filters} catalog={catalog} openId={openFilterId} onOpen={setOpenFilterId}
+          onChange={updateFilter} onRemove={removeFilter} onClear={() => setFilters([])} />
       </div>
-      <PlotTable rows={rows} searchResults={searchResults} onSelectPlot={openPlot} />
+      {filtering && rows.length === 0 ? (
+        <p className="app-main__empty">No shops match these filters.</p>
+      ) : (
+        <PlotTable rows={rows} searchResults={searchResults} onSelectPlot={openPlot} />
+      )}
     </div>
   );
 
@@ -81,7 +114,7 @@ function App() {
             With a card open on desktop, the card takes the right column and
             the search + table move under the map so you can keep browsing. */}
         <section className={`app-main__map${cardOpenOnDesktop ? ' app-main__map--with-list' : ''}`}>
-          <MarketMap plots={plots} searchResults={searchResults} selectedId={plotId} onSelectPlot={openPlot} />
+          <MarketMap plots={plots} highlightIds={highlightIds} selectedId={plotId} onSelectPlot={openPlot} />
           {cardOpenOnDesktop && list}
         </section>
         <section className="app-main__list">
