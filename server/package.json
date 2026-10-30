@@ -12,7 +12,9 @@
     "deploy:full": "npm run build:ui && npm run deploy",
     "db:load": "node db/load_plots.js",
     "tags:load": "node db/load_tags.js",
-    "plots": "node scripts/plots.js"
+    "plots": "node scripts/plots.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js"
   },
   "author": "carlo",
   "license": "MIT",

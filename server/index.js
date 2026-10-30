@@ -10,6 +10,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
 import { requireModerator } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
+import { scheduleBackups } from './lib/backup.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import { logModAction } from './lib/modlog.js';
@@ -490,3 +491,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // The fake Minecraft server for account verification runs in this same
 // process, so it shares the database. Set VERIFY_PORT (e.g. 25565) to enable.
 if (process.env.VERIFY_PORT) startVerifyServer(Number(process.env.VERIFY_PORT));
+
+// Nightly database backup to R2, on the live site only.
+if (process.env.NODE_ENV === 'production') scheduleBackups(db);
