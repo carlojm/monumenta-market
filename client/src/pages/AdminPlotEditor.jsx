@@ -130,7 +130,8 @@ function AdminPlotEditor() {
       const image = await res.json();
       setShop((s) => ({ ...s, images: [...s.images, image] }));
     } else {
-      setMessage('Upload failed.');
+      const data = await res.json().catch(() => ({}));
+      setMessage(`Upload failed. ${data.error ?? ''}`.trim());
     }
     e.target.value = '';
   };

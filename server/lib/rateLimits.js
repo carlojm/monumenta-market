@@ -12,7 +12,7 @@
 // { error } with a message the site shows as it is.
 // Logs say which limit was hit but never the IP, to keep players anonymous.
 
-import { rateLimit } from 'express-rate-limit';
+import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
 
 const MINUTE = 60_000;
 
@@ -51,3 +51,20 @@ export const loginByName = limit('login (name)', {
 
 // Verify codes are short (5 characters), so guessing has to be slow.
 export const claimByIp = limit('claim (ip)', { minutes: 15, max: 10, skipSuccessfulRequests: true });
+
+// --- Writes (5.6b). Every attempt counts, not just failures. ---
+
+// Actions that need an account count per account, so people sharing an IP
+// (a household, a school) don't use up each other's limit. A request with no
+// account (which the route will refuse anyway) counts by IP.
+const byAccount = (req) => (req.account ? `account:${req.account.id}` : ipKeyGenerator(req.ip));
+const tooOften = (wait) => `You're doing that too often. Please wait ${wait} and try again.`;
+const write = (name, options) => limit(name, { message: tooOften, ...options });
+
+// Reports don't need an account, so they're the easiest to spam: counted by IP.
+export const reports = write('report', { minutes: 60, max: 20 });
+export const comments = write('comment', { minutes: 10, max: 10, keyGenerator: byAccount });
+export const votes = write('vote', { minutes: 10, max: 60, keyGenerator: byAccount });
+export const tagEdits = write('tag edit', { minutes: 10, max: 30, keyGenerator: byAccount });
+export const tagSuggestions = write('tag suggestion', { minutes: 60, max: 10, keyGenerator: byAccount });
+export const uploads = write('upload', { minutes: 60, max: 30, keyGenerator: byAccount });

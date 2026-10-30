@@ -15,6 +15,7 @@ import { scheduleBackups } from './lib/backup.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
 import { logModAction } from './lib/modlog.js';
+import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
 import {
   KINDS, checkTagIds, cleanTag, listTags, sameName, setShopTags, tagsByShop, tagsForShop,
@@ -191,7 +192,7 @@ app.get('/api/tags', (req, res) => {
 // Any linked player can change a shop's tags (add or remove existing tags),
 // instantly. Body: { tag_ids } = the shop's full tag list. Logged on the card
 // ("Update by …") and in the mod log, so mistakes are easy to see and undo.
-app.put('/api/plots/:id/tags', (req, res) => {
+app.put('/api/plots/:id/tags', limits.tagEdits, (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to edit tags.' });
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to tag.' });
@@ -216,7 +217,7 @@ app.put('/api/plots/:id/tags', (req, res) => {
 const MAX_PENDING_SUGGESTIONS = 5;
 const pendingByAccount = db.prepare("SELECT COUNT(*) AS n FROM tags WHERE status = 'pending' AND suggested_by = ?");
 
-app.post('/api/tags/suggest', (req, res) => {
+app.post('/api/tags/suggest', limits.tagSuggestions, (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to suggest tags.' });
   const kind = req.body.kind;
   if (!KINDS.includes(kind)) return res.status(400).json({ error: 'kind must be category or stock' });
@@ -252,7 +253,7 @@ app.get('/api/shops/:id', (req, res) => {
 });
 
 // Linked accounts only. No approval queue: moderators delete bad comments afterwards.
-app.post('/api/plots/:id/comments', (req, res) => {
+app.post('/api/plots/:id/comments', limits.comments, (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to comment.' });
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to comment on' });
@@ -273,7 +274,7 @@ app.post('/api/plots/:id/comments', (req, res) => {
 
 // Accuracy vote from a linked account. The latest vote is the comment's status;
 // voting the same as the current status changes nothing.
-app.post('/api/comments/:id/vote', (req, res) => {
+app.post('/api/comments/:id/vote', limits.votes, (req, res) => {
   if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to vote.' });
   const { vote } = req.body;
   if (!VOTES.includes(vote)) return res.status(400).json({ error: `vote must be one of ${VOTES.join(', ')}` });
@@ -305,7 +306,7 @@ app.delete('/api/comments/:id', (req, res) => {
   res.json({ deleted: true });
 });
 
-app.post('/api/plots/:id/report', (req, res) => {
+app.post('/api/plots/:id/report', limits.reports, (req, res) => {
   const plot = getPlot.get(req.params.id);
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
   const activity = req.body.activity || null;
@@ -410,7 +411,7 @@ app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
 
 // --- Admin: images (attached to the plot's current shop) ---
 
-app.post('/api/plots/:id/image', requireModerator, upload.single('image'), async (req, res) => {
+app.post('/api/plots/:id/image', requireModerator, limits.uploads, upload.single('image'), async (req, res) => {
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to' });
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
