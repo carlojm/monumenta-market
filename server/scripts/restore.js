@@ -2,7 +2,7 @@
 //
 // Step 1 of a restore: download a backup from R2 and check it. It's saved next
 // to the database as market.db.restore; the live database isn't touched.
-// Restarting the server swaps it in (see db/init.js).
+// Restarting the server swaps it in (see db/applyRestore.js).
 //
 // Usage (from server/): npm run restore                list the backups
 //                       npm run restore -- 2026-10-29  fetch that day's backup

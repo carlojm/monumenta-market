@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import './db/applyRestore.js'; // must come before anything that opens the database
 import db from './db/init.js';
 import multer from 'multer';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
