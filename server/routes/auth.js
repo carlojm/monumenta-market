@@ -14,6 +14,7 @@ import {
   PASSWORD_MAX, checkPassword, endAllSessions, endSession, hashPassword,
   passwordProblem, publicAccount, refreshSession, startSession,
 } from '../lib/auth.js';
+import { claimByIp, loginByIp, loginByName } from '../lib/rateLimits.js';
 
 const router = express.Router();
 
@@ -34,7 +35,7 @@ const getAccount = db.prepare('SELECT * FROM accounts WHERE id = ?');
 // as a wrong password and can't be told apart by timing.
 const DUMMY_HASH = await hashPassword('not-a-real-password');
 
-router.post('/claim', async (req, res) => {
+router.post('/claim', claimByIp, async (req, res) => {
   const code = String(req.body.code ?? '').trim().toUpperCase();
   const problem = passwordProblem(req.body.password);
   if (problem) return res.status(400).json({ error: problem });
@@ -82,7 +83,7 @@ router.post('/claim', async (req, res) => {
   });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginByIp, loginByName, async (req, res) => {
   const name = String(req.body.name ?? '').trim();
   const password = req.body.password;
   const fail = () => res.status(401).json({ error: 'Wrong name or password.' });

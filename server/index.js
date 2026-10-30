@@ -29,6 +29,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// On Fly every request comes through Fly's proxy, which adds the visitor's
+// real IP to X-Forwarded-For. Trusting exactly one hop makes req.ip that IP
+// (rate limits count by it). Trusting more would let a visitor fake their IP
+// by sending the header themselves. Fly sets FLY_APP_NAME on its machines.
+if (process.env.FLY_APP_NAME) app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
