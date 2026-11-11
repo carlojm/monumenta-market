@@ -35,6 +35,12 @@ primary_region = 'iad'
   auto_stop_machines = 'off'
   [[services.ports]]
     port = 25565
+  # At most 25 open Minecraft connections at once; Fly's proxy refuses more,
+  # so a flood can't use up the machine. Joins last a second or two.
+  [services.concurrency]
+    type = 'connections'
+    soft_limit = 20
+    hard_limit = 25
 
 [[vm]]
   memory = '512mb'

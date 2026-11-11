@@ -100,6 +100,12 @@ export function startVerifyServer(port, { onlineMode = true } = {}) {
     },
     maxPlayers: 1,
     hideErrors: true,
+    // Drop connections that don't start logging in within 10s (the library's
+    // default is 30s). A real client does it at once; the Mojang check comes
+    // after this, so it isn't cut short. Stops idle connections hogging slots.
+    // (Rate limits by IP aren't possible here: on raw TCP, Fly's proxy hides
+    // the player's IP. fly.toml caps open connections instead.)
+    kickTimeout: 10_000,
     // Runs right after Mojang confirms the player, while still in the login
     // phase, so we can kick before any world data (which differs per version).
     beforeLogin: (client) => {

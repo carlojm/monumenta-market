@@ -1,10 +1,16 @@
 // server/db/load_plots.js
 //
-// Rebuilds the database from server/data/plots.json. This DROPS every table
-// first, so anything entered through the site (comments, reports, images)
-// is lost. Use it for the initial import, not on the live database.
+// Rebuilds the database from server/data/plots.json. This DROPS the shop
+// tables first, so anything entered through the site (comments, reports,
+// images, shop tags) is lost. It was for the initial import only: the live
+// database is now the real record, and plots.json is retired.
+//
+// So it refuses to run on a database that has anything the site added (see
+// siteData below). On your computer, --wipe-site-data rebuilds anyway (for a
+// test database). On Fly it always refuses.
 //
 // Usage (from server/): npm run db:load
+//                       npm run db:load -- --wipe-site-data   (local only)
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -79,6 +85,41 @@ const load = db.transaction(() => {
   }
   return counts;
 });
+
+// Things only the site creates. plots.json reports are all stamped 12:00:00,
+// so a report at any other time came from a player.
+const SITE_DATA = [
+  ['accounts', 'SELECT count(*) FROM accounts'],
+  ['images', 'SELECT count(*) FROM images'],
+  ['shop tags', 'SELECT count(*) FROM shop_tags'],
+  ['comment votes', 'SELECT count(*) FROM comment_votes'],
+  ['moderator log entries', 'SELECT count(*) FROM mod_log'],
+  ['comments by players or the shop log', 'SELECT count(*) FROM comments WHERE account_id IS NOT NULL OR is_system = 1'],
+  ['reports from players', "SELECT count(*) FROM reports WHERE created_at NOT LIKE '% 12:00:00'"],
+];
+
+function siteData() {
+  const tables = new Set(db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").pluck().all());
+  return SITE_DATA.flatMap(([label, sql]) => {
+    const table = sql.match(/FROM (\w+)/)[1];
+    if (!tables.has(table)) return []; // a brand-new database
+    const n = db.prepare(sql).pluck().get();
+    return n ? [`${n} ${label}`] : [];
+  });
+}
+
+const found = siteData();
+if (found.length) {
+  const onFly = !!process.env.FLY_APP_NAME;
+  const override = process.argv.includes('--wipe-site-data') && !onFly;
+  if (!override) {
+    console.error(`Refusing to rebuild: this database has data from the site (${found.join(', ')}).`);
+    console.error('Rebuilding would delete it. plots.json is retired; edit through the admin pages instead.');
+    if (!onFly) console.error('For a local test database only: npm run db:load -- --wipe-site-data');
+    process.exit(1);
+  }
+  console.log(`Wiping site data as asked: ${found.join(', ')}.`);
+}
 
 const c = load();
 console.log(`Loaded ${c.plots} plots, ${c.shops} current shops, ${c.past} past shops, ${c.reports} reports.`);

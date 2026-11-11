@@ -3,6 +3,9 @@
 // Helper for hand-editing server/data/plots.json. Save the file in your
 // editor before running a command that writes to it.
 //
+// Retired along with plots.json (roadmap 5.7): the live database is the real
+// record now, and db:load won't load this file over it. Kept for history.
+//
 // Usage (from server/):  npm run plots -- <command> [args]
 //
 //   handoff <id> <owner>                    archive the current shop (if any) and start a new one

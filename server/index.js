@@ -37,6 +37,7 @@ const PORT = process.env.PORT || 3001;
 if (process.env.FLY_APP_NAME) app.set('trust proxy', 1);
 
 app.use(cors());
+app.use('/api', limits.api); // safety net: 300 requests a minute per IP (before parsing bodies)
 app.use(express.json());
 app.use(cookieParser());
 app.use(loadAccount); // sets req.account when logged in
