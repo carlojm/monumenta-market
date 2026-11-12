@@ -522,6 +522,10 @@ app.delete('/api/admin/comments/:id', requireModerator, (req, res) => {
   res.json({ deleted: true });
 });
 
+// An /api address that matched no route above. Without this, the React app's
+// catch-all below would answer it with the HTML page.
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
+
 // --- Serve React build in production ---
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, 'dist');
@@ -529,6 +533,28 @@ if (process.env.NODE_ENV === 'production') {
   // Express 5 needs a named wildcard; a bare '*' throws at startup.
   app.get('/{*splat}', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }
+
+// Errors from any route or middleware end up here (Express 5 also catches
+// rejected promises in async routes). Express's built-in handler answers with
+// an HTML page and logs a full stack trace even for a visitor's broken JSON.
+// - Problems with the request itself (body-parser marks them `expose`: bad
+//   JSON, too large) get their status and a short message, and no log line.
+// - Anything else is our bug: log it in full for us, but tell the visitor
+//   only that something went wrong, never the details.
+const REQUEST_ERRORS = {
+  'entity.parse.failed': "The request wasn't valid JSON.",
+  'entity.too.large': 'The request was too large.',
+};
+// `next` is unused, but Express only treats a function as an error handler
+// when it takes exactly 4 arguments.
+app.use((err, req, res, next) => {
+  const status = err.status ?? err.statusCode ?? 500;
+  if (status < 500 && err.expose) {
+    return res.status(status).json({ error: REQUEST_ERRORS[err.type] ?? 'Bad request.' });
+  }
+  console.error(`Error on ${req.method} ${req.path}:`, err);
+  res.status(500).json({ error: 'Something went wrong on the server. Please try again.' });
+});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
