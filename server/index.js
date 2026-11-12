@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -14,6 +14,7 @@ import { startVerifyServer } from './lib/verifyServer.js';
 import { scheduleBackups } from './lib/backup.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
+import { imageType } from './lib/imageType.js';
 import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
@@ -24,7 +25,18 @@ import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import adminTagRoutes from './routes/adminTags.js';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
+const MAX_IMAGE_MB = 8;
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_IMAGE_MB * 1024 * 1024, files: 1 } });
+
+// Reads one uploaded file into req.file. multer reports problems (too big,
+// wrong field name) as errors, which would otherwise become a 500.
+function receiveImage(req, res, next) {
+  upload.single('image')(req, res, (err) => {
+    if (err?.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: `Images can be at most ${MAX_IMAGE_MB} MB.` });
+    if (err) return res.status(400).json({ error: 'Could not read the upload. Send one image.' });
+    next();
+  });
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -36,7 +48,27 @@ const PORT = process.env.PORT || 3001;
 // by sending the header themselves. Fly sets FLY_APP_NAME on its machines.
 if (process.env.FLY_APP_NAME) app.set('trust proxy', 1);
 
-app.use(cors());
+// Security headers: instructions the browser follows for this site.
+// - Content-Security-Policy: only run scripts, styles and fonts from this
+//   site, and only show images from here or the shop image host. If someone
+//   ever slips HTML into the page, the browser still won't run their script.
+// - frame-ancestors 'none': no other site can show this one in a frame
+//   (stops "clickjacking", where a hidden frame tricks you into clicking).
+// - Strict-Transport-Security (on by default): browsers use HTTPS only.
+// No CORS: the pages and the API share one origin, so other sites' scripts
+// get nothing (Vite proxies /api in dev).
+const imageHost = R2_PUBLIC_URL ? new URL(R2_PUBLIC_URL).origin : null;
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      'img-src': ["'self'", 'data:', ...(imageHost ? [imageHost] : [])],
+      'style-src': ["'self'"],
+      'font-src': ["'self'"],
+      'frame-ancestors': ["'none'"],
+      'upgrade-insecure-requests': null, // Fly already forces HTTPS, and this breaks local http tests
+    },
+  },
+}));
 app.use('/api', limits.api); // safety net: 300 requests a minute per IP (before parsing bodies)
 app.use(express.json());
 app.use(cookieParser());
@@ -412,19 +444,22 @@ app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
 
 // --- Admin: images (attached to the plot's current shop) ---
 
-app.post('/api/plots/:id/image', requireModerator, limits.uploads, upload.single('image'), async (req, res) => {
+app.post('/api/plots/:id/image', requireModerator, limits.uploads, receiveImage, async (req, res) => {
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to' });
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
-  const ext = req.file.originalname.split('.').pop();
-  const key = `market/${req.params.id}_${shop.id}_${Date.now()}.${ext}`;
+  // Trust the file's contents, never its name or claimed type: a file named
+  // photo.png could be a web page, which the image host would then serve.
+  const type = imageType(req.file.buffer);
+  if (!type) return res.status(400).json({ error: 'Only PNG, JPEG, WebP or GIF images can be uploaded.' });
+  const key = `market/${req.params.id}_${shop.id}_${Date.now()}.${type.ext}`;
 
   await r2.send(new PutObjectCommand({
     Bucket: R2_BUCKET,
     Key: key,
     Body: req.file.buffer,
-    ContentType: req.file.mimetype,
+    ContentType: type.mime,
   }));
 
   const url = `${R2_PUBLIC_URL}/${key}`;
