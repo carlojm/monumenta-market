@@ -164,6 +164,39 @@ export function createSchema() {
       PRIMARY KEY (shop_id, tag_id)
     );
     CREATE INDEX IF NOT EXISTS shop_tags_tag ON shop_tags(tag_id);
+
+    -- Page revisions (Phase 3): one row per edit to a shop page, whether it's a
+    -- player's suggestion waiting for review or an owner's/staff's direct edit.
+    -- Together they're the plot's page history.
+    -- Snapshots are JSON holding every shop field plus "tag_ids", so adding a
+    -- shop field never changes this table:
+    --   base, proposed: what the author saw and what they asked for. A field
+    --     where they differ was changed by the author; where base differs from
+    --     the shop at review time, someone else changed it too (a conflict).
+    --   old_values, new_values: set when applied; the shop just before, and
+    --     what was actually written (a reviewer may resolve conflicts or fix
+    --     typos first). Undo puts old_values back.
+    CREATE TABLE IF NOT EXISTS revisions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      plot_id TEXT NOT NULL REFERENCES plots(id),
+      shop_id INTEGER REFERENCES shops(id),   -- the shop being edited; NULL if the plot was empty
+      action TEXT NOT NULL,                   -- 'edit' | 'open' (a new shop/owner here) | 'vacate' (plot is now empty)
+      base TEXT,                              -- JSON snapshot, NULL if the plot was empty
+      proposed TEXT,                          -- JSON snapshot, NULL for 'vacate'
+      summary TEXT,                           -- optional "what did you change?"
+      author_id INTEGER REFERENCES accounts(id), -- NULL once the author deletes their account
+      direct INTEGER NOT NULL DEFAULT 0,      -- 1 = owner/staff edit, applied without review
+      status TEXT NOT NULL DEFAULT 'pending', -- 'pending' | 'approved' | 'rejected' | 'withdrawn'
+      reviewer_id INTEGER REFERENCES accounts(id),
+      review_note TEXT,                       -- why it was rejected or changed; shown to the author
+      old_values TEXT,                        -- JSON snapshot, set when applied
+      new_values TEXT,                        -- JSON snapshot, set when applied
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      reviewed_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS revisions_plot ON revisions(plot_id, created_at);       -- a plot's history
+    CREATE INDEX IF NOT EXISTS revisions_status ON revisions(status, created_at);      -- the review queue
+    CREATE INDEX IF NOT EXISTS revisions_author ON revisions(author_id, status);       -- "my edits", pending cap
   `);
 
   // --- Migrations: bring older databases up to date. Each runs once. ---
@@ -201,6 +234,7 @@ function addColumnIfMissing(table, column, definition) {
 // wipe them (shops' tag links go, since the shops are rebuilt).
 export function dropSchema() {
   db.exec(`
+    DROP TABLE IF EXISTS revisions;
     DROP TABLE IF EXISTS comment_votes;
     DROP TABLE IF EXISTS shop_tags;
     DROP TABLE IF EXISTS comments;

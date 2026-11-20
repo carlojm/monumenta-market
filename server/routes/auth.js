@@ -130,8 +130,13 @@ router.get('/me/comments', (req, res) => {
 // Deletes the logged-in account. Body: { confirm_name } must match the
 // account's name. Their comments stay but become Anonymous; their votes and
 // sessions are removed. Staff log entries and mod log entries keep the name as
-// plain text, so history still says who made a change.
+// plain text, so history still says who made a change. Their page edits stay
+// in each page's history without a name; suggestions still waiting for review
+// are withdrawn.
 const deleteAccount = db.transaction((accountId) => {
+  db.prepare("UPDATE revisions SET status = 'withdrawn' WHERE author_id = ? AND status = 'pending'").run(accountId);
+  db.prepare('UPDATE revisions SET author_id = NULL WHERE author_id = ?').run(accountId);
+  db.prepare('UPDATE revisions SET reviewer_id = NULL WHERE reviewer_id = ?').run(accountId);
   db.prepare('UPDATE comments SET account_id = NULL, author = NULL WHERE account_id = ? AND is_system = 0').run(accountId);
   db.prepare('UPDATE comments SET account_id = NULL WHERE account_id = ? AND is_system = 1').run(accountId);
   db.prepare('DELETE FROM comment_votes WHERE account_id = ?').run(accountId);

@@ -93,6 +93,7 @@ const SITE_DATA = [
   ['images', 'SELECT count(*) FROM images'],
   ['shop tags', 'SELECT count(*) FROM shop_tags'],
   ['comment votes', 'SELECT count(*) FROM comment_votes'],
+  ['page revisions', 'SELECT count(*) FROM revisions'],
   ['moderator log entries', 'SELECT count(*) FROM mod_log'],
   ['comments by players or the shop log', 'SELECT count(*) FROM comments WHERE account_id IS NOT NULL OR is_system = 1'],
   ['reports from players', "SELECT count(*) FROM reports WHERE created_at NOT LIKE '% 12:00:00'"],
