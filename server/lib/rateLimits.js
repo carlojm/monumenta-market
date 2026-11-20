@@ -68,6 +68,7 @@ export const votes = write('vote', { minutes: 10, max: 60, keyGenerator: byAccou
 export const tagEdits = write('tag edit', { minutes: 10, max: 30, keyGenerator: byAccount });
 export const tagSuggestions = write('tag suggestion', { minutes: 60, max: 10, keyGenerator: byAccount });
 export const uploads = write('upload', { minutes: 60, max: 30, keyGenerator: byAccount });
+export const revisions = write('page edit', { minutes: 60, max: 20, keyGenerator: byAccount });
 
 // --- Safety net (5.6c) on every /api request, for floods on routes with no
 // limit of their own (like the plot list). Far above what browsing needs.

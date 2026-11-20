@@ -18,12 +18,14 @@ import { imageType } from './lib/imageType.js';
 import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
+import { SHOP_FIELDS, closeShop, getCurrentShop, getPlot, getShop, openShop } from './lib/shops.js';
 import {
   KINDS, checkTagIds, cleanTag, listTags, sameName, setShopTags, tagsByShop, tagsForShop,
 } from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import adminTagRoutes from './routes/adminTags.js';
+import revisionRoutes from './routes/revisions.js';
 
 const MAX_IMAGE_MB = 8;
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_IMAGE_MB * 1024 * 1024, files: 1 } });
@@ -76,18 +78,14 @@ app.use(loadAccount); // sets req.account when logged in
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes); // admin-only account management
 app.use('/api/admin', adminTagRoutes); // tag management (moderators and admins)
+app.use('/api', revisionRoutes); // page revisions: suggest, review, publish
 
-const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
-  'guild_color', 'primary_color', 'secondary_color'];
 const ACTIVITY = ['vacant', 'wip', 'unclear', 'inactive', 'active'];
 const LOCK = ['locked', 'unlocked'];
 const REPORT_HISTORY = 20;
 
 // --- Shared queries ---
 
-const getPlot = db.prepare('SELECT * FROM plots WHERE id = ?');
-const getCurrentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL');
-const getShop = db.prepare('SELECT * FROM shops WHERE id = ?');
 // A linked comment shows the account's *current* name (so it follows renames)
 // and is marked verified. Older comments keep their typed name.
 const COMMENT_COLUMNS = `
@@ -144,21 +142,6 @@ function cleanShopFields(body) {
     if (f in body) out[f] = typeof body[f] === 'string' && body[f].trim() === '' ? null : body[f];
   }
   return out;
-}
-
-const insertShop = db.prepare(`
-  INSERT INTO shops (plot_id, owner, shop_name, guild_name, description, stock, palette,
-    guild_color, primary_color, secondary_color, opened_at)
-  VALUES (@plot_id, @owner, @shop_name, @guild_name, @description, @stock, @palette,
-    @guild_color, @primary_color, @secondary_color, CURRENT_TIMESTAMP)
-`);
-const closeShop = db.prepare('UPDATE shops SET closed_at = CURRENT_TIMESTAMP WHERE id = ?');
-
-function openShop(plotId, fields, actor) {
-  const row = Object.fromEntries(SHOP_FIELDS.map((f) => [f, fields[f] ?? null]));
-  const { lastInsertRowid } = insertShop.run({ ...row, plot_id: plotId });
-  addLogEntry(lastInsertRowid, actor, `Shop opened by ${fields.owner}`);
-  return lastInsertRowid;
 }
 
 // --- Public API ---
