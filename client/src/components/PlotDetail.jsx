@@ -258,7 +258,7 @@ function ReportForm({ plotId, onReported }) {
 // Older browsers without `closedby` need tap-outside-to-close done by hand.
 const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
 
-function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = false }) {
+function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false, openedInApp = false }) {
   const [detail, setDetail] = useState(null);
   const dialogRef = useRef(null);
   const headingRef = useRef(null);
@@ -278,7 +278,6 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const [confirmingClose, setConfirmingClose] = useState(false);
   const [notice, setNotice] = useState(null);
   const [showLinkPrompt, setShowLinkPrompt] = useState(false);
-  const [reloads, setReloads] = useState(0);
   const editButtonRef = useRef(null);
   // Esc or a tap outside with unsaved edits asks first. (Browsers may skip
   // this when the page hasn't been interacted with since the last time.)
@@ -287,15 +286,16 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
     e.preventDefault();
     setConfirmingClose(true);
   });
-  // Back on the card, focus returns to the Edit button (it's rendered again
-  // only after this update, hence the effect below).
+  // Back on the card, focus returns to the Edit button. It's only rendered
+  // again after the form closes, so its ref callback does the focusing.
   const refocusEdit = useRef(false);
-  useEffect(() => {
-    if (!editing && refocusEdit.current) {
+  const editButtonMounted = (el) => {
+    editButtonRef.current = el;
+    if (el && refocusEdit.current) {
       refocusEdit.current = false;
-      editButtonRef.current?.focus();
+      el.focus();
     }
-  }, [editing]);
+  };
 
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -303,14 +303,13 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const [deletedIds, setDeletedIds] = useState([]);
   const [myReports, setMyReports] = useState([]);
 
-  // `reloads` fetches it again after a published edit.
   useEffect(() => {
     if (!plot) return;
     fetch(`/api/plots/${plot.id}`)
       .then((res) => res.json())
       .then(setDetail)
       .catch((err) => setError(err.message));
-  }, [plot, reloads]);
+  }, [plot]);
 
   // Phones: the card is a native modal dialog. The browser keeps focus inside
   // it, closes it on Esc (and on a tap outside, with closedby="any"), and
@@ -390,11 +389,16 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
     stopEditing();
     setNotice(result);
     if (result.status === 'approved') {
-      setAnnouncement('Edit published.');
+      setAnnouncement('Edit saved.');
       // Load the new page. Comments and reports added here come back with it.
-      setMyComments([]);
-      setMyReports([]);
-      setReloads((n) => n + 1);
+      fetch(`/api/plots/${plot.id}`)
+        .then((res) => res.json())
+        .then((d) => {
+          setDetail(d);
+          setMyComments([]);
+          setMyReports([]);
+        })
+        .catch((err) => setError(err.message));
       onReported?.(); // refresh the plot list so search sees the changes
     } else {
       setAnnouncement('Edit sent for review.');
@@ -468,7 +472,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
           <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
           {/* Shown once the full page has loaded: an edit starts from it. */}
           {shop && detail && account !== undefined && !editing && (
-            <button type="button" className="plot-detail__edit" ref={editButtonRef} onClick={startEditing}>
+            <button type="button" className="plot-detail__edit" ref={editButtonMounted} onClick={startEditing}>
               <Pencil size={14} aria-hidden="true" /> Edit
             </button>
           )}
@@ -505,7 +509,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
                 </div>
               </>
             ) : notice.status === 'approved' ? (
-              <span>Published.</span>
+              <span>Edit saved.</span>
             ) : (
               <span>Suggestion withdrawn.</span>
             )}
@@ -514,7 +518,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
         )}
 
         {editing ? (
-          <ShopEditForm plot={plot} shop={shop} account={account} onDone={handleEditDone}
+          <ShopEditForm plot={plot} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
             onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
         ) : (
           <>

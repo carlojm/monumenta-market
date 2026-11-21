@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TagPicker from './TagPicker';
 import ColorInput from './ColorInput';
 import { suggestTags } from '../lib/tagSuggestions';
@@ -126,21 +126,15 @@ function TextSuggestions({ catalog, text, chosen, onAdd }) {
   );
 }
 
-// The Tags field of the shop edit form. `value` is the chosen tag ids; `text`
-// is the form's About and Keywords, so tags they mention are offered as you type.
-function TagEditor({ plotId, value, onChange, text }) {
-  const [catalog, setCatalog] = useState(null);
-  const [error, setError] = useState(null);
+// The Tags field of the shop edit form. `catalog` is GET /api/tags (null while
+// loading); `value` is the chosen tag ids; `text` is the form's About and
+// Keywords, so tags they mention are offered as you type.
+function TagEditor({ catalog, plotId, value, onChange, text }) {
   const [suggesting, setSuggesting] = useState(false);
   const [thanks, setThanks] = useState(null); // name of a suggestion just sent
 
-  useEffect(() => {
-    fetch('/api/tags').then((res) => res.json()).then(setCatalog).catch(() => setError('Could not load tags.'));
-  }, []);
-
   const add = (id) => onChange(value.includes(id) ? value : [...value, id]);
 
-  if (error) return <p className="tag-editor__error" role="alert">{error}</p>;
   return (
     <div className="tag-editor">
       {suggesting && catalog ? (

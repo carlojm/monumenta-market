@@ -116,3 +116,56 @@
     min-inline-size: 2.25rem;
   }
 }
+
+/* "Show changes" / "Back to editing": a text button, like "Suggest a new tag". */
+.shop-edit__toggle {
+  align-self: flex-start;
+  min-block-size: 1.5rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.875rem;
+}
+
+.shop-edit__toggle:hover {
+  text-decoration: underline;
+}
+
+.shop-edit__changes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* The changed text, keeping its line breaks. Removed words struck through on
+   red, added words on green; color isn't the only cue (strike, and the
+   hidden "Removed:"/"Added:" for screen readers). */
+.shop-edit__diff {
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+.shop-edit__diff del,
+.shop-edit__diff ins {
+  border-radius: var(--radius-sm);
+  padding: 0 0.125rem;
+  box-decoration-break: clone; /* the padding repeats when it wraps */
+}
+
+.shop-edit__diff del {
+  background: rgba(224, 138, 138, 0.15);
+  color: #e8a5a5;
+}
+
+.shop-edit__diff ins {
+  background: rgba(143, 191, 160, 0.2);
+  color: var(--text);
+  text-decoration: none;
+}
+
+@media (pointer: coarse) {
+  .shop-edit__toggle {
+    min-block-size: 2.25rem;
+  }
+}
