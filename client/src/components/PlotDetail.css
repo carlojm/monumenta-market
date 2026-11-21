@@ -2,7 +2,13 @@
   background: var(--sheet-bg);
   color: var(--text);
   width: 100%;
+  /* svh is the visible height with the browser's toolbars showing, so the
+     card always fits. vh on iOS Safari is the height with them hidden, so
+     the card's top slid under the address bar when it came back. (dvh would
+     follow the toolbars, but resizes the card mid-swipe.) vh is the fallback
+     for browsers without svh. */
   max-height: 85vh;
+  max-height: 95svh;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-bottom: none;
@@ -106,10 +112,10 @@
   margin: 0;
 }
 
-/* About and Keywords: reading text, at body size, keeping the owner's line breaks. */
+/* About and Keywords: the same size as the other rows, keeping the owner's
+   line breaks. */
 .plot-detail__text {
   white-space: pre-wrap;
-  font-size: 1rem;
   text-wrap: pretty;
 }
 
@@ -242,6 +248,7 @@
     border-radius: var(--radius-card);
     border-bottom: 1px solid var(--border);
     max-height: 80vh;
+    max-height: 95svh;
   }
 }
 
