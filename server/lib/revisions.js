@@ -116,14 +116,41 @@ export const isOwner = (account, shop) =>
   !!account && !!shop?.owner && account.name.toLowerCase() === shop.owner.trim().toLowerCase();
 // Owners can only edit their own shop; a new owner or an empty plot needs staff.
 export const canPublish = (account, action, shop) => isStaff(account) || (action === 'edit' && isOwner(account, shop));
-export function canReview(account, revision, shop) {
-  if (!account || revision.author_id === account.id) return false; // never your own
-  return canPublish(account, revision.action, shop);
-}
+// You can approve an edit exactly when you could have published it yourself,
+// including your own (a mod who queued an edit to double-check it later).
+export const canReview = (account, revision, shop) => !!account && canPublish(account, revision.action, shop);
 
 // Is the plot still in the state the revision was made for? An edit or vacate
 // needs the same shop; an open needs the same shop (or still none) it replaces.
 export const isStale = (revision, shop) => (revision.shop_id ?? null) !== (shop?.id ?? null);
+
+// --- Saving revision rows ---
+
+const insertRevision = db.prepare(`
+  INSERT INTO revisions (plot_id, shop_id, action, base, proposed, summary, author_id, direct, status,
+    reviewer_id, old_values, new_values, reviewed_at)
+  VALUES (@plot_id, @shop_id, @action, @base, @proposed, @summary, @author_id, @direct, @status,
+    @reviewer_id, @old_values, @new_values, CASE WHEN @direct = 1 THEN CURRENT_TIMESTAMP END)
+`);
+const json = (v) => (v == null ? null : JSON.stringify(v));
+
+// A suggestion waiting for review. Returns its id.
+export function recordSuggestion({ plotId, shopId, action, base, proposed, summary = null, account }) {
+  return insertRevision.run({
+    plot_id: plotId, shop_id: shopId, action, base: json(base), proposed: json(proposed), summary,
+    author_id: account.id, direct: 0, status: 'pending', reviewer_id: null, old_values: null, new_values: null,
+  }).lastInsertRowid;
+}
+
+// An edit applied at once by an owner or staff (`applied` is applyRevision's
+// result). `account` is null for the emergency ADMIN_TOKEN. Returns its id.
+export function recordDirect({ plotId, shopId, action, base, proposed, summary = null, account, applied }) {
+  return insertRevision.run({
+    plot_id: plotId, shop_id: shopId, action, base: json(base), proposed: json(proposed), summary,
+    author_id: account?.id ?? null, direct: 1, status: 'approved', reviewer_id: account?.id ?? null,
+    old_values: json(applied.old_values), new_values: json(applied.new_values),
+  }).lastInsertRowid;
+}
 
 const updateShop = (shopId, values, fields) => db.prepare(
   `UPDATE shops SET ${[...fields.map((f) => `${f} = @${f}`), 'updated_at = CURRENT_TIMESTAMP'].join(', ')} WHERE id = @id`,

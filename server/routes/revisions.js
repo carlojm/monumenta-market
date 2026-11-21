@@ -17,7 +17,7 @@ import { logModAction } from '../lib/modlog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
   ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, authorChanged, canPublish, canReview, cleanBase,
-  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, snapshotOf,
+  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, recordDirect, recordSuggestion, snapshotOf,
 } from '../lib/revisions.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot } from '../lib/shops.js';
 
@@ -25,12 +25,6 @@ const router = express.Router();
 
 const getRevision = db.prepare('SELECT * FROM revisions WHERE id = ?');
 const getAccountName = db.prepare('SELECT id, name FROM accounts WHERE id = ?');
-const insertRevision = db.prepare(`
-  INSERT INTO revisions (plot_id, shop_id, action, base, proposed, summary, author_id, direct, status,
-    reviewer_id, old_values, new_values, reviewed_at)
-  VALUES (@plot_id, @shop_id, @action, @base, @proposed, @summary, @author_id, @direct, @status,
-    @reviewer_id, @old_values, @new_values, CASE WHEN @direct = 1 THEN CURRENT_TIMESTAMP END)
-`);
 const withdrawMine = db.prepare(
   "UPDATE revisions SET status = 'withdrawn' WHERE author_id = ? AND plot_id = ? AND status = 'pending'",
 );
@@ -111,11 +105,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     return res.status(409).json({ error: 'This plot is already empty.' });
   }
 
-  const row = {
-    plot_id: plot.id, shop_id: shop?.id ?? null, action, base: json(base), proposed: json(proposed),
-    summary: cleanNote(req.body.summary), author_id: account.id,
-    direct: 0, status: 'pending', reviewer_id: null, old_values: null, new_values: null,
-  };
+  const row = { plotId: plot.id, shopId: shop?.id ?? null, action, base, proposed, summary: cleanNote(req.body.summary), account };
 
   // Publish at once: the owner editing their shop, or staff.
   if (canPublish(account, action, shop) && !req.body.request_review) {
@@ -133,14 +123,11 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     }
     const result = db.transaction(() => {
       const applied = applyRevision({ action, plotId: plot.id, shop, values, author: account });
-      const { lastInsertRowid } = insertRevision.run({
-        ...row, direct: 1, status: 'approved', reviewer_id: account.id,
-        old_values: json(applied.old_values), new_values: json(applied.new_values),
-      });
+      const id = recordDirect({ ...row, applied });
       if (isStaff(account)) {
         logModAction(req, `revision.${action}`, `plot:${plot.id}`, `Published an edit (${applied.changed.join(', ') || 'no changes'})`);
       }
-      return { id: lastInsertRowid, changed: applied.changed };
+      return { id, changed: applied.changed };
     })();
     return res.status(201).json({ status: 'approved', ...result });
   }
@@ -152,8 +139,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     if (countPending.get(account.id).n >= MAX_PENDING_PER_ACCOUNT) {
       return { error: `You have ${MAX_PENDING_PER_ACCOUNT} edits waiting for review. Please wait for some of those first.` };
     }
-    const { lastInsertRowid } = insertRevision.run(row);
-    return { id: lastInsertRowid, replaced };
+    return { id: recordSuggestion(row), replaced };
   })();
   if (result.error) return res.status(429).json({ error: result.error });
   res.status(201).json({ status: 'pending', ...result });
@@ -196,10 +182,7 @@ function reviewable(req, res) {
   if (!revision) return void res.status(404).json({ error: 'Edit not found' });
   if (revision.status !== 'pending') return void res.status(409).json({ error: 'This edit has already been reviewed.' });
   const shop = getCurrentShop.get(revision.plot_id) ?? null;
-  if (!canReview(req.account, revision, shop)) {
-    const why = revision.author_id === req.account.id ? "You can't review your own edit." : "You can't review this edit.";
-    return void res.status(403).json({ error: why });
-  }
+  if (!canReview(req.account, revision, shop)) return void res.status(403).json({ error: "You can't review this edit." });
   return { revision, shop };
 }
 

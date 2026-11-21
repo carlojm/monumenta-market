@@ -18,7 +18,8 @@ import { imageType } from './lib/imageType.js';
 import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
-import { SHOP_FIELDS, closeShop, getCurrentShop, getPlot, getShop, openShop } from './lib/shops.js';
+import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from './lib/shops.js';
+import { applyRevision, authorChanged, cleanSnapshot, recordDirect, snapshotOf } from './lib/revisions.js';
 import {
   KINDS, checkTagIds, cleanTag, listTags, sameName, setShopTags, tagsByShop, tagsForShop,
 } from './lib/tags.js';
@@ -133,15 +134,6 @@ function shopWithDetails(shop) {
     comments: getApprovedComments.all(shop.id),
     images: getImages.all(shop.id),
   };
-}
-
-// Blank strings from forms mean "not set".
-function cleanShopFields(body) {
-  const out = {};
-  for (const f of SHOP_FIELDS) {
-    if (f in body) out[f] = typeof body[f] === 'string' && body[f].trim() === '' ? null : body[f];
-  }
-  return out;
 }
 
 // --- Public API ---
@@ -341,85 +333,61 @@ app.post('/api/plots/:id/report', limits.reports, (req, res) => {
 
 // --- Admin: edit a plot's shop ---
 //
-// Body: any SHOP_FIELDS, plus `rename: true` to fix an owner typo in place.
+// Body: any SHOP_FIELDS and `tag_ids`, plus `rename: true` to fix an owner
+// typo in place. Fields not sent stay as they are.
 // - Plot is vacant: opens a new shop (owner required).
 // - Owner changed (and not a rename): closes the current shop and opens a new
 //   one with the submitted fields. The old shop keeps its history.
 // - Otherwise: updates the current shop and logs each changed field.
+// These are page revisions published at once (lib/revisions.js), so they show
+// in the page history like everyone else's edits.
 
 app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
   const plot = getPlot.get(req.params.id);
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
-  const fields = cleanShopFields(req.body);
-  const current = getCurrentShop.get(plot.id);
-  // Optional: the shop's complete tag list (replaces its current tags).
-  let tagIds;
-  if ('tag_ids' in req.body) {
-    const checked = checkTagIds(req.body.tag_ids);
-    if (checked.error) return res.status(400).json({ error: checked.error });
-    tagIds = checked.ids;
+  const current = getCurrentShop.get(plot.id) ?? null;
+  const now = snapshotOf(current);
+  const sentOwner = typeof req.body.owner === 'string' ? req.body.owner.trim() : current?.owner;
+
+  let action = 'edit';
+  if (!current) {
+    if (!sentOwner) return res.status(400).json({ error: 'Owner is required to open a shop' });
+    action = 'open';
+  } else if (!sentOwner) {
+    return res.status(400).json({ error: 'Owner can\'t be blank. Use vacate to empty the plot.' });
+  } else if (sentOwner !== current.owner && !req.body.rename) {
+    action = 'open';
   }
-  // Tags for a newly opened shop: logged together with the opening.
-  const tagNewShop = (shopId) => {
-    if (!tagIds?.length) return;
-    const { added } = setShopTags(shopId, tagIds);
-    addLogEntry(shopId, req.account, `tags set: ${added.join(', ')}`);
-  };
+  // A new shop starts from only what was submitted; an edit keeps unsent fields.
+  const cleaned = cleanSnapshot(req.body, action === 'open' ? null : now);
+  if (cleaned.error) return res.status(400).json({ error: cleaned.error });
+  const values = cleaned.snapshot;
+  if (action === 'edit' && !authorChanged(now, values)) return res.json({ updated: false });
 
-  const result = db.transaction(() => {
-    if (!current) {
-      if (!fields.owner) return { status: 400, body: { error: 'Owner is required to open a shop' } };
-      logModAction(req, 'shop.open', `plot:${plot.id}`, `Opened a shop for ${fields.owner}`);
-      const opened = openShop(plot.id, fields, req.account);
-      tagNewShop(opened);
-      return { status: 201, body: { opened } };
+  const applied = db.transaction(() => {
+    const result = applyRevision({ action, plotId: plot.id, shop: current, values, author: req.account });
+    recordDirect({ plotId: plot.id, shopId: current?.id ?? null, action, base: now, proposed: values, account: req.account, applied: result });
+    if (action === 'open') {
+      logModAction(req, 'shop.open', `plot:${plot.id}`, current
+        ? `Closed ${current.owner}'s shop and opened one for ${values.owner}`
+        : `Opened a shop for ${values.owner}`);
+    } else {
+      logModAction(req, 'shop.edit', `plot:${plot.id}`, `Edited ${current.owner}'s shop: ${result.changed.join(', ')}`);
     }
-
-    if ('owner' in fields && !fields.owner) {
-      return { status: 400, body: { error: 'Owner can\'t be blank. Use vacate to empty the plot.' } };
-    }
-
-    if (fields.owner && fields.owner !== current.owner && !req.body.rename) {
-      closeShop.run(current.id);
-      addLogEntry(current.id, req.account, `Shop closed, plot taken over by ${fields.owner}`);
-      logModAction(req, 'shop.open', `plot:${plot.id}`,
-        `Closed ${current.owner}'s shop and opened one for ${fields.owner}`);
-      const opened = openShop(plot.id, fields, req.account);
-      tagNewShop(opened);
-      return { status: 201, body: { closed: current.id, opened } };
-    }
-
-    const changed = SHOP_FIELDS.filter((f) => f in fields && fields[f] !== current[f]);
-    for (const f of changed) {
-      addLogEntry(current.id, req.account,
-        `${f} updated from "${current[f] ?? '(empty)'}" to "${fields[f] ?? '(empty)'}"`);
-    }
-    if (tagIds) {
-      const { added, removed } = setShopTags(current.id, tagIds);
-      if (added.length || removed.length) {
-        const parts = [added.length && `added ${added.join(', ')}`, removed.length && `removed ${removed.join(', ')}`];
-        addLogEntry(current.id, req.account, `tags updated: ${parts.filter(Boolean).join('; ')}`);
-        changed.push('tags');
-      }
-    }
-    if (!changed.length) return { status: 200, body: { updated: false } };
-    logModAction(req, 'shop.edit', `plot:${plot.id}`, `Edited ${current.owner}'s shop: ${changed.join(', ')}`);
-    const fieldChanges = changed.filter((f) => f !== 'tags');
-    const sets = [...fieldChanges.map((f) => `${f} = @${f}`), 'updated_at = CURRENT_TIMESTAMP'].join(', ');
-    db.prepare(`UPDATE shops SET ${sets} WHERE id = @id`)
-      .run({ ...Object.fromEntries(fieldChanges.map((f) => [f, fields[f]])), id: current.id });
-    return { status: 200, body: { updated: changed } };
+    return result;
   })();
 
-  res.status(result.status).json(result.body);
+  if (action === 'open') return res.status(201).json({ ...(current ? { closed: current.id } : {}), opened: applied.opened });
+  res.json({ updated: applied.changed });
 });
 
 app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
   const current = getCurrentShop.get(req.params.id);
   if (!current) return res.status(409).json({ error: 'Plot is already vacant' });
   db.transaction(() => {
-    closeShop.run(current.id);
-    addLogEntry(current.id, req.account, 'Shop closed, plot is now vacant');
+    const now = snapshotOf(current);
+    const applied = applyRevision({ action: 'vacate', plotId: req.params.id, shop: current, author: req.account });
+    recordDirect({ plotId: req.params.id, shopId: current.id, action: 'vacate', base: now, proposed: null, account: req.account, applied });
     logModAction(req, 'shop.vacate', `plot:${req.params.id}`, `Closed ${current.owner}'s shop; plot is now vacant`);
   })();
   res.json({ closed: current.id });
