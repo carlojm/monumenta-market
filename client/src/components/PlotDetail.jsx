@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Pencil, X } from 'lucide-react';
+import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
@@ -470,10 +470,11 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
 
         <div className="plot-detail__header">
           <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
-          {/* Shown once the full page has loaded: an edit starts from it. */}
-          {shop && detail && account !== undefined && !editing && (
+          {/* Shown once the full page has loaded: an edit starts from it.
+              A vacant plot's form starts at "A new shop is here". */}
+          {detail && account !== undefined && !editing && (
             <button type="button" className="plot-detail__edit" ref={editButtonMounted} onClick={startEditing}>
-              <Pencil size={14} aria-hidden="true" /> Edit
+              {shop ? <><Pencil size={14} aria-hidden="true" /> Edit</> : <><Plus size={14} aria-hidden="true" /> Add shop</>}
             </button>
           )}
         </div>

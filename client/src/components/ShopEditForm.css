@@ -169,3 +169,25 @@
     min-block-size: 2.25rem;
   }
 }
+
+/* "Not the same shop anymore?" and its two links. */
+.shop-edit__modes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
+}
+
+.shop-edit__modes .shop-edit__muted {
+  flex-basis: 100%;
+}
+
+/* The current shop is about to close: amber, like other cautions. */
+.shop-edit__warning {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid #e0b87a;
+  border-radius: var(--radius-sm);
+  background: rgba(224, 184, 122, 0.1);
+  color: #e0b87a;
+}
