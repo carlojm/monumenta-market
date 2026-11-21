@@ -92,6 +92,34 @@ function ChangesView({ changes, addedTags, removedTags }) {
   );
 }
 
+const labelOf = (key) => [OWNER, ...FIELDS].find((f) => f.key === key)?.label ?? key;
+
+// Force edit found that someone changed the same fields meanwhile. For each,
+// pick your version or the current one. Focus starts on the explanation.
+function ConflictView({ conflicts, choices, onChoose }) {
+  return (
+    <div className="shop-edit__changes">
+      <p className="shop-edit__warning" tabIndex={-1} ref={focusOnMount}>
+        Someone changed this page while you were editing. Choose which version to keep below; your other
+        changes are kept.
+      </p>
+      {conflicts.map((c) => (
+        <fieldset className="shop-edit__conflict" key={c.field}>
+          <legend>{labelOf(c.field)}</legend>
+          {[['mine', 'Yours', c.mine], ['theirs', 'Current', c.theirs]].map(([value, name, text]) => (
+            <label className="shop-edit__choice" key={value}>
+              <input type="radio" name={`shop-edit-conflict-${c.field}`} checked={choices[c.field] === value}
+                onChange={() => onChoose(c.field, value)} />
+              <span className="shop-edit__choice-name">{name}</span>
+              <span className="shop-edit__choice-text">{text ?? <span className="shop-edit__muted">(empty)</span>}</span>
+            </label>
+          ))}
+        </fieldset>
+      ))}
+    </div>
+  );
+}
+
 // Editing a shop in place on its card, in one of three modes:
 //   edit    change the current shop's details
 //   open    "A new shop is here": a different owner (the current shop closes)
@@ -103,7 +131,8 @@ function ChangesView({ changes, addedTags, removedTags }) {
 function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyChange }) {
   // What the shop looked like when editing began. The server compares an edit
   // against it, so a change someone else makes meanwhile isn't overwritten.
-  const [base] = useState(() => (shop ? {
+  // After a conflict is resolved, it becomes the page as it is now.
+  const [base, setBase] = useState(() => (shop ? {
     ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])),
     tag_ids: (shop.tags ?? []).map((t) => t.id),
   } : EMPTY));
@@ -118,6 +147,8 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const [error, setError] = useState(null);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [showingChanges, setShowingChanges] = useState(false);
+  // From a Force edit that clashed: { conflicts, current, choices }.
+  const [conflict, setConflict] = useState(null);
 
   const isStaff = account.role === 'moderator' || account.role === 'admin';
   const isOwner = !!shop && account.name.toLowerCase() === shop.owner.trim().toLowerCase();
@@ -127,12 +158,13 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
 
   const fieldsFor = (m) => [...(m === 'open' ? [OWNER] : []), ...FIELDS]
     .filter((f) => !f.guildOnly || plot.is_guild || (m === 'edit' && shop?.guild_name));
-  const baseFor = (m) => (m === 'edit' ? base : EMPTY);
+  // `b` is the edit base, passed in when it's about to change (a resolved conflict).
+  const baseFor = (m, b = base) => (m === 'edit' ? b : EMPTY);
   // Blank space at the ends doesn't count: the server trims it off anyway.
-  const isEdited = (m, vals, key) => vals[key].trim() !== (baseFor(m)[key] ?? '');
+  const isEdited = (m, vals, key, b = base) => vals[key].trim() !== (baseFor(m, b)[key] ?? '');
   // "Empty" has nothing to fill in, so nothing to lose.
-  const isDirty = (m, d) => m !== 'vacate'
-    && (fieldsFor(m).some((f) => isEdited(m, d[m].values, f.key)) || !sameIds(d[m].tagIds, baseFor(m).tag_ids));
+  const isDirty = (m, d, b = base) => m !== 'vacate'
+    && (fieldsFor(m).some((f) => isEdited(m, d[m].values, f.key, b)) || !sameIds(d[m].tagIds, baseFor(m, b).tag_ids));
 
   const fields = fieldsFor(mode);
   const { values, tagIds } = drafts[mode] ?? { values: {}, tagIds: [] };
@@ -142,8 +174,8 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
 
   // The card (which asks before closing) and the browser's leave warning
   // hear about every change as it happens.
-  const report = (m, d) => {
-    const nextDirty = isDirty(m, d);
+  const report = (m, d, b = base) => {
+    const nextDirty = isDirty(m, d, b);
     onDirtyChange(nextDirty);
     leaveWarning(nextDirty);
   };
@@ -159,22 +191,16 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
 
   const switchMode = (m) => {
     setMode(m);
+    setConflict(null);
     setShowingChanges(false);
     setConfirmingCancel(false);
     setError(null);
     report(m, drafts);
   };
 
-  const submit = async (requestReview) => {
-    if (mode !== 'vacate' && !dirty) return setError("You haven't changed anything yet.");
-    if (mode === 'open' && !values.owner.trim()) return setError('A new shop needs an owner.');
+  const send = async (body, requestReview) => {
     setSending(true);
     setError(null);
-    const body = mode === 'edit'
-      ? { action: 'edit', base, proposed: { ...base, ...values, tag_ids: tagIds } }
-      : mode === 'open'
-        ? { action: 'open', proposed: { ...values, tag_ids: tagIds } }
-        : { action: 'vacate' };
     try {
       const res = await fetch(`/api/plots/${plot.id}/revisions`, {
         method: 'POST',
@@ -182,12 +208,59 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
         body: JSON.stringify({ ...body, summary, request_review: requestReview }),
       });
       const data = await res.json().catch(() => ({}));
+      // The page changed in the same fields: show the chooser.
+      if (res.status === 409 && data.conflicts) {
+        setConflict({ conflicts: data.conflicts, current: data.current, choices: {} });
+        setShowingChanges(false);
+        setSending(false);
+        return;
+      }
       if (!res.ok) throw new Error(data.error || 'Could not save your edit. Please try again.');
       onDone(data);
     } catch (err) {
       setError(err.message);
       setSending(false);
     }
+  };
+
+  const submit = (requestReview) => {
+    if (conflict) return resolve(requestReview);
+    if (mode !== 'vacate' && !dirty) return setError("You haven't changed anything yet.");
+    if (mode === 'open' && !values.owner.trim()) return setError('A new shop needs an owner.');
+    send(mode === 'edit'
+      ? { action: 'edit', base, proposed: { ...base, ...values, tag_ids: tagIds } }
+      : mode === 'open'
+        ? { action: 'open', proposed: { ...values, tag_ids: tagIds } }
+        : { action: 'vacate' }, requestReview);
+  };
+
+  // Applies the choices on top of the page as it is now, the way the server
+  // merges: fields you changed keep your value (or your choice, where both
+  // changed), the rest take the current value; tags you added or removed are
+  // added or removed again. The current page becomes the new base.
+  const resolve = (requestReview) => {
+    const { conflicts, current, choices } = conflict;
+    if (conflicts.some((c) => !choices[c.field])) return setError('Choose a version for each field first.');
+    const picked = Object.fromEntries(conflicts.map((c) => [c.field, (choices[c.field] === 'mine' ? c.mine : c.theirs) ?? '']));
+    const nextValues = Object.fromEntries(Object.keys(values).map((key) => [key,
+      key in picked ? picked[key] : isEdited('edit', values, key) ? values[key] : current[key] ?? '']));
+    const added = tagIds.filter((id) => !base.tag_ids.includes(id));
+    const removed = base.tag_ids.filter((id) => !tagIds.includes(id));
+    const nextTagIds = [...new Set([...current.tag_ids, ...added])].filter((id) => !removed.includes(id));
+    const next = { ...drafts, edit: { values: nextValues, tagIds: nextTagIds } };
+    setBase(current);
+    setDrafts(next);
+    setConflict(null);
+    report('edit', next, current);
+    if (!isDirty('edit', next, current)) {
+      return setError('Nothing left to save: the page already has these changes.');
+    }
+    send({ action: 'edit', base: current, proposed: { ...current, ...nextValues, tag_ids: nextTagIds } }, requestReview);
+  };
+
+  const choose = (field, value) => {
+    setError(null);
+    setConflict({ ...conflict, choices: { ...conflict.choices, [field]: value } });
   };
 
   const cancel = () => (dirty ? setConfirmingCancel(true) : onCancel());
@@ -215,7 +288,7 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
         {!canPublish && <p className="shop-edit__muted">{reviewer} reviews it before it shows.</p>}
       </div>
 
-      {shop && (
+      {shop && !conflict && (
         mode === 'edit' ? (
           <div className="shop-edit__modes">
             <span className="shop-edit__muted">Not the same shop anymore?</span>
@@ -238,7 +311,9 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
         )
       )}
 
-      {mode === 'vacate' ? null : showingChanges ? (
+      {conflict ? (
+        <ConflictView conflicts={conflict.conflicts} choices={conflict.choices} onChoose={choose} />
+      ) : mode === 'vacate' ? null : showingChanges ? (
         <ChangesView changes={changes} addedTags={addedTags} removedTags={removedTags} />
       ) : (
         <>
@@ -276,7 +351,7 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
       )}
 
       {/* The same button both ways, so focus stays on it. */}
-      {dirty && (
+      {dirty && !conflict && (
         <button type="button" className="shop-edit__toggle" onClick={() => setShowingChanges((v) => !v)}
           aria-expanded={showingChanges}>
           {showingChanges ? 'Back to editing' : 'Show changes'}

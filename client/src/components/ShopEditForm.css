@@ -191,3 +191,46 @@
   background: rgba(224, 184, 122, 0.1);
   color: #e0b87a;
 }
+
+/* Choosing between your version and the current one, per field. */
+.shop-edit__conflict {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.shop-edit__conflict legend {
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Each choice is a card; the whole card is the click target. */
+.shop-edit__choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.5rem;
+  align-items: baseline;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.shop-edit__choice:has(input:checked) {
+  border-color: var(--accent);
+}
+
+.shop-edit__choice-name {
+  font-weight: 600;
+}
+
+.shop-edit__choice-text {
+  grid-column: 2;
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
