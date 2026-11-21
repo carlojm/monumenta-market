@@ -38,10 +38,19 @@ function App() {
   const closePlot = () => (fromApp ? navigate(-1) : navigate('/', { replace: true }));
 
   // Desktop: the card replaces the list, so start the card at the top and
-  // put the list back where it was on "Back".
+  // put the list back where it was on "Back", with focus back on the row
+  // that opened the card (phones get this from the card's dialog).
+  const lastOpened = useRef(null);
   useLayoutEffect(() => {
     if (!isDesktop) return;
     window.scrollTo(0, plotId ? 0 : listScroll.current);
+    if (plotId) {
+      lastOpened.current = plotId;
+    } else if (lastOpened.current) {
+      document.querySelector(`.plot-table__open[data-plot-id="${CSS.escape(lastOpened.current)}"]`)
+        ?.focus({ preventScroll: true });
+      lastOpened.current = null;
+    }
   }, [plotId, isDesktop]);
 
   const loadPlots = () =>

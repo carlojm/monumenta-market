@@ -47,7 +47,14 @@ function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
                 !plot.shop && 'plot-table__row--vacant',
               ].filter(Boolean).join(' ')}
             >
-              <td className="plot-table__shop">{displayName(plot.shop)}</td>
+              {/* The row is clickable; this button is how the keyboard (and screen
+                  readers) open it. data-plot-id lets the page return focus here. */}
+              <td className="plot-table__shop">
+                <button type="button" className="plot-table__open" data-plot-id={plot.id}
+                  onClick={(e) => { e.stopPropagation(); onSelectPlot(plot); }}>
+                  {displayName(plot.shop)}
+                </button>
+              </td>
               {!showMatch && <td>{plot.zone}</td>}
               <td>
                 {!plot.shop ? 'Vacant' : report ? (

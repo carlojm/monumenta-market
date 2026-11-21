@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
@@ -26,6 +26,16 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   const [accuracy, setAccuracy] = useState({ value: c.accuracy, at: c.accuracy_at });
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState(null);
+  // Cancelling the delete confirmation puts focus back on the Delete button
+  // (it was replaced by the confirmation, so focus would otherwise be lost).
+  const deleteButton = useRef(null);
+  const refocusDelete = useRef(false);
+  useEffect(() => {
+    if (!confirmingDelete && refocusDelete.current) {
+      refocusDelete.current = false;
+      deleteButton.current?.focus();
+    }
+  }, [confirmingDelete]);
   const isOwn = !!account && !!c.verified && c.author === account.name;
   const isStaff = account?.role === 'moderator' || account?.role === 'admin';
   const canAct = interactive && !!account && !c.is_system;
@@ -92,7 +102,10 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
               {isOwn ? 'Delete this comment?' : `Delete ${c.author || 'Anonymous'}'s comment?`}
             </span>
             <button type="button" onClick={remove}>Yes</button>
-            <button type="button" onClick={() => setConfirmingDelete(false)}>Cancel</button>
+            {/* Focus starts on the safe choice. */}
+            <button type="button" autoFocus onClick={() => { refocusDelete.current = true; setConfirmingDelete(false); }}>
+              Cancel
+            </button>
           </div>
         ) : (
           <div className="plot-detail__comment-actions">
@@ -103,12 +116,12 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
               Outdated
             </button>
             {canDelete && (
-              <button type="button" onClick={() => setConfirmingDelete(true)}>Delete</button>
+              <button type="button" ref={deleteButton} onClick={() => setConfirmingDelete(true)}>Delete</button>
             )}
           </div>
         )
       )}
-      {error && <p className="plot-detail__error">{error}</p>}
+      {error && <p className="plot-detail__error" role="alert">{error}</p>}
     </li>
   );
 }
@@ -212,13 +225,23 @@ function ReportForm({ plotId, onReported }) {
           <span className="plot-detail__muted">Also pick locked or unlocked.</span>
         )
       )}
-      {error && <p className="plot-detail__error">{error}</p>}
+      {error && <p className="plot-detail__error" role="alert">{error}</p>}
     </div>
   );
 }
 
+// Older browsers without `closedby` need tap-outside-to-close done by hand.
+const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
+
 function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const [detail, setDetail] = useState(null);
+  const dialogRef = useRef(null);
+  const headingRef = useRef(null);
+  const commentsHeadingRef = useRef(null);
+  // Read out by screen readers (visually hidden): "Report sent", etc.
+  const [announcement, setAnnouncement] = useState('');
+  // The dialog's close listener is set up once; this always calls the latest onClose.
+  const onDialogClose = useEffectEvent(() => onClose());
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
@@ -236,6 +259,33 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
       .then(setDetail)
       .catch((err) => setError(err.message));
   }, [plot]);
+
+  // Phones: the card is a native modal dialog. The browser keeps focus inside
+  // it, closes it on Esc (and on a tap outside, with closedby="any"), and
+  // tells screen readers it opened. Closing it closes the card (onClose
+  // updates the URL). It's removed rather than closed when the URL changes
+  // (e.g. the Back button), so focus is put back on what opened it by hand.
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const opener = document.activeElement;
+    dialog.showModal();
+    // A close event arrives a moment after the close. If the dialog has been
+    // reopened since (React re-runs this setup in development), it's stale.
+    const handleClose = () => { if (!dialog.open) onDialogClose(); };
+    dialog.addEventListener('close', handleClose);
+    return () => {
+      dialog.removeEventListener('close', handleClose);
+      if (dialog.open) dialog.close();
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
+  }, []);
+
+  // Desktop: the card replaces the list, so move focus to its title, or
+  // keyboard and screen reader users wouldn't know it opened.
+  useEffect(() => {
+    if (inline) headingRef.current?.focus({ preventScroll: true });
+  }, [inline]);
 
   if (!plot) return null;
 
@@ -280,6 +330,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
       const saved = await postJson(`/api/plots/${plot.id}/comments`, { body: commentBody.trim() });
       setMyComments((prev) => [saved, ...prev]);
       setCommentBody('');
+      setAnnouncement('Comment posted.');
     } catch (err) {
       setError(`Could not submit comment: ${err.message}`);
     } finally {
@@ -289,16 +340,29 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
 
   const handleReported = (report) => {
     setMyReports((prev) => [report, ...prev]);
+    setAnnouncement(`Report sent: ${reportLabel(report)}. Thanks!`);
     onReported?.();
   };
 
+  // The deleted comment had focus; move it to the Comments heading.
+  const handleDeleted = (id) => {
+    setDeletedIds((ids) => [...ids, id]);
+    setAnnouncement('Comment deleted.');
+    commentsHeadingRef.current?.focus({ preventScroll: true });
+  };
+
+  // Fallback for browsers without closedby: a click on the dialog itself but
+  // outside its box landed on the backdrop.
+  const handleBackdropClick = (e) => {
+    if (SUPPORTS_CLOSEDBY || e.target !== e.currentTarget) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+  };
+
   // `inline` (desktop): the card sits in the page's right column with a back
-  // button. Otherwise (phones): a bottom sheet over a dark overlay.
-  const sheet = (
-      <div
-        className={`plot-detail__sheet${inline ? ' plot-detail__sheet--inline' : ''}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+  // button. Otherwise (phones): a bottom sheet dialog over the page.
+  const content = (
+      <>
         {inline ? (
           <button className="plot-detail__back" onClick={onClose}>← Back to list</button>
         ) : (
@@ -307,7 +371,8 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
           </button>
         )}
 
-        <h2>{displayName(shop)}</h2>
+        <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
+        <p className="visually-hidden" role="status">{announcement}</p>
 
         {images.length > 0 && (
           <div className="plot-detail__carousel">
@@ -406,12 +471,12 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
         )}
         {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
 
-        {error && <p className="plot-detail__error">{error}</p>}
+        {error && <p className="plot-detail__error" role="alert">{error}</p>}
 
         {shop && (
           <>
             <hr />
-            <h3>Comments</h3>
+            <h3 ref={commentsHeadingRef} tabIndex={-1}>Comments</h3>
             {/* <p className="plot-detail__comment-hint">
               Leave a comment if this shop is different from described.
             </p> */}
@@ -423,10 +488,14 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
               </p>
             ) : (
               <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-                <span className="plot-detail__muted">
-                  Commenting as <strong className="plot-detail__author--linked">{account.name}</strong>
-                </span>
+                <label htmlFor="plot-detail-comment">
+                  Add a comment{' '}
+                  <span className="plot-detail__muted">
+                    as <strong className="plot-detail__author--linked">{account.name}</strong>
+                  </span>
+                </label>
                 <textarea
+                  id="plot-detail-comment"
                   placeholder="This shop has changed / is now selling..."
                   value={commentBody}
                   onChange={(e) => setCommentBody(e.target.value)}
@@ -441,7 +510,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             <CommentList
               comments={comments}
               interactive
-              onDeleted={(id) => setDeletedIds((ids) => [...ids, id])}
+              onDeleted={handleDeleted}
             />
           </>
         )}
@@ -453,14 +522,21 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
           </>
         )}
-      </div>
+      </>
   );
 
-  if (inline) return sheet;
+  if (inline) {
+    return (
+      <section className="plot-detail__sheet plot-detail__sheet--inline" aria-labelledby="plot-detail-title">
+        {content}
+      </section>
+    );
+  }
   return (
-    <div className="plot-detail__overlay" onClick={onClose}>
-      {sheet}
-    </div>
+    <dialog ref={dialogRef} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
+      closedby="any" onClick={handleBackdropClick}>
+      {content}
+    </dialog>
   );
 }
 
