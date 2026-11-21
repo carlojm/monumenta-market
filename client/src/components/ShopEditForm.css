@@ -1,0 +1,118 @@
+/* Editing a shop on its card. Labels sit above their fields (not in a side
+   column like the card's details), so fields get the full width on phones. */
+.shop-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.shop-edit__mode h3 {
+  margin: 0;
+}
+
+.shop-edit__mode p {
+  margin: 0.25rem 0 0;
+}
+
+.shop-edit__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shop-edit__field > p {
+  margin: 0;
+}
+
+.shop-edit__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-block-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.shop-edit__field input,
+.shop-edit__field textarea {
+  width: 100%;
+  font: inherit;
+}
+
+.shop-edit textarea {
+  min-height: 4rem;
+  /* Grows with the text, up to a point (where supported; elsewhere it scrolls). */
+  field-sizing: content;
+  max-height: 40vh;
+}
+
+/* A changed field gets an accent edge, matching its "Edited" label. Two
+   classes, to outrank index.css's input[type="text"]. */
+.shop-edit .shop-edit__input--edited {
+  border-color: var(--accent);
+}
+
+.shop-edit__edited {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.shop-edit__reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 1.5rem;
+  min-inline-size: 1.5rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+}
+
+.shop-edit__reset:hover {
+  color: var(--text);
+}
+
+.shop-edit__readonly {
+  color: var(--text);
+}
+
+.shop-edit__muted {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.shop-edit__error {
+  margin: 0;
+  color: #e08a8a;
+}
+
+.shop-edit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shop-edit__primary:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+@media (pointer: coarse) {
+  .shop-edit__reset,
+  .shop-edit__actions button {
+    min-block-size: 2.25rem;
+    min-inline-size: 2.25rem;
+  }
+}

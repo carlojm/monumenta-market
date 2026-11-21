@@ -119,10 +119,61 @@
   text-wrap: pretty;
 }
 
+/* The shop name with the Edit button beside it. Baseline alignment keeps the
+   button level with the name's first line, even when a long name wraps. */
+.plot-detail__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.plot-detail__dialog .plot-detail__header {
+  padding-inline-end: 2rem; /* room for the close button */
+}
+
 /* A long shop name wraps into even lines instead of leaving one word alone. */
 .plot-detail__sheet h2 {
   text-wrap: balance;
-  padding-inline-end: 2rem; /* room for the close button */
+}
+
+.plot-detail__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* What happened to your last edit, or "discard your unsaved edit?". */
+.plot-detail__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--code-bg);
+  font-size: 0.875rem;
+}
+
+.plot-detail__notice-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.plot-detail__notice button {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.plot-detail__notice .plot-detail__error {
+  flex-basis: 100%;
+  margin: 0;
 }
 
 /* Section headings in the card sit at body size; weight sets them apart. */
@@ -384,7 +435,9 @@
 .plot-detail__chips button,
 .plot-detail__comment-actions button,
 .plot-detail__sheet .tag-chip--add,
-.plot-detail__back {
+.plot-detail__back,
+.plot-detail__edit,
+.plot-detail__notice button {
   min-block-size: 1.5rem;
   min-inline-size: 1.5rem;
 }
@@ -398,7 +451,9 @@
   .plot-detail__chips button,
   .plot-detail__comment-actions button,
   .plot-detail__sheet .tag-chip--add,
-  .plot-detail__submit {
+  .plot-detail__submit,
+  .plot-detail__edit,
+  .plot-detail__notice button {
     min-block-size: 2.25rem;
     min-inline-size: 2.25rem;
   }

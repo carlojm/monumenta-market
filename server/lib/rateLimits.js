@@ -65,7 +65,6 @@ const write = (name, options) => limit(name, { message: tooOften, ...options });
 export const reports = write('report', { minutes: 60, max: 20 });
 export const comments = write('comment', { minutes: 10, max: 10, keyGenerator: byAccount });
 export const votes = write('vote', { minutes: 10, max: 60, keyGenerator: byAccount });
-export const tagEdits = write('tag edit', { minutes: 10, max: 30, keyGenerator: byAccount });
 export const tagSuggestions = write('tag suggestion', { minutes: 60, max: 10, keyGenerator: byAccount });
 export const uploads = write('upload', { minutes: 60, max: 30, keyGenerator: byAccount });
 export const revisions = write('page edit', { minutes: 60, max: 20, keyGenerator: byAccount });

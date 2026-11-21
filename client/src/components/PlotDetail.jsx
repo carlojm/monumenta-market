@@ -1,10 +1,10 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, Pencil, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
-import TagEditor from './TagEditor';
+import ShopEditForm from './ShopEditForm';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -140,9 +140,9 @@ function CommentList({ comments, interactive = false, onDeleted }) {
 
 // About and Keywords rows. They go inside the card's <dl>, so their labels
 // share one column with Owner, Plot and Status. The shop's stock tags sit
-// under Keywords; `after` is the "+" edit button.
-function ShopText({ shop, tags, after = null }) {
-  const showKeywords = shop.stock || tags.length > 0 || after;
+// under Keywords.
+function ShopText({ shop, tags }) {
+  const showKeywords = shop.stock || tags.length > 0;
   return (
     <>
       {shop.description && (
@@ -156,7 +156,7 @@ function ShopText({ shop, tags, after = null }) {
           <dt>Keywords</dt>
           <dd className="plot-detail__text">
             {shop.stock}
-            <TagChips tags={tags} className="plot-detail__stock-tags" after={after} />
+            <TagChips tags={tags} className="plot-detail__stock-tags" />
           </dd>
         </>
       )}
@@ -270,20 +270,47 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
-  const [editingTags, setEditingTags] = useState(false);
+  // Editing the shop (ShopEditForm). `editDirty`: it has unsaved changes, so
+  // closing the card asks first (`confirmingClose`). `notice`: what happened to
+  // the last edit, shown at the top of the card.
+  const [editing, setEditing] = useState(false);
+  const [editDirty, setEditDirty] = useState(false);
+  const [confirmingClose, setConfirmingClose] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [showLinkPrompt, setShowLinkPrompt] = useState(false);
+  const [reloads, setReloads] = useState(0);
+  const editButtonRef = useRef(null);
+  // Esc or a tap outside with unsaved edits asks first. (Browsers may skip
+  // this when the page hasn't been interacted with since the last time.)
+  const onDialogCancel = useEffectEvent((e) => {
+    if (!(editing && editDirty)) return;
+    e.preventDefault();
+    setConfirmingClose(true);
+  });
+  // Back on the card, focus returns to the Edit button (it's rendered again
+  // only after this update, hence the effect below).
+  const refocusEdit = useRef(false);
+  useEffect(() => {
+    if (!editing && refocusEdit.current) {
+      refocusEdit.current = false;
+      editButtonRef.current?.focus();
+    }
+  }, [editing]);
+
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [myComments, setMyComments] = useState([]);
   const [deletedIds, setDeletedIds] = useState([]);
   const [myReports, setMyReports] = useState([]);
 
+  // `reloads` fetches it again after a published edit.
   useEffect(() => {
     if (!plot) return;
     fetch(`/api/plots/${plot.id}`)
       .then((res) => res.json())
       .then(setDetail)
       .catch((err) => setError(err.message));
-  }, [plot]);
+  }, [plot, reloads]);
 
   // Phones: the card is a native modal dialog. The browser keeps focus inside
   // it, closes it on Esc (and on a tap outside, with closedby="any"), and
@@ -298,9 +325,12 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
     // A close event arrives a moment after the close. If the dialog has been
     // reopened since (React re-runs this setup in development), it's stale.
     const handleClose = () => { if (!dialog.open) onDialogClose(); };
+    const handleCancel = (e) => onDialogCancel(e);
     dialog.addEventListener('close', handleClose);
+    dialog.addEventListener('cancel', handleCancel);
     return () => {
       dialog.removeEventListener('close', handleClose);
+      dialog.removeEventListener('cancel', handleCancel);
       if (dialog.open) dialog.close();
       if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
@@ -334,18 +364,52 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const pastShops = detail?.past_shops || [];
   const categoryTags = (shop?.tags ?? []).filter((t) => t.kind === 'category');
   const stockTags = (shop?.tags ?? []).filter((t) => t.kind === 'stock');
-  // Linked players can edit the shop's tags from the end of the stock tag row:
-  // "+" when the shop has tags, "Add tags…" when it has none yet.
-  const canEditTags = !!account && !!shop;
-  const hasTags = (shop?.tags ?? []).length > 0;
-  const editTagsButton = canEditTags ? (
-    <button type="button" className="tag-chip--add" onClick={() => setEditingTags(true)} aria-label="Edit tags">
-      {hasTags ? '+' : 'Add tags…'}
-    </button>
-  ) : null;
-  const handleTagsSaved = (tags) => {
-    setDetail((d) => (d?.shop ? { ...d, shop: { ...d.shop, tags } } : d));
-    onReported?.(); // refresh the plot list so search sees the new tags
+  // Closing with unsaved edits asks first.
+  const requestClose = () => (editing && editDirty ? setConfirmingClose(true) : onClose());
+
+  // Logged-out visitors get a prompt to link their account instead.
+  const startEditing = () => {
+    if (!account) return setShowLinkPrompt(true);
+    setNotice(null);
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+    setEditDirty(false);
+    setConfirmingClose(false);
+  };
+
+  const handleEditCancelled = () => {
+    refocusEdit.current = true;
+    stopEditing();
+  };
+
+  const handleEditDone = (result) => {
+    refocusEdit.current = true;
+    stopEditing();
+    setNotice(result);
+    if (result.status === 'approved') {
+      setAnnouncement('Edit published.');
+      // Load the new page. Comments and reports added here come back with it.
+      setMyComments([]);
+      setMyReports([]);
+      setReloads((n) => n + 1);
+      onReported?.(); // refresh the plot list so search sees the changes
+    } else {
+      setAnnouncement('Edit sent for review.');
+    }
+  };
+
+  const withdraw = async () => {
+    try {
+      await postJson(`/api/revisions/${notice.id}/withdraw`, {});
+      setNotice({ status: 'withdrawn' });
+      setAnnouncement('Suggestion withdrawn.');
+      editButtonRef.current?.focus();
+    } catch (err) {
+      setNotice({ ...notice, error: err.message });
+    }
   };
 
   const handleSubmitComment = async (e) => {
@@ -383,7 +447,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const handleBackdropClick = (e) => {
     if (SUPPORTS_CLOSEDBY || e.target !== e.currentTarget) return;
     const r = e.currentTarget.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) requestClose();
   };
 
   // `inline` (desktop): the card sits in the page's right column with a back
@@ -391,152 +455,200 @@ function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = f
   const content = (
       <>
         {inline ? (
-          <button className="plot-detail__back" onClick={onClose}>
+          <button className="plot-detail__back" onClick={requestClose}>
             <ArrowLeft size={16} aria-hidden="true" /> Back to list
           </button>
         ) : (
-          <button className="plot-detail__close" onClick={onClose} aria-label="Close">
+          <button className="plot-detail__close" onClick={requestClose} aria-label="Close">
             <X size={20} aria-hidden="true" />
           </button>
         )}
 
-        <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
+        <div className="plot-detail__header">
+          <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
+          {/* Shown once the full page has loaded: an edit starts from it. */}
+          {shop && detail && account !== undefined && !editing && (
+            <button type="button" className="plot-detail__edit" ref={editButtonRef} onClick={startEditing}>
+              <Pencil size={14} aria-hidden="true" /> Edit
+            </button>
+          )}
+        </div>
         <p className="visually-hidden" role="status">{announcement}</p>
 
-        {images.length > 0 && (
-          <div className="plot-detail__carousel">
-            <img src={images[imageIndex].url} alt={`${displayName(shop)} photo ${imageIndex + 1}`} />
-            {images.length > 1 && (
-              <>
-                <button
-                  className="plot-detail__carousel-nav plot-detail__carousel-nav--prev"
-                  onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
-                  aria-label="Previous image"
-                >
-                  ‹
-                </button>
-                <button
-                  className="plot-detail__carousel-nav plot-detail__carousel-nav--next"
-                  onClick={() => setImageIndex((i) => (i + 1) % images.length)}
-                  aria-label="Next image"
-                >
-                  ›
-                </button>
-                <div className="plot-detail__carousel-count">
-                  {imageIndex + 1} / {images.length}
-                </div>
-              </>
-            )}
+        {showLinkPrompt && !account && (
+          <p className="plot-detail__link-prompt">
+            <Link to="/account?tab=link">Link your Minecraft account</Link> to edit.
+          </p>
+        )}
+
+        {confirmingClose && (
+          <div className="plot-detail__notice">
+            <span>Discard your unsaved edit?</span>
+            <div className="plot-detail__notice-actions">
+              <button type="button" onClick={onClose}>Discard</button>
+              {/* Focus starts on the safe choice. */}
+              <button type="button" autoFocus onClick={() => setConfirmingClose(false)}>Keep editing</button>
+            </div>
           </div>
         )}
 
-        <dl className="plot-detail__meta">
+        {notice && (
+          <div className="plot-detail__notice">
+            {notice.status === 'pending' ? (
+              <>
+                <span>
+                  Your edit is waiting for review.
+                  {notice.replaced > 0 && ' It replaces your earlier suggestion.'}
+                </span>
+                <div className="plot-detail__notice-actions">
+                  <button type="button" onClick={withdraw}>Withdraw</button>
+                </div>
+              </>
+            ) : notice.status === 'approved' ? (
+              <span>Published.</span>
+            ) : (
+              <span>Suggestion withdrawn.</span>
+            )}
+            {notice.error && <p className="plot-detail__error" role="alert">{notice.error}</p>}
+          </div>
+        )}
+
+        {editing ? (
+          <ShopEditForm plot={plot} shop={shop} account={account} onDone={handleEditDone}
+            onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
+        ) : (
+          <>
+
+          {images.length > 0 && (
+            <div className="plot-detail__carousel">
+              <img src={images[imageIndex].url} alt={`${displayName(shop)} photo ${imageIndex + 1}`} />
+              {images.length > 1 && (
+                <>
+                  <button
+                    className="plot-detail__carousel-nav plot-detail__carousel-nav--prev"
+                    onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
+                    aria-label="Previous image"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="plot-detail__carousel-nav plot-detail__carousel-nav--next"
+                    onClick={() => setImageIndex((i) => (i + 1) % images.length)}
+                    aria-label="Next image"
+                  >
+                    ›
+                  </button>
+                  <div className="plot-detail__carousel-count">
+                    {imageIndex + 1} / {images.length}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          <dl className="plot-detail__meta">
+            {shop && (
+              <>
+                <dt>{shop.guild_name ? 'Guild' : 'Owner'}</dt>
+                <dd>{ownerLabel(shop)}</dd>
+              </>
+            )}
+            {categoryTags.length > 0 && (
+              <>
+                <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>
+                <dd><TagChips tags={categoryTags} /></dd>
+              </>
+            )}
+            <dt>Plot</dt>
+            <dd><span className="coord">{plot.id}</span></dd>
+            <dt>Coords</dt>
+            <dd><span className="coord">{plot.x}, {plot.z}</span></dd>
+            {shop?.palette && (
+              <>
+                <dt>Palette</dt>
+                <dd>{shop.palette}</dd>
+              </>
+            )}
+            <dt>Status</dt>
+            <dd className="plot-detail__status">
+              {/* A vacant plot has no shop to report on: no history, no report form. */}
+              {!shop ? (
+                <span>Vacant</span>
+              ) : latestReport ? (
+                <span>
+                  {reportLabel(latestReport)}{' '}
+                  <span className="plot-detail__muted">{timeAgo(latestReport.created_at)}</span>
+                </span>
+              ) : (
+                <span className="plot-detail__muted">No reports yet</span>
+              )}
+              {shop && reports.length > 1 && (
+                <details className="plot-detail__history">
+                  <summary>History ({reports.length})</summary>
+                  <ul>
+                    {reports.map((r, i) => (
+                      <li key={i}>
+                        {reportLabel(r)} <span className="plot-detail__muted">{timeAgo(r.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+              {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
+            </dd>
+            {shop && <ShopText shop={shop} tags={stockTags} />}
+          </dl>
+
+          {error && <p className="plot-detail__error" role="alert">{error}</p>}
+
           {shop && (
             <>
-              <dt>{shop.guild_name ? 'Guild' : 'Owner'}</dt>
-              <dd>{ownerLabel(shop)}</dd>
+              <hr />
+              <h3 ref={commentsHeadingRef} tabIndex={-1}>Comments</h3>
+              {/* <p className="plot-detail__comment-hint">
+                Leave a comment if this shop is different from described.
+              </p> */}
+
+              {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
+              {account === undefined ? null : !account ? (
+                <p className="plot-detail__link-prompt">
+                  <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
+                </p>
+              ) : (
+                <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
+                  <label htmlFor="plot-detail-comment">
+                    Add a comment{' '}
+                    <span className="plot-detail__muted">
+                      as <strong className="plot-detail__author--linked">{account.name}</strong>
+                    </span>
+                  </label>
+                  <textarea
+                    id="plot-detail-comment"
+                    value={commentBody}
+                    onChange={(e) => setCommentBody(e.target.value)}
+                    required
+                  />
+                  <button type="submit" disabled={submitting}>
+                    {submitting ? 'Posting…' : 'Post comment'}
+                  </button>
+                </form>
+              )}
+
+              <CommentList
+                comments={comments}
+                interactive
+                onDeleted={handleDeleted}
+              />
             </>
           )}
-          {categoryTags.length > 0 && (
+
+          {pastShops.length > 0 && (
             <>
-              <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>
-              <dd><TagChips tags={categoryTags} /></dd>
+              <hr />
+              <h3>Past shops</h3>
+              {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
             </>
           )}
-          <dt>Plot</dt>
-          <dd><span className="coord">{plot.id}</span></dd>
-          <dt>Coords</dt>
-          <dd><span className="coord">{plot.x}, {plot.z}</span></dd>
-          {shop?.palette && (
-            <>
-              <dt>Palette</dt>
-              <dd>{shop.palette}</dd>
-            </>
-          )}
-          <dt>Status</dt>
-          <dd className="plot-detail__status">
-            {/* A vacant plot has no shop to report on: no history, no report form. */}
-            {!shop ? (
-              <span>Vacant</span>
-            ) : latestReport ? (
-              <span>
-                {reportLabel(latestReport)}{' '}
-                <span className="plot-detail__muted">{timeAgo(latestReport.created_at)}</span>
-              </span>
-            ) : (
-              <span className="plot-detail__muted">No reports yet</span>
-            )}
-            {shop && reports.length > 1 && (
-              <details className="plot-detail__history">
-                <summary>History ({reports.length})</summary>
-                <ul>
-                  {reports.map((r, i) => (
-                    <li key={i}>
-                      {reportLabel(r)} <span className="plot-detail__muted">{timeAgo(r.created_at)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            )}
-            {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
-          </dd>
-          {shop && <ShopText shop={shop} tags={stockTags} after={editTagsButton} />}
-        </dl>
-
-        {editingTags && (
-          <TagEditor plotId={plot.id} shopTags={shop.tags ?? []} shopText={`${shop.description ?? ''}\n${shop.stock ?? ''}`}
-            onClose={() => setEditingTags(false)}
-            onSaved={handleTagsSaved} />
-        )}
-
-        {error && <p className="plot-detail__error" role="alert">{error}</p>}
-
-        {shop && (
-          <>
-            <hr />
-            <h3 ref={commentsHeadingRef} tabIndex={-1}>Comments</h3>
-            {/* <p className="plot-detail__comment-hint">
-              Leave a comment if this shop is different from described.
-            </p> */}
-
-            {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
-            {account === undefined ? null : !account ? (
-              <p className="plot-detail__link-prompt">
-                <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
-              </p>
-            ) : (
-              <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-                <label htmlFor="plot-detail-comment">
-                  Add a comment{' '}
-                  <span className="plot-detail__muted">
-                    as <strong className="plot-detail__author--linked">{account.name}</strong>
-                  </span>
-                </label>
-                <textarea
-                  id="plot-detail-comment"
-                  value={commentBody}
-                  onChange={(e) => setCommentBody(e.target.value)}
-                  required
-                />
-                <button type="submit" disabled={submitting}>
-                  {submitting ? 'Posting…' : 'Post comment'}
-                </button>
-              </form>
-            )}
-
-            <CommentList
-              comments={comments}
-              interactive
-              onDeleted={handleDeleted}
-            />
-          </>
-        )}
-
-        {pastShops.length > 0 && (
-          <>
-            <hr />
-            <h3>Past shops</h3>
-            {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
           </>
         )}
       </>

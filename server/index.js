@@ -21,7 +21,7 @@ import { addLogEntry } from './lib/shopLog.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from './lib/shops.js';
 import { applyRevision, authorChanged, cleanSnapshot, recordDirect, snapshotOf } from './lib/revisions.js';
 import {
-  KINDS, checkTagIds, cleanTag, listTags, sameName, setShopTags, tagsByShop, tagsForShop,
+  KINDS, cleanTag, listTags, sameName, tagsByShop, tagsForShop,
 } from './lib/tags.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
@@ -195,29 +195,6 @@ app.get('/api/plots/:id', (req, res) => {
 // Every approved tag and group, in display order (for the tag picker).
 app.get('/api/tags', (req, res) => {
   res.json(listTags());
-});
-
-// Any linked player can change a shop's tags (add or remove existing tags),
-// instantly. Body: { tag_ids } = the shop's full tag list. Logged on the card
-// ("Update by …") and in the mod log, so mistakes are easy to see and undo.
-app.put('/api/plots/:id/tags', limits.tagEdits, (req, res) => {
-  if (!req.account) return res.status(401).json({ error: 'Link your Minecraft account to edit tags.' });
-  const shop = getCurrentShop.get(req.params.id);
-  if (!shop) return res.status(409).json({ error: 'This plot has no shop to tag.' });
-  const checked = checkTagIds(req.body.tag_ids);
-  if (checked.error) return res.status(400).json({ error: checked.error });
-
-  const changes = db.transaction(() => {
-    const { added, removed } = setShopTags(shop.id, checked.ids);
-    if (!added.length && !removed.length) return null;
-    const parts = [added.length && `added ${added.join(', ')}`, removed.length && `removed ${removed.join(', ')}`]
-      .filter(Boolean).join('; ');
-    db.prepare('UPDATE shops SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(shop.id);
-    addLogEntry(shop.id, req.account, `tags updated: ${parts}`);
-    logModAction(req, 'tag.shop_edit', `plot:${req.params.id}`, `Changed ${shop.owner}'s shop tags: ${parts}`);
-    return { added, removed };
-  })();
-  res.json({ updated: !!changes, ...(changes ?? { added: [], removed: [] }), tags: tagsForShop(shop.id) });
 });
 
 // Suggest a tag that isn't in the list yet. It's pending (hidden) until staff
