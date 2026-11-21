@@ -10,14 +10,16 @@
 //                                           can_review false where only a mod may approve)
 //   POST /revisions/:id/approve {values?, note?}  `values` resolves conflicts or fixes typos
 //   POST /revisions/:id/reject  {note?}
+//   POST /revisions/:id/undo                the author of a Force edit puts the page back
 
 import express from 'express';
 import db from '../db/init.js';
 import { logModAction } from '../lib/modlog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
-  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, authorChanged, canPublish, canReview, cleanBase,
-  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, recordDirect, recordSuggestion, snapshotOf,
+  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, cleanBase,
+  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, recordDirect, recordSuggestion, sameSnapshot,
+  snapshotOf,
 } from '../lib/revisions.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot } from '../lib/shops.js';
 
@@ -34,6 +36,9 @@ const finishReview = db.prepare(`
     old_values = @old_values, new_values = @new_values, reviewed_at = CURRENT_TIMESTAMP
   WHERE id = @id AND status = 'pending'
 `);
+const latestApplied = db.prepare(
+  "SELECT id FROM revisions WHERE plot_id = ? AND status = 'approved' ORDER BY id DESC LIMIT 1",
+);
 const pendingRevisions = db.prepare(`
   SELECT r.*, a.name AS author_name FROM revisions r LEFT JOIN accounts a ON a.id = r.author_id
   WHERE r.status = 'pending' ORDER BY r.created_at, r.id
@@ -245,6 +250,45 @@ router.post('/revisions/:id/reject', (req, res) => {
     logModAction(req, 'revision.reject', `plot:${revision.plot_id}`, `Rejected ${author?.name ?? 'a deleted account'}'s ${revision.action}`);
   }
   res.json({ status: 'rejected' });
+});
+
+// --- Undo your own Force edit ---
+
+// Right after a Force edit, its author can put the page back. Only while
+// nothing has changed the page since: an undo never throws away someone
+// else's later work. After that, it's an ordinary edit.
+router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
+  const account = req.account;
+  if (!account) return res.status(401).json({ error: 'Log in first.' });
+  const revision = getRevision.get(req.params.id);
+  if (!revision || revision.author_id !== account.id || !revision.direct || revision.status !== 'approved') {
+    return res.status(404).json({ error: 'Edit not found' });
+  }
+  const shop = getCurrentShop.get(revision.plot_id) ?? null;
+  const row = { ...revision, old_values: parse(revision.old_values), new_values: parse(revision.new_values) };
+  const changedSince = latestApplied.get(revision.plot_id).id !== revision.id
+    || !sameSnapshot(snapshotOf(shop), row.new_values);
+  if (changedSince) {
+    return res.status(409).json({ error: 'The page has changed since, so this can no longer be undone. Edit it instead.' });
+  }
+  // The same rule as making the change now: an owner can undo an edit to
+  // their own shop; closing or replacing a shop needs a moderator.
+  if (!canPublish(account, revision.action === 'edit' ? 'edit' : 'open', shop)) {
+    return res.status(403).json({ error: "You can't undo this edit." });
+  }
+
+  const result = db.transaction(() => {
+    const applied = applyUndo({ revision: row, shop, account });
+    const id = recordDirect({
+      plotId: revision.plot_id, shopId: shop?.id ?? null, action: applied.action, base: applied.old_values,
+      proposed: applied.new_values, summary: `Undo of #${revision.id}`, account, applied,
+    });
+    if (isStaff(account)) {
+      logModAction(req, 'revision.undo', `plot:${revision.plot_id}`, `Undid their ${revision.action} #${revision.id}`);
+    }
+    return { id, changed: applied.changed };
+  })();
+  res.status(201).json({ status: 'undone', ...result });
 });
 
 export default router;

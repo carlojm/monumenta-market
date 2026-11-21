@@ -16,7 +16,7 @@
 import db from '../db/init.js';
 import { roleOf } from './auth.js';
 import { addLogEntry } from './shopLog.js';
-import { SHOP_FIELDS, closeShop, openShop } from './shops.js';
+import { SHOP_FIELDS, closeShop, openShop, reopenShop } from './shops.js';
 import { checkTagIds, setShopTags } from './tags.js';
 
 export const ACTIONS = ['edit', 'open', 'vacate'];
@@ -87,6 +87,12 @@ export function cleanBase(input) {
 }
 
 export const cleanNote = (text) => (typeof text === 'string' ? text.trim().slice(0, NOTE_MAX) || null : null);
+
+// Are two snapshots (or two nulls, for an empty plot) the same page?
+export function sameSnapshot(a, b) {
+  if (!a || !b) return !a && !b;
+  return SHOP_FIELDS.every((f) => (a[f] ?? null) === (b[f] ?? null)) && sameTags(a.tag_ids, b.tag_ids);
+}
 
 // Did the author change anything at all?
 export function authorChanged(base, proposed) {
@@ -193,4 +199,32 @@ export function applyRevision({ action, plotId, shop, values, author, credit = '
   if (fields.length || added.length || removed.length) updateShop(shop.id, values, fields);
   const changed = [...fields, ...(added.length || removed.length ? ['tags'] : [])];
   return { old_values: old, new_values: snapshotOf({ ...values, id: shop.id }), changed };
+}
+
+// Undoes a direct revision (3.3e). Call inside a transaction, after checking
+// the page is still exactly as it left it. `revision` is the row, with
+// old_values and new_values parsed. Returns { action, old_values, new_values,
+// changed } for the new revisions row: the undo is saved as the change it makes.
+export function applyUndo({ revision, shop, account }) {
+  const credit = ` (undo of #${revision.id})`;
+  if (revision.action === 'edit') {
+    const applied = applyRevision({ action: 'edit', plotId: revision.plot_id, shop, values: revision.old_values, author: account, credit });
+    return { action: 'edit', ...applied };
+  }
+  // A new shop was opened here: close it, and bring back the one it replaced.
+  // "The plot is now empty": bring the closed shop back.
+  if (shop) {
+    closeShop.run(shop.id);
+    addLogEntry(shop.id, account, `Shop closed${credit}`);
+  }
+  if (revision.shop_id) {
+    reopenShop.run(revision.shop_id);
+    addLogEntry(revision.shop_id, account, `Shop reopened${credit}`);
+  }
+  return {
+    action: revision.shop_id ? 'open' : 'vacate',
+    old_values: revision.new_values,
+    new_values: revision.old_values,
+    changed: [revision.shop_id ? 'reopen' : 'vacate'],
+  };
 }

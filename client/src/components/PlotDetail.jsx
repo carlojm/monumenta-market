@@ -384,24 +384,45 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
     stopEditing();
   };
 
+  // Loads the page again after a change. Comments and reports added here
+  // come back with it. The plot list is refreshed too, so search sees it.
+  const reload = () => {
+    fetch(`/api/plots/${plot.id}`)
+      .then((res) => res.json())
+      .then((d) => {
+        setDetail(d);
+        setMyComments([]);
+        setMyReports([]);
+      })
+      .catch((err) => setError(err.message));
+    onReported?.();
+  };
+
   const handleEditDone = (result) => {
     refocusEdit.current = true;
     stopEditing();
     setNotice(result);
     if (result.status === 'approved') {
       setAnnouncement('Edit saved.');
-      // Load the new page. Comments and reports added here come back with it.
-      fetch(`/api/plots/${plot.id}`)
-        .then((res) => res.json())
-        .then((d) => {
-          setDetail(d);
-          setMyComments([]);
-          setMyReports([]);
-        })
-        .catch((err) => setError(err.message));
-      onReported?.(); // refresh the plot list so search sees the changes
+      reload();
     } else {
       setAnnouncement('Edit sent for review.');
+    }
+  };
+
+  // Right after a Force edit: put the page back. Focus goes to Edit, since
+  // the Undo button goes away.
+  const undo = async () => {
+    try {
+      await postJson(`/api/revisions/${notice.id}/undo`, {});
+      setNotice({ status: 'undone' });
+      setAnnouncement('Edit undone.');
+      reload();
+      editButtonRef.current?.focus();
+    } catch (err) {
+      setNotice({ ...notice, error: err.message });
+      reload(); // most likely the page changed since: show it as it is now
+      editButtonRef.current?.focus();
     }
   };
 
@@ -510,7 +531,17 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
                 </div>
               </>
             ) : notice.status === 'approved' ? (
-              <span>Edit saved.</span>
+              <>
+                <span>Edit saved.</span>
+                {/* Gone once undo turns out to be impossible (the page changed since). */}
+                {!notice.error && (
+                  <div className="plot-detail__notice-actions">
+                    <button type="button" onClick={undo}>Undo</button>
+                  </div>
+                )}
+              </>
+            ) : notice.status === 'undone' ? (
+              <span>Edit undone.</span>
             ) : (
               <span>Suggestion withdrawn.</span>
             )}

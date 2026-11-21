@@ -21,6 +21,8 @@ const insertShop = db.prepare(`
     @guild_color, @primary_color, @secondary_color, CURRENT_TIMESTAMP)
 `);
 export const closeShop = db.prepare('UPDATE shops SET closed_at = CURRENT_TIMESTAMP WHERE id = ?');
+// Undo (3.3e) brings a just-closed shop back, comments and all.
+export const reopenShop = db.prepare('UPDATE shops SET closed_at = NULL WHERE id = ?');
 
 export function openShop(plotId, fields, actor) {
   const row = Object.fromEntries(SHOP_FIELDS.map((f) => [f, fields[f] ?? null]));
