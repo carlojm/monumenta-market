@@ -140,7 +140,8 @@ function App() {
         </section>
         <section className="app-main__list">
           {cardOpenOnDesktop ? (
-            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots} />
+            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} onClose={closePlot} onReported={loadPlots}
+              openedInApp={fromApp} />
           ) : (
             list
           )}

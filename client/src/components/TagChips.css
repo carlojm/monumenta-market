@@ -2,17 +2,17 @@
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.25rem;
   margin: 0;
   padding: 0;
 }
 
 /* Colored chips: a tinted background and border in the tag's color. */
 .tag-chip {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   line-height: 1.3;
-  padding: 0.1rem 0.45rem;
-  border-radius: 3px;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-chip);
   border: 1px solid color-mix(in srgb, var(--tag-color) 60%, transparent);
   background: color-mix(in srgb, var(--tag-color) 16%, transparent);
   color: color-mix(in srgb, var(--tag-color) 35%, var(--text));
@@ -29,10 +29,10 @@
 /* The "+" at the end of a row, to edit the shop's tags. */
 .tag-chip--add {
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   line-height: 1.3;
-  padding: 0.1rem 0.5rem;
-  border-radius: 3px;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-chip);
   border: 1px dashed var(--text-muted);
   background: none;
   color: var(--text-muted);

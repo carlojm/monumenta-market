@@ -39,6 +39,14 @@
   --code-bg: #1c1f16;
   --sheet-bg: #191c13;
 
+  /* Corner radius scale (from unslop): bigger things get rounder corners.
+     A corner inside another is the outer radius minus the padding between
+     them, never below 4. */
+  --radius-sm: 4px;      /* monospace IDs, small tags */
+  --radius-chip: 6px;    /* tag chips, small buttons */
+  --radius-control: 8px; /* buttons, inputs */
+  --radius-card: 12px;   /* cards and sheets */
+
   --sans: 'OpenRunde', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: ui-monospace, 'SFMono-Regular', Consolas, 'Courier New', monospace;
 
@@ -63,8 +71,8 @@ h1, h2, h3 {
   margin: 0 0 0.5rem;
 }
 
-h1 { font-size: 1.5rem; font-weight: 700; }
-h2 { font-size: 1.25rem; font-weight: 700; }
+h1 { font-size: 1.5rem; font-weight: 600; }
+h2 { font-size: 1.25rem; font-weight: 600; }
 h3 { font-size: 1.05rem; font-weight: 600; }
 
 p {
@@ -88,8 +96,8 @@ button, input, textarea {
 button {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-control);
+  padding: 0.5rem 0.75rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -123,16 +131,16 @@ a:focus-visible,
 input[type="text"], input[type="password"], textarea {
   background: var(--code-bg);
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-control);
+  padding: 0.5rem 0.75rem;
   width: 100%;
 }
 
 code, .coord {
   font-family: var(--mono);
   background: var(--code-bg);
-  border-radius: 2px;
-  padding: 0.1rem 0.3rem;
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.25rem;
   font-size: 0.9em;
 }
 

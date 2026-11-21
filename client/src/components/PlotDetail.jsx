@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowLeft, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
@@ -127,13 +128,39 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
 }
 
 function CommentList({ comments, interactive = false, onDeleted }) {
-  if (!comments.length) return <p className="plot-detail__empty">No comments yet.</p>;
+  if (!comments.length) return <p className="plot-detail__empty">No comments yet</p>;
   return (
     <ul className="plot-detail__comments">
       {comments.map((c) => (
         <CommentItem key={c.id} comment={c} interactive={interactive} onDeleted={onDeleted} />
       ))}
     </ul>
+  );
+}
+
+// About and Keywords rows. They go inside the card's <dl>, so their labels
+// share one column with Owner, Plot and Status. The shop's stock tags sit
+// under Keywords; `after` is the "+" edit button.
+function ShopText({ shop, tags, after = null }) {
+  const showKeywords = shop.stock || tags.length > 0 || after;
+  return (
+    <>
+      {shop.description && (
+        <>
+          <dt>About</dt>
+          <dd className="plot-detail__text">{shop.description}</dd>
+        </>
+      )}
+      {showKeywords && (
+        <>
+          <dt>Keywords</dt>
+          <dd className="plot-detail__text">
+            {shop.stock}
+            <TagChips tags={tags} className="plot-detail__stock-tags" after={after} />
+          </dd>
+        </>
+      )}
+    </>
   );
 }
 
@@ -154,9 +181,7 @@ function PastShop({ summary }) {
         <p className="plot-detail__muted">Loading…</p>
       ) : (
         <>
-          {shop.description && <p className="plot-detail__description">{shop.description}</p>}
-          {shop.stock && <p><span className="plot-detail__label">Stock:</span> {shop.stock}</p>}
-          <TagChips tags={shop.tags} className="plot-detail__stock-tags" />
+          <dl className="plot-detail__meta"><ShopText shop={shop} tags={shop.tags} /></dl>
           <CommentList comments={shop.comments} />
         </>
       )}
@@ -190,7 +215,7 @@ function ReportForm({ plotId, onReported }) {
   if (!allowed) {
     return (
       <p className="plot-detail__muted">
-        Thanks for reporting. You can report this plot again in {cooldownRemainingMinutes(plotId)}m.
+        Thanks for reporting. You can report again in {cooldownRemainingMinutes(plotId)}m.
       </p>
     );
   }
@@ -201,7 +226,7 @@ function ReportForm({ plotId, onReported }) {
 
   return (
     <div className="plot-detail__report-form">
-      <span className="plot-detail__muted">Were you just here? Report what you saw:</span>
+      <span className="plot-detail__muted">Report what you see here</span>
       <div className="plot-detail__chips" role="group" aria-label="Activity">
         {ACTIVITIES.map((a) => (
           <button key={a} type="button" aria-pressed={activity === a} onClick={() => toggle(activity, a, setActivity)}>
@@ -233,7 +258,7 @@ function ReportForm({ plotId, onReported }) {
 // Older browsers without `closedby` need tap-outside-to-close done by hand.
 const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
 
-function PlotDetail({ plot, onClose, onReported, inline = false }) {
+function PlotDetail({ plot, onClose, onReported, inline = false, openedInApp = false }) {
   const [detail, setDetail] = useState(null);
   const dialogRef = useRef(null);
   const headingRef = useRef(null);
@@ -282,10 +307,12 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   }, []);
 
   // Desktop: the card replaces the list, so move focus to its title, or
-  // keyboard and screen reader users wouldn't know it opened.
+  // keyboard and screen reader users wouldn't know it opened. Not on a page
+  // opened straight from a link: the card is already the page, and the
+  // browser would draw a focus ring on the title.
   useEffect(() => {
-    if (inline) headingRef.current?.focus({ preventScroll: true });
-  }, [inline]);
+    if (inline && openedInApp) headingRef.current?.focus({ preventScroll: true });
+  }, [inline, openedInApp]);
 
   if (!plot) return null;
 
@@ -364,10 +391,12 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
   const content = (
       <>
         {inline ? (
-          <button className="plot-detail__back" onClick={onClose}>← Back to list</button>
+          <button className="plot-detail__back" onClick={onClose}>
+            <ArrowLeft size={16} aria-hidden="true" /> Back to list
+          </button>
         ) : (
           <button className="plot-detail__close" onClick={onClose} aria-label="Close">
-            ×
+            <X size={20} aria-hidden="true" />
           </button>
         )}
 
@@ -417,7 +446,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
           <dt>Plot</dt>
           <dd><span className="coord">{plot.id}</span></dd>
           <dt>Coords</dt>
-          <dd className="coord">{plot.x}, {plot.z}</dd>
+          <dd><span className="coord">{plot.x}, {plot.z}</span></dd>
           {shop?.palette && (
             <>
               <dt>Palette</dt>
@@ -451,25 +480,14 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
             )}
             {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
           </dd>
+          {shop && <ShopText shop={shop} tags={stockTags} after={editTagsButton} />}
         </dl>
 
-        {shop?.description && (
-          <p className="plot-detail__description">
-            <span className="plot-detail__label">About:</span> {shop.description}
-          </p>
-        )}
-        {shop?.stock && (
-          <p className="plot-detail__description">
-            <span className="plot-detail__label">Keywords:</span> {shop.stock}
-          </p>
-        )}
-        <TagChips tags={stockTags} className="plot-detail__stock-tags" after={editTagsButton} />
         {editingTags && (
           <TagEditor plotId={plot.id} shopTags={shop.tags ?? []} shopText={`${shop.description ?? ''}\n${shop.stock ?? ''}`}
             onClose={() => setEditingTags(false)}
             onSaved={handleTagsSaved} />
         )}
-        {!shop && <p className="plot-detail__muted">Nobody has a shop on this plot right now.</p>}
 
         {error && <p className="plot-detail__error" role="alert">{error}</p>}
 
@@ -496,7 +514,6 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
                 </label>
                 <textarea
                   id="plot-detail-comment"
-                  placeholder="This shop has changed / is now selling..."
                   value={commentBody}
                   onChange={(e) => setCommentBody(e.target.value)}
                   required
@@ -518,7 +535,7 @@ function PlotDetail({ plot, onClose, onReported, inline = false }) {
         {pastShops.length > 0 && (
           <>
             <hr />
-            <h3>Past shops on this plot</h3>
+            <h3>Past shops</h3>
             {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
           </>
         )}
