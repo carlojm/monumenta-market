@@ -1,0 +1,76 @@
+/* Suggestions waiting for review, on the card (PendingEdits.jsx). */
+.pending-edits {
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+}
+
+.pending-edits__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.pending-edits button {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  min-block-size: 1.5rem;
+}
+
+.pending-edits__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pending-edits__list > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.pending-edits__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.5rem;
+}
+
+.pending-edits__summary {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.pending-edits__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pending-edits__label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.pending-edits__muted {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.pending-edits__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (pointer: coarse) {
+  .pending-edits button {
+    min-block-size: 2.25rem;
+  }
+}

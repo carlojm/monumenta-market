@@ -4,6 +4,7 @@ import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
+import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
@@ -407,6 +408,7 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
       reload();
     } else {
       setAnnouncement('Edit sent for review.');
+      reload(); // it shows up under "waiting for review"
     }
   };
 
@@ -426,15 +428,17 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
     }
   };
 
-  const withdraw = async () => {
+  // From the pending list. The button goes away, so focus goes to Edit.
+  const withdraw = async (id) => {
     try {
-      await postJson(`/api/revisions/${notice.id}/withdraw`, {});
+      await postJson(`/api/revisions/${id}/withdraw`, {});
       setNotice({ status: 'withdrawn' });
       setAnnouncement('Suggestion withdrawn.');
-      editButtonRef.current?.focus();
+      reload();
     } catch (err) {
-      setNotice({ ...notice, error: err.message });
+      setNotice({ status: 'withdrawn', error: err.message });
     }
+    editButtonRef.current?.focus();
   };
 
   const handleSubmitComment = async (e) => {
@@ -521,15 +525,10 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
         {notice && (
           <div className="plot-detail__notice">
             {notice.status === 'pending' ? (
-              <>
-                <span>
-                  Your edit is waiting for review.
-                  {notice.replaced > 0 && ' It replaces your earlier suggestion.'}
-                </span>
-                <div className="plot-detail__notice-actions">
-                  <button type="button" onClick={withdraw}>Withdraw</button>
-                </div>
-              </>
+              <span>
+                Sent for review.
+                {notice.replaced > 0 && ' It replaces your earlier suggestion.'}
+              </span>
             ) : notice.status === 'approved' ? (
               <>
                 <span>Edit saved.</span>
@@ -543,10 +542,14 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
             ) : notice.status === 'undone' ? (
               <span>Edit undone.</span>
             ) : (
-              <span>Suggestion withdrawn.</span>
+              <span>{notice.error ? 'Could not withdraw it.' : 'Suggestion withdrawn.'}</span>
             )}
             {notice.error && <p className="plot-detail__error" role="alert">{notice.error}</p>}
           </div>
+        )}
+
+        {!editing && detail?.pending_edits && (
+          <PendingEdits edits={detail.pending_edits} catalog={catalog} shopTags={shop?.tags ?? []} onWithdraw={withdraw} />
         )}
 
         {editing ? (

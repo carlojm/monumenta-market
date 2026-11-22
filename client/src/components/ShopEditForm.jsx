@@ -1,26 +1,10 @@
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import TagEditor from './TagEditor';
-import { wordDiff } from '../lib/wordDiff';
+import DiffText from './DiffText';
+import { FIELDS, OWNER, SHOP_FIELDS, labelOf } from '../lib/shopFields';
 import { displayName } from '../lib/plots';
 import './ShopEditForm.css';
-
-// Every field of a shop, as the server's revisions expect (server/lib/shops.js).
-const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
-  'guild_color', 'primary_color', 'secondary_color'];
-
-// The fields players edit here, in card order. Lengths match the server's
-// limits. The colors are left to the admin editor: the site doesn't show them.
-const FIELDS = [
-  { key: 'shop_name', label: 'Shop name', max: 80, hint: "Leave blank to use the owner's name." },
-  { key: 'guild_name', label: 'Guild name', max: 80, guildOnly: true },
-  { key: 'description', label: 'About', max: 4000, multiline: true },
-  { key: 'stock', label: 'Keywords', max: 4000, multiline: true, hint: 'What the shop sells. Search looks here.' },
-  { key: 'palette', label: 'Palette', max: 200 },
-];
-
-// Typed only for a new shop; an edit can't change the owner.
-const OWNER = { key: 'owner', label: 'Owner', max: 32, hint: 'Player name, or the guild tag without brackets.' };
 
 // A plot with no shop, as a snapshot (a new shop is compared against it).
 const EMPTY = { ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, null])), tag_ids: [] };
@@ -62,37 +46,26 @@ function FieldLabel({ htmlFor, labelId, label, edited, onReset }) {
   );
 }
 
-// "Show changes": only the changed fields, with removed words struck through
-// and added words highlighted. Screen readers hear "Removed:" and "Added:".
+// "Show changes": only the changed fields, with their changes marked.
 function ChangesView({ changes, addedTags, removedTags }) {
   return (
     <div className="shop-edit__changes">
       {changes.map((f) => (
         <div className="shop-edit__field" key={f.key}>
           <span className="shop-edit__label-row">{f.label}</span>
-          <p className="shop-edit__diff">
-            {f.parts.map((part, i) => (
-              part.type === 'removed' ? (
-                <del key={i}><span className="visually-hidden">Removed: </span>{part.text}</del>
-              ) : part.type === 'added' ? (
-                <ins key={i}><span className="visually-hidden">Added: </span>{part.text}</ins>
-              ) : part.text
-            ))}
-          </p>
+          <DiffText before={f.before} after={f.after} />
         </div>
       ))}
       {(addedTags.length > 0 || removedTags.length > 0) && (
         <div className="shop-edit__field">
           <span className="shop-edit__label-row">Tags</span>
-          {addedTags.length > 0 && <p className="shop-edit__diff">Added <ins>{addedTags.join(', ')}</ins></p>}
-          {removedTags.length > 0 && <p className="shop-edit__diff">Removed <del>{removedTags.join(', ')}</del></p>}
+          {addedTags.length > 0 && <p className="diff-text">Added <ins>{addedTags.join(', ')}</ins></p>}
+          {removedTags.length > 0 && <p className="diff-text">Removed <del>{removedTags.join(', ')}</del></p>}
         </div>
       )}
     </div>
   );
 }
-
-const labelOf = (key) => [OWNER, ...FIELDS].find((f) => f.key === key)?.label ?? key;
 
 // Force edit found that someone changed the same fields meanwhile. For each,
 // pick your version or the current one. Focus starts on the explanation.
@@ -269,7 +242,7 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const tagName = (id) => catalog?.tags.find((t) => t.id === id)?.name ?? shop?.tags?.find((t) => t.id === id)?.name ?? `#${id}`;
   const modeBase = baseFor(mode);
   const changes = showingChanges
-    ? fields.filter((f) => edited(f.key)).map((f) => ({ ...f, parts: wordDiff(modeBase[f.key] ?? '', values[f.key].trim()) }))
+    ? fields.filter((f) => edited(f.key)).map((f) => ({ ...f, before: modeBase[f.key], after: values[f.key].trim() }))
     : [];
   const addedTags = showingChanges ? tagIds.filter((id) => !modeBase.tag_ids.includes(id)).map(tagName) : [];
   const removedTags = showingChanges ? modeBase.tag_ids.filter((id) => !tagIds.includes(id)).map(tagName) : [];

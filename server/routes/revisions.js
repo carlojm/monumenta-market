@@ -18,15 +18,14 @@ import { logModAction } from '../lib/modlog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
   ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, cleanBase,
-  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, recordDirect, recordSuggestion, sameSnapshot,
-  snapshotOf,
+  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, parse, preview, publicRevision, recordDirect,
+  recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
-import { SHOP_FIELDS, getCurrentShop, getPlot } from '../lib/shops.js';
+import { getCurrentShop, getPlot } from '../lib/shops.js';
 
 const router = express.Router();
 
 const getRevision = db.prepare('SELECT * FROM revisions WHERE id = ?');
-const getAccountName = db.prepare('SELECT id, name FROM accounts WHERE id = ?');
 const withdrawMine = db.prepare(
   "UPDATE revisions SET status = 'withdrawn' WHERE author_id = ? AND plot_id = ? AND status = 'pending'",
 );
@@ -45,31 +44,7 @@ const pendingRevisions = db.prepare(`
 `);
 
 const json = (v) => (v == null ? null : JSON.stringify(v));
-const parse = (v) => (v == null ? null : JSON.parse(v));
 const credit = (account) => ` (approved by ${account.name})`;
-
-// What a revision looks like to the browser.
-function publicRevision(r, extra = {}) {
-  return {
-    id: r.id, plot_id: r.plot_id, shop_id: r.shop_id, action: r.action, status: r.status,
-    direct: !!r.direct, summary: r.summary, review_note: r.review_note,
-    author: r.author_name ?? getAccountName.get(r.author_id)?.name ?? null,
-    base: parse(r.base), proposed: parse(r.proposed),
-    created_at: r.created_at, reviewed_at: r.reviewed_at, ...extra,
-  };
-}
-
-// What approving would do right now: the fields it changes and any conflicts.
-function preview(revision, shop) {
-  if (isStale(revision, shop)) return { stale: true, changes: [], conflicts: [] };
-  if (revision.action !== 'edit') return { stale: false, changes: [], conflicts: [] };
-  const now = snapshotOf(shop);
-  const { values, conflicts } = mergeEdit(parse(revision.base), parse(revision.proposed), now);
-  const changes = SHOP_FIELDS.filter((f) => values[f] !== now[f]).map((f) => ({ field: f, from: now[f], to: values[f] }));
-  const added = values.tag_ids.filter((id) => !now.tag_ids.includes(id));
-  const removed = now.tag_ids.filter((id) => !values.tag_ids.includes(id));
-  return { stale: false, changes, tags: { added, removed }, conflicts };
-}
 
 // --- Submit ---
 

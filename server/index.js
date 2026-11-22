@@ -19,7 +19,7 @@ import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from './lib/shops.js';
-import { applyRevision, authorChanged, cleanSnapshot, recordDirect, snapshotOf } from './lib/revisions.js';
+import { applyRevision, authorChanged, cleanSnapshot, pendingForPlot, recordDirect, snapshotOf } from './lib/revisions.js';
 import {
   KINDS, cleanTag, listTags, sameName, tagsByShop, tagsForShop,
 } from './lib/tags.js';
@@ -182,10 +182,12 @@ app.get('/api/plots/:id', (req, res) => {
     WHERE plot_id = ? AND closed_at IS NOT NULL ORDER BY closed_at DESC, id DESC
   `).all(plot.id);
 
+  const shop = getCurrentShop.get(plot.id);
   res.json({
     ...plot,
     is_guild: !!plot.is_guild,
-    shop: shopWithDetails(getCurrentShop.get(plot.id)),
+    shop: shopWithDetails(shop),
+    pending_edits: pendingForPlot(plot.id, shop ?? null, req.account),
     latest_report: latestStatus(plot.id),
     reports,
     past_shops: pastShops,

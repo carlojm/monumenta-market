@@ -1,0 +1,24 @@
+/* The changed text, keeping its line breaks (DiffText.jsx). */
+.diff-text {
+  margin: 0;
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+.diff-text del,
+.diff-text ins {
+  border-radius: var(--radius-sm);
+  padding: 0 0.125rem;
+  box-decoration-break: clone; /* the padding repeats when it wraps */
+}
+
+.diff-text del {
+  background: rgba(224, 138, 138, 0.15);
+  color: #e8a5a5;
+}
+
+.diff-text ins {
+  background: rgba(143, 191, 160, 0.2);
+  color: var(--text);
+  text-decoration: none;
+}

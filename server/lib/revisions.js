@@ -130,6 +130,49 @@ export const canReview = (account, revision, shop) => !!account && canPublish(ac
 // needs the same shop; an open needs the same shop (or still none) it replaces.
 export const isStale = (revision, shop) => (revision.shop_id ?? null) !== (shop?.id ?? null);
 
+// --- Showing revisions ---
+
+export const parse = (v) => (v == null ? null : JSON.parse(v));
+export const getAccountName = db.prepare('SELECT id, name FROM accounts WHERE id = ?');
+
+// What a revision looks like to the browser.
+export function publicRevision(r, extra = {}) {
+  return {
+    id: r.id, plot_id: r.plot_id, shop_id: r.shop_id, action: r.action, status: r.status,
+    direct: !!r.direct, summary: r.summary, review_note: r.review_note,
+    author: r.author_name ?? getAccountName.get(r.author_id)?.name ?? null,
+    base: parse(r.base), proposed: parse(r.proposed),
+    created_at: r.created_at, reviewed_at: r.reviewed_at, ...extra,
+  };
+}
+
+// What approving would do right now: the fields it changes and any conflicts.
+export function preview(revision, shop) {
+  if (isStale(revision, shop)) return { stale: true, changes: [], conflicts: [] };
+  if (revision.action !== 'edit') return { stale: false, changes: [], conflicts: [] };
+  const now = snapshotOf(shop);
+  const { values, conflicts } = mergeEdit(parse(revision.base), parse(revision.proposed), now);
+  const changes = SHOP_FIELDS.filter((f) => values[f] !== now[f]).map((f) => ({ field: f, from: now[f], to: values[f] }));
+  const added = values.tag_ids.filter((id) => !now.tag_ids.includes(id));
+  const removed = now.tag_ids.filter((id) => !values.tag_ids.includes(id));
+  return { stale: false, changes, tags: { added, removed }, conflicts };
+}
+
+// A plot's suggestions waiting for review, oldest first, for its card (3.6).
+// Public, like a wiki's pending changes: anyone can see what's suggested and
+// by whom. `mine` and `can_review` are for the account viewing (or null).
+const pendingOnPlot = db.prepare(`
+  SELECT r.*, a.name AS author_name FROM revisions r LEFT JOIN accounts a ON a.id = r.author_id
+  WHERE r.plot_id = ? AND r.status = 'pending' ORDER BY r.created_at, r.id
+`);
+export function pendingForPlot(plotId, shop, account) {
+  return pendingOnPlot.all(plotId).map((r) => publicRevision(r, {
+    mine: !!account && r.author_id === account.id,
+    can_review: canReview(account, r, shop),
+    ...preview(r, shop),
+  }));
+}
+
 // --- Saving revision rows ---
 
 const insertRevision = db.prepare(`
