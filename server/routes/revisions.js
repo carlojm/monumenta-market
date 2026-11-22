@@ -11,17 +11,18 @@
 //   POST /revisions/:id/approve {values?, note?}  `values` resolves conflicts or fixes typos
 //   POST /revisions/:id/reject  {note?}
 //   POST /revisions/:id/undo                the author of a Force edit puts the page back
+// Every one of these is recorded in the Mod log (lib/revisionLog.js).
 
 import express from 'express';
 import db from '../db/init.js';
-import { logModAction } from '../lib/modlog.js';
+import { logRevision, shopName, snapshotDiff } from '../lib/revisionLog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
   ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, cleanBase,
   cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, parse, preview, publicRevision, recordDirect,
   recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
-import { getCurrentShop, getPlot } from '../lib/shops.js';
+import { SHOP_FIELDS, getCurrentShop, getPlot } from '../lib/shops.js';
 import { tagsForShop } from '../lib/tags.js';
 
 const router = express.Router();
@@ -45,7 +46,35 @@ const pendingRevisions = db.prepare(`
 `);
 
 const json = (v) => (v == null ? null : JSON.stringify(v));
+const parsed = (r) => ({ ...r, base: parse(r.base), proposed: parse(r.proposed) });
 const credit = (account) => ` (approved by ${account.name})`;
+
+// --- For the Mod log ---
+
+// What a revision asks for: the shop it was made for (`base` is the page as
+// its author saw it), and an edit's changes or a new shop's fields.
+function asked({ action, base, proposed }) {
+  const data = { action, shop: shopName(base) };
+  if (action === 'edit') return { ...data, ...snapshotDiff(base, proposed) };
+  if (action === 'open') return { ...data, owner: proposed.owner, ...snapshotDiff(null, proposed) };
+  return data;
+}
+
+// What applying a revision did (`applied` is applyRevision's result).
+function made(action, { old_values: before, new_values: after }) {
+  const data = { action, shop: shopName(before) };
+  if (action === 'edit') return { ...data, ...snapshotDiff(before, after) };
+  if (action === 'open') return { ...data, owner: after.owner, ...snapshotDiff(null, after) };
+  return data;
+}
+
+// The edit form says how a clash was settled before sending: kept 'mine' or
+// 'current' in each field. Only recorded, never trusted for anything else.
+function cleanResolved(input) {
+  if (!Array.isArray(input)) return null;
+  return input.filter((x) => SHOP_FIELDS.includes(x?.field) && ['mine', 'current'].includes(x?.kept))
+    .slice(0, SHOP_FIELDS.length).map(({ field, kept }) => ({ field, kept }));
+}
 
 // --- Submit ---
 
@@ -87,6 +116,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
   }
 
   const row = { plotId: plot.id, shopId: shop?.id ?? null, action, base, proposed, summary: cleanNote(req.body.summary), account };
+  const resolved = cleanResolved(req.body.resolved);
 
   // Publish at once: the owner editing their shop, or staff.
   if (canPublish(account, action, shop) && !req.body.request_review) {
@@ -105,9 +135,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     const result = db.transaction(() => {
       const applied = applyRevision({ action, plotId: plot.id, shop, values, author: account });
       const id = recordDirect({ ...row, applied });
-      if (isStaff(account)) {
-        logModAction(req, `revision.${action}`, `plot:${plot.id}`, `Published an edit (${applied.changed.join(', ') || 'no changes'})`);
-      }
+      logRevision(req, 'publish', { revisionId: id, plotId: plot.id, ...made(action, applied), summary: row.summary, resolved });
       return { id, changed: applied.changed };
     })();
     return res.status(201).json({ status: 'approved', ...result });
@@ -120,7 +148,9 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     if (countPending.get(account.id).n >= MAX_PENDING_PER_ACCOUNT) {
       return { error: `You have ${MAX_PENDING_PER_ACCOUNT} edits waiting for review. Please wait for some of those first.` };
     }
-    return { id: recordSuggestion(row), replaced };
+    const id = recordSuggestion(row);
+    logRevision(req, 'suggest', { revisionId: id, plotId: plot.id, ...asked(row), summary: row.summary, replaced: replaced || null, resolved });
+    return { id, replaced };
   })();
   if (result.error) return res.status(429).json({ error: result.error });
   res.status(201).json({ status: 'pending', ...result });
@@ -134,6 +164,9 @@ router.post('/revisions/:id/withdraw', (req, res) => {
   if (!revision || revision.author_id !== req.account.id) return res.status(404).json({ error: 'Edit not found' });
   if (revision.status !== 'pending') return res.status(409).json({ error: 'This edit has already been reviewed.' });
   db.prepare("UPDATE revisions SET status = 'withdrawn' WHERE id = ?").run(revision.id);
+  logRevision(req, 'withdraw', {
+    revisionId: revision.id, plotId: revision.plot_id, ...asked(parsed(revision)), summary: revision.summary,
+  });
   res.json({ status: 'withdrawn' });
 });
 
@@ -183,6 +216,9 @@ router.post('/revisions/:id/approve', (req, res) => {
   }
   const overrides = req.body.values ?? {};
   let values = null;
+  // For the log: how each clash was settled, and text the reviewer fixed.
+  let resolved = null;
+  let suggested = null; // what approving as-is would have saved
   if (revision.action === 'edit') {
     const merged = mergeEdit(parse(revision.base), parse(revision.proposed), snapshotOf(shop));
     const open = merged.conflicts.filter((c) => !(c.field in overrides));
@@ -195,12 +231,20 @@ router.post('/revisions/:id/approve', (req, res) => {
       return res.status(400).json({ error: 'The owner can only change through "A new shop is here".' });
     }
     values = cleaned.snapshot;
+    suggested = merged.values;
+    resolved = merged.conflicts.map((c) => ({
+      field: c.field, kept: values[c.field] === c.mine ? 'mine' : values[c.field] === c.theirs ? 'current' : 'edited',
+    }));
   } else if (revision.action === 'open') {
     const cleaned = cleanSnapshot(overrides, parse(revision.proposed));
     if (cleaned.error) return res.status(400).json({ error: cleaned.error });
     if (!cleaned.snapshot.owner) return res.status(400).json({ error: 'A new shop needs an owner.' });
     values = cleaned.snapshot;
+    suggested = parse(revision.proposed);
   }
+  const clashed = new Set(resolved?.map((x) => x.field));
+  const edited = suggested && SHOP_FIELDS.filter((f) => !clashed.has(f) && values[f] !== suggested[f])
+    .map((f) => ({ field: f, suggested: suggested[f], saved: values[f] }));
 
   const author = getAccountName.get(revision.author_id) ?? null;
   const result = db.transaction(() => {
@@ -211,10 +255,10 @@ router.post('/revisions/:id/approve', (req, res) => {
       id: revision.id, status: 'approved', reviewer_id: req.account.id, review_note: cleanNote(req.body.note),
       old_values: json(applied.old_values), new_values: json(applied.new_values),
     });
-    if (isStaff(req.account)) {
-      logModAction(req, 'revision.approve', `plot:${revision.plot_id}`,
-        `Approved ${author?.name ?? 'a deleted account'}'s ${revision.action} (${applied.changed.join(', ') || 'no changes left'})`);
-    }
+    logRevision(req, 'approve', {
+      revisionId: revision.id, plotId: revision.plot_id, ...made(revision.action, applied),
+      author: author?.name, summary: revision.summary, note: cleanNote(req.body.note), resolved, edited,
+    });
     return { changed: applied.changed };
   })();
   res.json({ status: 'approved', ...result });
@@ -224,14 +268,15 @@ router.post('/revisions/:id/reject', (req, res) => {
   const found = reviewable(req, res);
   if (!found) return;
   const { revision } = found;
+  const note = cleanNote(req.body.note);
   finishReview.run({
-    id: revision.id, status: 'rejected', reviewer_id: req.account.id, review_note: cleanNote(req.body.note),
+    id: revision.id, status: 'rejected', reviewer_id: req.account.id, review_note: note,
     old_values: null, new_values: null,
   });
-  if (isStaff(req.account)) {
-    const author = getAccountName.get(revision.author_id);
-    logModAction(req, 'revision.reject', `plot:${revision.plot_id}`, `Rejected ${author?.name ?? 'a deleted account'}'s ${revision.action}`);
-  }
+  logRevision(req, 'reject', {
+    revisionId: revision.id, plotId: revision.plot_id, ...asked(parsed(revision)),
+    author: getAccountName.get(revision.author_id)?.name, summary: revision.summary, note,
+  });
   res.json({ status: 'rejected' });
 });
 
@@ -266,9 +311,7 @@ router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
       plotId: revision.plot_id, shopId: shop?.id ?? null, action: applied.action, base: applied.old_values,
       proposed: applied.new_values, summary: `Undo of #${revision.id}`, account, applied,
     });
-    if (isStaff(account)) {
-      logModAction(req, 'revision.undo', `plot:${revision.plot_id}`, `Undid their ${revision.action} #${revision.id}`);
-    }
+    logRevision(req, 'undo', { revisionId: id, plotId: revision.plot_id, ...made(applied.action, applied), undid: revision.id });
     return { id, changed: applied.changed };
   })();
   res.status(201).json({ status: 'undone', ...result });

@@ -114,6 +114,8 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const [showingChanges, setShowingChanges] = useState(false);
   // From a Force edit that clashed: { conflicts, current, choices }.
   const [conflict, setConflict] = useState(null);
+  // Which version was kept in each clashing field, sent along for the Mod log.
+  const [resolved, setResolved] = useState([]);
 
   const isStaff = account.role === 'moderator' || account.role === 'admin';
   const isOwner = !!shop && account.name.toLowerCase() === shop.owner.trim().toLowerCase();
@@ -163,14 +165,17 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
     report(m, drafts);
   };
 
-  const send = async (body, requestReview) => {
+  // `kept` is passed in right after a clash is settled: `resolved` itself
+  // only updates on the next render.
+  const send = async (body, requestReview, kept = resolved) => {
     setSending(true);
     setError(null);
     try {
       const res = await fetch(`/api/plots/${plot.id}/revisions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...body, summary, request_review: requestReview }),
+        body: JSON.stringify({ ...body, summary, request_review: requestReview,
+          resolved: body.action === 'edit' ? kept : undefined }),
       });
       const data = await res.json().catch(() => ({}));
       // The page changed in the same fields: show the chooser.
@@ -206,6 +211,9 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const resolve = (requestReview) => {
     const { conflicts, current, choices } = conflict;
     if (conflicts.some((c) => !choices[c.field])) return setError('Choose a version for each field first.');
+    const kept = conflicts.map((c) => ({ field: c.field, kept: choices[c.field] === 'mine' ? 'mine' : 'current' }));
+    const nextResolved = [...resolved.filter((x) => !kept.some((k) => k.field === x.field)), ...kept];
+    setResolved(nextResolved);
     const picked = Object.fromEntries(conflicts.map((c) => [c.field, (choices[c.field] === 'mine' ? c.mine : c.theirs) ?? '']));
     const nextValues = Object.fromEntries(Object.keys(values).map((key) => [key,
       key in picked ? picked[key] : isEdited('edit', values, key) ? values[key] : current[key] ?? '']));
@@ -220,7 +228,7 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
     if (!isDirty('edit', next, current)) {
       return setError('Nothing left to save: the page already has these changes.');
     }
-    send({ action: 'edit', base: current, proposed: { ...current, ...nextValues, tag_ids: nextTagIds } }, requestReview);
+    send({ action: 'edit', base: current, proposed: { ...current, ...nextValues, tag_ids: nextTagIds } }, requestReview, nextResolved);
   };
 
   const choose = (field, value) => {

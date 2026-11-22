@@ -117,8 +117,9 @@ export function createSchema() {
     CREATE INDEX IF NOT EXISTS comment_votes_comment ON comment_votes(comment_id, created_at);
   `);
 
-  // Private record of staff actions (admin only). account_id is NULL when the
-  // emergency ADMIN_TOKEN was used. Not cleared by db:load.
+  // Private record of staff actions, comment activity and page revisions
+  // (staff only). account_id is NULL when the emergency ADMIN_TOKEN was used.
+  // Not cleared by db:load.
   db.exec(`
     CREATE TABLE IF NOT EXISTS mod_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,6 +128,8 @@ export function createSchema() {
       action TEXT NOT NULL,                      -- e.g. 'comment.delete', 'shop.edit', 'account.role'
       target TEXT,                               -- e.g. 'plot:lime-3', 'account:4'
       details TEXT,                              -- human-readable summary
+      revision_id INTEGER,                       -- the revision a 'revision.*' entry is about
+      data TEXT,                                 -- JSON specifics, e.g. each field's old and new text
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -217,6 +220,10 @@ export function createSchema() {
 
   // Oct 2026: mod log entries keep the staff member's name.
   addColumnIfMissing('mod_log', 'actor_name', 'TEXT');
+
+  // Nov 2026: revision entries link their revision and keep what changed (3.13).
+  addColumnIfMissing('mod_log', 'revision_id', 'INTEGER');
+  addColumnIfMissing('mod_log', 'data', 'TEXT');
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

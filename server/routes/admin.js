@@ -5,12 +5,12 @@
 //   PUT /accounts/:id/role {role} 'player' | 'moderator' (admins come from .env)
 //   PUT /accounts/:id/ban {reason?, delete_comments?}   ban (logs them out everywhere)
 //   DELETE /accounts/:id/ban    unban
-//   GET /modlog?offset=          staff actions, newest first
+//   GET /modlog?offset=          staff actions, comments and page revisions, newest first (moderators too)
 
 import express from 'express';
 import db from '../db/init.js';
 import { endAllSessions, roleOf } from '../lib/auth.js';
-import { requireAdmin } from '../middleware/adminAuth.js';
+import { requireAdmin, requireModerator } from '../middleware/adminAuth.js';
 import { logModAction } from '../lib/modlog.js';
 
 // requireAdmin goes on each route, not router.use(): this router is mounted at
@@ -95,9 +95,9 @@ router.delete('/accounts/:id/ban', requireAdmin, (req, res) => {
   res.json(withRole(getAccount.get(account.id)));
 });
 
-// The mod log: every staff action, newest first, 50 per page.
+// The mod log, newest first, 50 per page. Moderators see it too (3.13).
 const modLogPage = db.prepare(`
-  SELECT m.id, m.action, m.target, m.details, m.created_at,
+  SELECT m.id, m.action, m.target, m.details, m.revision_id, m.data, m.created_at,
     COALESCE(a.name, m.actor_name) AS actor,
     (m.account_id IS NULL AND m.actor_name IS NOT NULL) AS actor_deleted
   FROM mod_log m LEFT JOIN accounts a ON a.id = m.account_id
@@ -105,10 +105,11 @@ const modLogPage = db.prepare(`
   LIMIT @limit OFFSET @offset
 `);
 
-router.get('/modlog', requireAdmin, (req, res) => {
+router.get('/modlog', requireModerator, (req, res) => {
   const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
   const rows = modLogPage.all({ limit: PAGE + 1, offset });
-  res.json({ entries: rows.slice(0, PAGE), hasMore: rows.length > PAGE });
+  const entries = rows.slice(0, PAGE).map((e) => ({ ...e, data: e.data == null ? null : JSON.parse(e.data) }));
+  res.json({ entries, hasMore: rows.length > PAGE });
 });
 
 export default router;
