@@ -207,8 +207,64 @@
 
 .admin-page__tabs {
   display: flex;
+  flex-wrap: wrap; /* six tabs don't fit on one line on phones */
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+/* Admin → Needs review (AdminReview.jsx). Items reuse PendingEdits.css. */
+.admin-review {
+  max-width: 680px;
+  font-size: 0.875rem;
+}
+
+.admin-review__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-review__top h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.admin-review__status {
+  margin: 0.5rem 0;
+  min-height: 1.25rem;
+  color: var(--text-muted);
+}
+
+.admin-review__muted {
+  color: var(--text-muted);
+}
+
+.admin-review__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-review__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.admin-review__plot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .admin-page__tabs button[aria-pressed='true'] {

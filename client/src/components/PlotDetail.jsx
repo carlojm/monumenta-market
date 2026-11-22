@@ -428,6 +428,16 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
     }
   };
 
+  // Approved or rejected from the pending list (owners and mods). The page
+  // reloads to show the change; focus goes to Edit, as the buttons are gone.
+  const handleReviewed = (outcome) => {
+    // Not 'approved': that's your own Force edit, with Undo.
+    setNotice({ status: outcome === 'approved' ? 'accepted' : 'rejected' });
+    setAnnouncement(outcome === 'approved' ? 'Edit approved.' : 'Edit rejected.');
+    reload();
+    editButtonRef.current?.focus();
+  };
+
   // From the pending list. The button goes away, so focus goes to Edit.
   const withdraw = async (id) => {
     try {
@@ -541,6 +551,10 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
               </>
             ) : notice.status === 'undone' ? (
               <span>Edit undone.</span>
+            ) : notice.status === 'accepted' ? (
+              <span>Edit approved.</span>
+            ) : notice.status === 'rejected' ? (
+              <span>Edit rejected.</span>
             ) : (
               <span>{notice.error ? 'Could not withdraw it.' : 'Suggestion withdrawn.'}</span>
             )}
@@ -549,7 +563,8 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
         )}
 
         {!editing && detail?.pending_edits && (
-          <PendingEdits edits={detail.pending_edits} catalog={catalog} shopTags={shop?.tags ?? []} onWithdraw={withdraw} />
+          <PendingEdits edits={detail.pending_edits} catalog={catalog} shopTags={shop?.tags ?? []} onWithdraw={withdraw}
+            onReviewed={handleReviewed} />
         )}
 
         {editing ? (

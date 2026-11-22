@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import TagEditor from './TagEditor';
 import DiffText from './DiffText';
-import { FIELDS, OWNER, SHOP_FIELDS, labelOf } from '../lib/shopFields';
+import VersionChoice from './VersionChoice';
+import { FIELDS, OWNER, SHOP_FIELDS, tagNamer } from '../lib/shopFields';
 import { displayName } from '../lib/plots';
 import './ShopEditForm.css';
 
@@ -77,17 +78,8 @@ function ConflictView({ conflicts, choices, onChoose }) {
         changes are kept.
       </p>
       {conflicts.map((c) => (
-        <fieldset className="shop-edit__conflict" key={c.field}>
-          <legend>{labelOf(c.field)}</legend>
-          {[['mine', 'Yours', c.mine], ['theirs', 'Current', c.theirs]].map(([value, name, text]) => (
-            <label className="shop-edit__choice" key={value}>
-              <input type="radio" name={`shop-edit-conflict-${c.field}`} checked={choices[c.field] === value}
-                onChange={() => onChoose(c.field, value)} />
-              <span className="shop-edit__choice-name">{name}</span>
-              <span className="shop-edit__choice-text">{text ?? <span className="shop-edit__muted">(empty)</span>}</span>
-            </label>
-          ))}
-        </fieldset>
+        <VersionChoice key={c.field} conflict={c} names={['Yours', 'Current']} value={choices[c.field]}
+          onChoose={onChoose} idPrefix="shop-edit-conflict" />
       ))}
     </div>
   );
@@ -239,7 +231,7 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const cancel = () => (dirty ? setConfirmingCancel(true) : onCancel());
 
   // For "Show changes", worked out only while it's open.
-  const tagName = (id) => catalog?.tags.find((t) => t.id === id)?.name ?? shop?.tags?.find((t) => t.id === id)?.name ?? `#${id}`;
+  const tagName = tagNamer(catalog, shop?.tags ?? []);
   const modeBase = baseFor(mode);
   const changes = showingChanges
     ? fields.filter((f) => edited(f.key)).map((f) => ({ ...f, before: modeBase[f.key], after: values[f.key].trim() }))

@@ -20,3 +20,8 @@ export const OWNER = { key: 'owner', label: 'Owner', max: 32, hint: 'Player name
 const COLOR_LABELS = { guild_color: 'Guild color', primary_color: 'Primary color', secondary_color: 'Secondary color' };
 
 export const labelOf = (key) => [OWNER, ...FIELDS].find((f) => f.key === key)?.label ?? COLOR_LABELS[key] ?? key;
+
+// A tag's name from its id: the tag list (GET /api/tags) first, then the
+// shop's own tags (a shop can keep a tag that's no longer in the list).
+export const tagNamer = (catalog, shopTags = []) => (id) =>
+  catalog?.tags.find((t) => t.id === id)?.name ?? shopTags.find((t) => t.id === id)?.name ?? `#${id}`;

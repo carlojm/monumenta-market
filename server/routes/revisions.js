@@ -22,6 +22,7 @@ import {
   recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
 import { getCurrentShop, getPlot } from '../lib/shops.js';
+import { tagsForShop } from '../lib/tags.js';
 
 const router = express.Router();
 
@@ -148,7 +149,14 @@ router.get('/revisions/pending', (req, res) => {
     // Owners see every suggestion about their own shop, including ones only a
     // mod can approve (like "this plot is now empty"), so they know about them.
     if (!staff && !isOwner(req.account, shop)) continue;
-    list.push(publicRevision(r, { owner: shop?.owner ?? null, can_review: reviewable, ...preview(r, shop) }));
+    list.push(publicRevision(r, {
+      owner: shop?.owner ?? null,
+      // The plot's current shop, so the queue can name it (null when vacant).
+      shop: shop ? { owner: shop.owner, shop_name: shop.shop_name, guild_name: shop.guild_name, tags: tagsForShop(shop.id) } : null,
+      mine: r.author_id === req.account.id,
+      can_review: reviewable,
+      ...preview(r, shop),
+    }));
   }
   res.json(list);
 });
