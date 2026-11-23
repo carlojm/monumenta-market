@@ -1,0 +1,72 @@
+# CI: on every pull request and every push to main, GitHub runs the lint,
+# the build, the API tests and the browser tests (the same commands as on
+# your computer; see "Testing" in claude.md). A ✗ on a commit or pull request
+# means one of them failed. For a browser test failure, the run's
+# "test-report" download has a snapshot and a trace of each failure.
+#
+# Actions are pinned to a commit (not a tag, which can be moved later), with
+# the release it is in the comment. Update them like any other package.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch cancels a run that's still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read the code, nothing else.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 25.2.1 # the same as production (server/Dockerfile)
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+
+      - name: Install
+        run: |
+          npm ci --prefix server
+          npm ci --prefix client
+
+      - name: Lint
+        working-directory: client
+        run: npm run lint
+
+      - name: Build
+        working-directory: client
+        run: npm run build
+
+      - name: API tests
+        working-directory: server
+        run: npm test
+
+      # GitHub's Ubuntu machines come with Google Chrome, which the browser
+      # tests use (channel 'chrome' in playwright.config.js).
+      - name: Browser tests
+        working-directory: client
+        run: |
+          google-chrome --version
+          npm run test:e2e
+
+      - name: Save the browser test report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-report
+          path: client/test-results
+          retention-days: 7
