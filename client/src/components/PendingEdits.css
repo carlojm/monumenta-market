@@ -57,6 +57,17 @@
   color: var(--text-muted);
 }
 
+/* A consequence of approving, in the same style as the edit form's
+   (.shop-edit__warning). */
+.pending-edits__warning {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid #e0b87a;
+  border-radius: var(--radius-sm);
+  background: rgba(224, 184, 122, 0.1);
+  color: #e0b87a;
+}
+
 .pending-edits__muted {
   margin: 0;
   color: var(--text-muted);

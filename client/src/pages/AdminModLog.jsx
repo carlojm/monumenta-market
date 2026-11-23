@@ -142,9 +142,12 @@ function fieldList(d) {
 
 // Which shop and what about it.
 function subject(kind, d) {
-  if (kind === 'undo' && d.action === 'open') return `Brought back ${d.owner}'s shop`;
-  if (kind === 'undo' && d.action === 'vacate') return `${d.shop} closed again`;
-  if (d.action === 'open') return `New shop by ${d.owner}${d.shop ? `, replacing ${d.shop}` : ''}`;
+  const reopened = d.moved_back ? `, and their shop at ${d.moved_back} reopened` : '';
+  if (kind === 'undo' && d.action === 'open') return `Brought back ${d.owner}'s shop${reopened}`;
+  if (kind === 'undo' && d.action === 'vacate') return `${d.shop} closed again${reopened}`;
+  if (d.action === 'open') {
+    return `New shop by ${d.owner}${d.shop ? `, replacing ${d.shop}` : ''}${d.moved_from ? `, moved from ${d.moved_from}` : ''}`;
+  }
   if (d.action === 'vacate') return `${d.shop} closed, the plot is now empty`;
   return `${d.shop}: ${fieldList(d)}`;
 }

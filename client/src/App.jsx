@@ -140,7 +140,7 @@ function App() {
         </section>
         <section className="app-main__list">
           {cardOpenOnDesktop ? (
-            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} catalog={catalog} onClose={closePlot} onReported={loadPlots}
+            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} plots={plots} catalog={catalog} onClose={closePlot} onReported={loadPlots}
               openedInApp={fromApp} />
           ) : (
             list
@@ -148,7 +148,7 @@ function App() {
         </section>
         {/* Phones: the card is a bottom sheet over the page. */}
         {!isDesktop && (
-          <PlotDetail key={selectedPlot?.id} plot={selectedPlot} catalog={catalog} onClose={closePlot} onReported={loadPlots} />
+          <PlotDetail key={selectedPlot?.id} plot={selectedPlot} plots={plots} catalog={catalog} onClose={closePlot} onReported={loadPlots} />
         )}
       </main>
     </div>

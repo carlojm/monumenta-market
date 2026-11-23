@@ -153,6 +153,7 @@ function EditItem({ edit: e, onWithdrawn }) {
       <Link to={`/plot/${e.plot_id}`} className="account-edit__shop">
         {title(e)} <span className="coord">{e.plot_id}</span>
       </Link>
+      {e.moved_from && <p className="account-comment__muted">Moved from <span className="coord">{e.moved_from}</span></p>}
       {e.summary && <Note by="You" text={e.summary} />}
       {e.review_note && <Note by={e.reviewer ?? 'Reviewer'} text={e.review_note} />}
       {error && <p className="account-form__error" role="alert">{error}</p>}

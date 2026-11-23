@@ -259,7 +259,7 @@ function ReportForm({ plotId, onReported }) {
 // Older browsers without `closedby` need tap-outside-to-close done by hand.
 const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
 
-function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false, openedInApp = false }) {
+function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inline = false, openedInApp = false }) {
   const [detail, setDetail] = useState(null);
   const dialogRef = useRef(null);
   const headingRef = useRef(null);
@@ -568,7 +568,7 @@ function PlotDetail({ plot, catalog = null, onClose, onReported, inline = false,
         )}
 
         {editing ? (
-          <ShopEditForm plot={plot} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
+          <ShopEditForm plot={plot} plots={plots} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
             onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
         ) : (
           <>

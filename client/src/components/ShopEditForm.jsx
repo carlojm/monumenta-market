@@ -93,7 +93,8 @@ function ConflictView({ conflicts, choices, onChoose }) {
 // skipping review) their own shop's details; staff can for everything. The
 // rest is a suggestion for review. `catalog` is GET /api/tags (App loads it).
 // `onDone(result)` gets the server's answer ({ status: 'pending' | 'approved', ... }).
-function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyChange }) {
+// `plots` is the map's list, for spotting a new owner who has a shop elsewhere.
+function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCancel, onDirtyChange }) {
   // What the shop looked like when editing began. The server compares an edit
   // against it, so a change someone else makes meanwhile isn't overwritten.
   // After a conflict is resolved, it becomes the page as it is now.
@@ -138,6 +139,11 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
   const edited = (key) => isEdited(mode, values, key);
   const tagsEdited = mode !== 'vacate' && !sameIds(tagIds, baseFor(mode).tag_ids);
   const dirty = isDirty(mode, drafts);
+  // One shop per owner (3.12): a new owner with a shop elsewhere moves here,
+  // and that shop closes. Names match ignoring case, like on the server.
+  const typedOwner = mode === 'open' ? values.owner.trim().toLowerCase() : '';
+  const movingFrom = typedOwner ? plots.find((p) => p.id !== plot.id && p.shop?.owner.toLowerCase() === typedOwner) : null;
+  const moveNote = movingFrom && `${movingFrom.shop.owner} already has a shop at ${movingFrom.id}. Opening this one closes it.`;
 
   // The card (which asks before closing) and the browser's leave warning
   // hear about every change as it happens.
@@ -306,10 +312,16 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
               <div className="shop-edit__field" key={f.key}>
                 <FieldLabel htmlFor={id} label={f.label} edited={marked} onReset={reset(f.key)} />
                 <Input id={id} type={f.multiline ? undefined : 'text'} value={values[f.key]} onChange={set(f.key)}
-                  maxLength={f.max} aria-describedby={f.hint ? `${id}-hint` : undefined}
+                  maxLength={f.max}
+                  aria-describedby={[f.hint && `${id}-hint`, f.key === 'owner' && moveNote && `${id}-moving`].filter(Boolean).join(' ') || undefined}
                   aria-required={f.key === 'owner' || undefined}
                   className={marked ? 'shop-edit__input--edited' : undefined} />
                 {f.hint && <p id={`${id}-hint`} className="shop-edit__muted">{f.hint}</p>}
+                {f.key === 'owner' && moveNote && (
+                  <p id={`${id}-moving`} className="shop-edit__warning">
+                    {movingFrom.shop.owner} already has a shop at <span className="coord">{movingFrom.id}</span>. Opening this one closes it.
+                  </p>
+                )}
               </div>
             );
           })}
@@ -339,6 +351,9 @@ function ShopEditForm({ plot, shop, account, catalog, onDone, onCancel, onDirtyC
         <input id="shop-edit-summary" type="text" value={summary} maxLength={300}
           onChange={(e) => setSummary(e.target.value)} />
       </div>
+
+      {/* Says when the move note appears; the note itself is linked to the Owner field. */}
+      <p className="visually-hidden" aria-live="polite">{moveNote}</p>
 
       {error && <p className="shop-edit__error" role="alert">{error}</p>}
 

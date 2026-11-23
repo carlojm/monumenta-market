@@ -16,6 +16,12 @@ function PendingChanges({ edit, tagName }) {
     const filled = [OWNER, ...FIELDS].filter((f) => edit.proposed[f.key]);
     return (
       <>
+        {/* One shop per owner: approving moves them, closing their other shop. */}
+        {edit.moves_from && (
+          <p className="pending-edits__warning">
+            {edit.proposed.owner}'s shop at <span className="coord">{edit.moves_from}</span> closes when this is approved.
+          </p>
+        )}
         {filled.map((f) => (
           <div className="pending-edits__field" key={f.key}>
             <span className="pending-edits__label">{f.label}</span>
