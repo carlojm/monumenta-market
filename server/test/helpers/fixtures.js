@@ -16,5 +16,6 @@ export const ACCOUNTS = [
   { name: 'Player2', role: 'player' },
   { name: 'ShopOwner', role: 'player' }, // owns corridors-2
   { name: 'ModTester', role: 'moderator' },
+  { name: 'ModTester2', role: 'moderator' },
   { name: 'AdminTester', role: 'admin' },
 ].map((a, i) => ({ ...a, uuid: `00000000-0000-0000-0000-${String(i + 1).padStart(12, '0')}` }));

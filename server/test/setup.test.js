@@ -3,9 +3,11 @@
 
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import { after, before, test } from 'node:test';
 import { startServer } from './helpers/server.js';
 import { ACCOUNTS, PASSWORD } from './helpers/fixtures.js';
+import { SHOP_FIELDS } from './helpers/api.js';
 
 let server;
 before(async () => { server = await startServer(); });
@@ -56,4 +58,11 @@ test('test mode refuses to start on the live site', () => {
     assert.notEqual(run.status, 0, JSON.stringify(live));
     assert.match(run.stderr, /TEST_MODE is only for local tests/);
   }
+});
+
+test("the tests' list of shop fields matches the server's", () => {
+  // Read as text: importing lib/shops.js would open the real database.
+  const source = fs.readFileSync(new URL('../lib/shops.js', import.meta.url), 'utf8');
+  const list = source.match(/export const SHOP_FIELDS = \[([^\]]*)\]/)[1].match(/'[^']+'/g).map((f) => f.slice(1, -1));
+  assert.deepEqual(SHOP_FIELDS, list);
 });
