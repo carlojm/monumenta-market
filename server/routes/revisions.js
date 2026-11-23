@@ -8,6 +8,7 @@
 //   POST /revisions/:id/withdraw            the author cancels a pending one
 //   GET  /revisions/pending                 the review queue (staff: all; owners: their shop, with
 //                                           can_review false where only a mod may approve)
+//   GET  /revisions/mine?offset=&withdrawn= your own edits, newest first, 20 at a time
 //   POST /revisions/:id/approve {values?, note?}  `values` resolves conflicts or fixes typos
 //   POST /revisions/:id/reject  {note?}
 //   POST /revisions/:id/undo                the author of a Force edit puts the page back
@@ -192,6 +193,47 @@ router.get('/revisions/pending', (req, res) => {
     }));
   }
   res.json(list);
+});
+
+// --- Your edits ---
+
+const MINE_PAGE = 20;
+const myRevisions = db.prepare(`
+  SELECT r.*, rv.name AS reviewer_name FROM revisions r LEFT JOIN accounts rv ON rv.id = r.reviewer_id
+  WHERE r.author_id = @author AND (r.status = 'withdrawn') = @withdrawn
+  ORDER BY r.created_at DESC, r.id DESC LIMIT @limit OFFSET @offset
+`);
+const countWithdrawn = db.prepare("SELECT count(*) FROM revisions WHERE author_id = ? AND status = 'withdrawn'").pluck();
+
+// The account page's "Your edits": everything you've suggested or published,
+// newest first. Withdrawn ones (including suggestions you replaced) come
+// separately with ?withdrawn=1; the main list says how many there are. Each
+// says what it changed (what was saved, once approved; what
+// you asked for, otherwise), how it was reviewed and the reviewer's note, and
+// `adjusted`: fields you changed that were saved differently (a reviewer fixed
+// them or kept a newer version).
+router.get('/revisions/mine', (req, res) => {
+  if (!req.account) return res.status(401).json({ error: 'Log in first.' });
+  const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
+  const withdrawn = req.query.withdrawn === '1' ? 1 : 0;
+  const rows = myRevisions.all({ author: req.account.id, withdrawn, limit: MINE_PAGE + 1, offset });
+  const edits = rows.slice(0, MINE_PAGE).map((r) => {
+    const p = parsed(r);
+    const applied = r.status === 'approved';
+    const after = applied ? parse(r.new_values) : null;
+    const adjusted = applied && !r.direct && r.action !== 'vacate'
+      ? SHOP_FIELDS.filter((f) => (r.action === 'open' || p.base[f] !== p.proposed[f]) && p.proposed[f] !== after[f])
+        .map((f) => ({ field: f, suggested: p.proposed[f], saved: after[f] }))
+      : [];
+    return {
+      id: r.id, plot_id: r.plot_id, status: r.status, direct: !!r.direct, summary: r.summary,
+      // A Force edit records its author as the reviewer; no one else reviewed it.
+      review_note: r.review_note, reviewer: r.direct ? null : r.reviewer_name ?? null, created_at: r.created_at, reviewed_at: r.reviewed_at,
+      ...(applied ? made(r.action, { old_values: parse(r.old_values), new_values: after }) : asked(p)),
+      adjusted,
+    };
+  });
+  res.json({ edits, hasMore: rows.length > MINE_PAGE, withdrawn: countWithdrawn.get(req.account.id) });
 });
 
 // --- Approve and reject ---

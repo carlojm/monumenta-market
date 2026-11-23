@@ -1,6 +1,6 @@
 import { Suspense, use, useRef, useState, useTransition } from 'react';
-import DiffText from '../components/DiffText';
-import { SHOP_FIELDS, labelOf } from '../lib/shopFields';
+import RevisionChanges from '../components/RevisionChanges';
+import { labelOf } from '../lib/shopFields';
 import { dayLabel, loadLog } from '../lib/modLog';
 import { parseUtc } from '../lib/reports';
 
@@ -157,7 +157,6 @@ function LogEntry({ entry: e }) {
   const when = parseUtc(e.created_at);
   // The author's note: on a review it's the suggester's, otherwise it's theirs.
   const summaryBy = kind === 'approve' || kind === 'reject' ? d.author ?? 'A deleted account' : actor;
-  const hasChanges = d.changes || d.tags || d.resolved || d.edited;
 
   return (
     <li className="modlog-entry">
@@ -183,61 +182,13 @@ function LogEntry({ entry: e }) {
       {d.summary && <Note by={summaryBy} text={d.summary} />}
       {d.note && <Note by={actor} text={d.note} />}
       {d.replaced && <p className="admin-modlog__muted">Replaced their earlier suggestion</p>}
-      {kind && hasChanges && (
-        <details className="modlog-entry__changes">
-          <summary>Show changes</summary>
-          <Changes kind={kind} d={d} />
-        </details>
-      )}
+      {kind && <RevisionChanges kind={kind} d={d} />}
     </li>
   );
 }
 
 function Note({ by, text }) {
   return <p className="modlog-entry__note"><span className="admin-modlog__muted">{by}:</span> “{text}”</p>;
-}
-
-// How a clash in a field was settled. 'mine' is the edit's own version.
-function keptLabel(kind, kept) {
-  if (kept === 'current') return 'kept the current version';
-  if (kept === 'edited') return 'blended both versions';
-  return kind === 'approve' ? 'kept the suggested version' : 'kept their version';
-}
-
-// Each field that changed, as a word diff, with any clash or reviewer fix.
-function Changes({ kind, d }) {
-  const changes = d.changes ?? [];
-  const fields = SHOP_FIELDS.filter((f) => [changes, d.resolved ?? [], d.edited ?? []].some((list) => list.some((x) => x.field === f)));
-  return (
-    <div className="modlog-changes">
-      {fields.map((f) => {
-        const change = changes.find((c) => c.field === f);
-        const resolved = d.resolved?.find((x) => x.field === f);
-        const edited = d.edited?.find((x) => x.field === f);
-        const note = resolved ? keptLabel(kind, resolved.kept) : edited ? 'fixed while approving' : null;
-        return (
-          <div className="modlog-changes__field" key={f}>
-            <span className="modlog-changes__label">
-              {labelOf(f)}{note && <span className="admin-modlog__muted"> {note}</span>}
-            </span>
-            {change && <DiffText before={change.from} after={change.to} />}
-            {edited && (
-              <p className="modlog-changes__suggested">
-                <span className="admin-modlog__muted">Suggested:</span> {edited.suggested ?? '(empty)'}
-              </p>
-            )}
-          </div>
-        );
-      })}
-      {d.tags && (
-        <div className="modlog-changes__field">
-          <span className="modlog-changes__label">Tags</span>
-          {d.tags.added.length > 0 && <p className="diff-text">Added <ins>{d.tags.added.join(', ')}</ins></p>}
-          {d.tags.removed.length > 0 && <p className="diff-text">Removed <del>{d.tags.removed.join(', ')}</del></p>}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default AdminModLog;

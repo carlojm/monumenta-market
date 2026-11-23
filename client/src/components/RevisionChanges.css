@@ -1,0 +1,44 @@
+/* "Show changes" for a page revision (RevisionChanges.jsx). */
+.revision-changes summary {
+  cursor: pointer;
+  color: var(--link);
+  padding-block: 0.125rem; /* 24px tall */
+}
+
+.revision-changes__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border);
+}
+
+.revision-changes__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.revision-changes__field p {
+  margin: 0;
+}
+
+.revision-changes__label {
+  font-weight: 600;
+}
+
+.revision-changes__muted {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.revision-changes__suggested {
+  white-space: pre-wrap;
+}
+
+@media (pointer: coarse) {
+  .revision-changes summary {
+    padding-block: 0.5rem; /* 36px tall, text centered */
+  }
+}

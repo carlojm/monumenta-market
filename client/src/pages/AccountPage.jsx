@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
+import { Suspense, use, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BadgeCheck } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Collapsible from '../components/Collapsible';
+import YourEdits from '../components/YourEdits';
+import { loadMyComments } from '../lib/myActivity';
 import { useAccount } from '../lib/account';
 import { formatDate, timeAgo } from '../lib/reports';
 import { displayName } from '../lib/plots';
@@ -197,7 +200,12 @@ function LoggedInView({ account }) {
         </div>
       )}
 
-      <YourComments />
+      <Collapsible title="Your edits" className="account-section">
+        <YourEdits />
+      </Collapsible>
+      <Collapsible title="Your comments" className="account-section">
+        <YourComments />
+      </Collapsible>
       <DeleteAccount account={account} />
     </>
   );
@@ -263,19 +271,23 @@ function DeleteAccount({ account }) {
 const COMMENTS_PAGE = 20;
 
 // The logged-in account's comments. Each links to its plot's card; deleting
-// asks for confirmation inline.
+// asks for confirmation inline. Mounted when its section first opens, so the
+// list loads then (useState's initializer, no effect), with Suspense inside.
 function YourComments() {
-  const [comments, setComments] = useState(null); // null while loading
+  const [first] = useState(() => loadMyComments());
+  return (
+    <Suspense fallback={<p className="account-note">Loading…</p>}>
+      <CommentList first={first} />
+    </Suspense>
+  );
+}
+
+function CommentList({ first }) {
+  const loaded = use(first);
+  const [comments, setComments] = useState(loaded.error ? [] : loaded);
   const [shown, setShown] = useState(COMMENTS_PAGE);
   const [confirmingId, setConfirmingId] = useState(null);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch('/api/auth/me/comments')
-      .then((res) => (res.ok ? res.json() : []))
-      .then(setComments)
-      .catch(() => setComments([]));
-  }, []);
 
   const remove = async (id) => {
     setError(null);
@@ -285,11 +297,10 @@ function YourComments() {
     setConfirmingId(null);
   };
 
-  if (comments === null) return null;
+  if (loaded.error) return <p className="account-form__error" role="alert">{loaded.error}</p>;
 
   return (
-    <section className="account-comments">
-      <h3>Your comments</h3>
+    <div className="account-comments">
       {comments.length === 0 ? (
         <p className="account-note">You haven't commented yet. Open a shop on the map to leave one.</p>
       ) : (
@@ -331,7 +342,7 @@ function YourComments() {
       {comments.length > shown && (
         <button type="button" onClick={() => setShown((n) => n + COMMENTS_PAGE)}>Show more</button>
       )}
-    </section>
+    </div>
   );
 }
 
