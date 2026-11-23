@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './lib/env.js'; // first: settings (.env, or test mode)
 import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';

@@ -13,12 +13,15 @@
 // Logs say which limit was hit but never the IP, to keep players anonymous.
 
 import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
+import { TEST_MODE } from './env.js';
 
 const MINUTE = 60_000;
 
 const tooMany = (wait) => `Too many tries. Please wait ${wait} and try again.`;
 
 function limit(name, { minutes, max, message = tooMany, ...options }) {
+  // The automated tests make many edits quickly (lib/env.js).
+  if (TEST_MODE) return (req, res, next) => next();
   return rateLimit({
     windowMs: minutes * MINUTE,
     limit: max,

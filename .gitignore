@@ -2,3 +2,6 @@
 claude.md
 bots.md
 .claude/
+
+# Test database (server/test/seed.js builds it)
+server/test/.cache/
