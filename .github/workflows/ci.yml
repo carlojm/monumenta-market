@@ -4,6 +4,12 @@
 # means one of them failed. For a browser test failure, the run's
 # "test-report" download has a snapshot and a trace of each failure.
 #
+# CD: after a push to main passes, the deploy job puts it live on Fly (the
+# same as `npm run deploy:full`). It uses the FLY_API_TOKEN secret of the
+# "production" environment: a deploy token that can only deploy lofy. To stop
+# deploys, disable this workflow in the Actions tab; `npm run deploy:full`
+# still works by hand.
+#
 # Actions are pinned to a commit (not a tag, which can be moved later), with
 # the release it is in the comment. Update them like any other package.
 
@@ -14,10 +20,11 @@ on:
   push:
     branches: [main]
 
-# A newer push to the same branch cancels a run that's still going.
+# On a pull request, a newer push cancels the run that's still going. On
+# main, runs wait their turn instead: a deploy is never stopped halfway.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Read the code, nothing else.
 permissions:
@@ -70,3 +77,33 @@ jobs:
           name: test-report
           path: client/test-results
           retention-days: 7
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production # the only job that can read FLY_API_TOKEN
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 25.2.1
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Build the site into server/dist
+        run: |
+          npm ci --prefix client
+          npm run build:ui --prefix server
+
+      - uses: superfly/flyctl-actions/setup-flyctl@fc53c09e1bc3be6f54706524e3b82c4f462f77be # 1.5
+        with:
+          version: 0.5.6
+
+      - name: Deploy to Fly
+        working-directory: server
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
