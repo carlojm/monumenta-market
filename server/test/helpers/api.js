@@ -65,3 +65,6 @@ export async function edit(as, name, plot, changes, extra = {}) {
 
 // Read-only access to the server's copy of the database, for checks.
 export const readDb = (server) => new Database(server.dbPath, { readonly: true });
+
+// Writing to it: only for data the API can't make, like an old-format row.
+export const writeDb = (server) => new Database(server.dbPath);

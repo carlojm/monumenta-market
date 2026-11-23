@@ -13,7 +13,7 @@ import { apiFor } from '../../server/test/helpers/api.js';
 import { PASSWORD } from '../../server/test/helpers/fixtures.js';
 import { CLIENT_DIST } from './paths.js';
 
-export { edit, readDb, snapshot } from '../../server/test/helpers/api.js';
+export { edit, readDb, snapshot, writeDb } from '../../server/test/helpers/api.js';
 
 export const PHONE = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true };
 export const DESKTOP = { viewport: { width: 1280, height: 900 } };
@@ -46,7 +46,12 @@ export async function pageAs(browser, server, name, options = PHONE) {
   return page;
 }
 
-export const expectNoProblems = (page) => expect(page.problems, 'console errors or warnings').toEqual([]);
+// `statuses`: answers the test expects, which the browser also logs, e.g. a
+// 409 when the page changed while editing.
+export function expectNoProblems(page, { statuses = [] } = {}) {
+  const expected = (m) => statuses.some((s) => m.includes(`status of ${s} `));
+  expect(page.problems.filter((m) => !expected(m)), 'console errors or warnings').toEqual([]);
+}
 
 // Text with its spaces tidied, for comparing what's on screen.
 export const text = async (locator) => (await locator.textContent()).replace(/\s+/g, ' ').trim();
