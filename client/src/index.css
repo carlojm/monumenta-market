@@ -128,7 +128,7 @@ a:focus-visible,
   border: 0;
 }
 
-input[type="text"], input[type="password"], textarea {
+input[type="text"], input[type="password"], input[type="search"], textarea {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-control);

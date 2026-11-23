@@ -5,7 +5,8 @@
 //   PUT /accounts/:id/role {role} 'player' | 'moderator' (admins come from .env)
 //   PUT /accounts/:id/ban {reason?, delete_comments?}   ban (logs them out everywhere)
 //   DELETE /accounts/:id/ban    unban
-//   GET /modlog?offset=          staff actions, comments and page revisions, newest first (moderators too)
+//   GET /modlog?kind=&q=&offset= staff actions, comments and page revisions, newest first (moderators too)
+//                                kind: all | edits | comments | staff; q matches a plot, a name or any text
 
 import express from 'express';
 import db from '../db/init.js';
@@ -96,18 +97,30 @@ router.delete('/accounts/:id/ban', requireAdmin, (req, res) => {
 });
 
 // The mod log, newest first, 50 per page. Moderators see it too (3.13).
+// Each filter is up to three action patterns; unused slots never match.
+const LOG_KINDS = {
+  edits: ['revision.%', 'shop.%', 'image.%'],
+  comments: ['comment.%'],
+  staff: ['account.%', 'tag.%'],
+};
 const modLogPage = db.prepare(`
   SELECT m.id, m.action, m.target, m.details, m.revision_id, m.data, m.created_at,
     COALESCE(a.name, m.actor_name) AS actor,
     (m.account_id IS NULL AND m.actor_name IS NOT NULL) AS actor_deleted
   FROM mod_log m LEFT JOIN accounts a ON a.id = m.account_id
+  WHERE (@all = 1 OR m.action LIKE @p1 OR m.action LIKE @p2 OR m.action LIKE @p3)
+    AND (@q = '' OR COALESCE(a.name, m.actor_name) LIKE @like OR m.target LIKE @like
+      OR m.details LIKE @like OR m.data LIKE @like)
   ORDER BY m.created_at DESC, m.id DESC
   LIMIT @limit OFFSET @offset
 `);
 
 router.get('/modlog', requireModerator, (req, res) => {
   const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
-  const rows = modLogPage.all({ limit: PAGE + 1, offset });
+  const patterns = LOG_KINDS[req.query.kind] ?? [];
+  const [p1, p2, p3] = [...patterns, '', '', ''];
+  const q = String(req.query.q ?? '').trim().slice(0, 100);
+  const rows = modLogPage.all({ all: patterns.length ? 0 : 1, p1, p2, p3, q, like: `%${q}%`, limit: PAGE + 1, offset });
   const entries = rows.slice(0, PAGE).map((e) => ({ ...e, data: e.data == null ? null : JSON.parse(e.data) }));
   res.json({ entries, hasMore: rows.length > PAGE });
 });

@@ -39,13 +39,11 @@ function StaffArea({ account }) {
         <button onClick={() => setTab('plots')} aria-pressed={tab === 'plots'}>Plots</button>
         <button onClick={() => setTab('comments')} aria-pressed={tab === 'comments'}>Comments</button>
         <button onClick={() => setTab('tags')} aria-pressed={tab === 'tags'}>Tags</button>
-        {/* Accounts (making moderators) and the mod log are for admins only. */}
+        {/* Accounts (making moderators) is for admins only. */}
         {account.role === 'admin' && (
-          <>
-            <button onClick={() => setTab('accounts')} aria-pressed={tab === 'accounts'}>Accounts</button>
-            <button onClick={() => setTab('modlog')} aria-pressed={tab === 'modlog'}>Mod log</button>
-          </>
+          <button onClick={() => setTab('accounts')} aria-pressed={tab === 'accounts'}>Accounts</button>
         )}
+        <button onClick={() => setTab('modlog')} aria-pressed={tab === 'modlog'}>Mod log</button>
       </div>
       {tab === 'review' && (
         <Suspense fallback={<p>Loading…</p>}>
@@ -57,7 +55,7 @@ function StaffArea({ account }) {
       {tab === 'comments' && <AdminComments />}
       {tab === 'tags' && <AdminTags />}
       {tab === 'accounts' && account.role === 'admin' && <AdminAccounts />}
-      {tab === 'modlog' && account.role === 'admin' && <AdminModLog />}
+      {tab === 'modlog' && <AdminModLog />}
     </>
   );
 }
