@@ -3,7 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import TagEditor from './TagEditor';
 import DiffText from './DiffText';
 import VersionChoice from './VersionChoice';
-import { FIELDS, OWNER, SHOP_FIELDS, tagNamer } from '../lib/shopFields';
+import { FIELDS, OWNER, SHOP_FIELDS, maintainersOf, tagNamer } from '../lib/shopFields';
 import { displayName } from '../lib/plots';
 import './ShopEditForm.css';
 
@@ -119,10 +119,9 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
   const [resolved, setResolved] = useState([]);
 
   const isStaff = account.role === 'moderator' || account.role === 'admin';
-  const isOwner = !!shop && account.name.toLowerCase() === shop.owner.trim().toLowerCase();
-  // Matches the server: owners publish edits to their own shop; a new owner
-  // or an empty plot always needs a moderator.
-  const canPublish = isStaff || (mode === 'edit' && isOwner);
+  const me = account.name.toLowerCase();
+  const isOwner = !!shop && me === shop.owner.trim().toLowerCase();
+  const isMaintainer = maintainersOf(shop).some((n) => n.toLowerCase() === me);
 
   const fieldsFor = (m) => [...(m === 'open' ? [OWNER] : []), ...FIELDS]
     .filter((f) => !f.guildOnly || plot.is_guild || (m === 'edit' && shop?.guild_name));
@@ -139,6 +138,12 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
   const edited = (key) => isEdited(mode, values, key);
   const tagsEdited = mode !== 'vacate' && !sameIds(tagIds, baseFor(mode).tag_ids);
   const dirty = isDirty(mode, drafts);
+  // Matches the server (canPublish in lib/revisions.js): the owner and
+  // maintainers publish edits to their own shop, but only the owner changes
+  // who the maintainers are. A new owner or an empty plot needs a moderator.
+  const changingMaintainers = mode === 'edit' && edited('maintainers');
+  const canPublish = isStaff || (mode === 'edit' && (isOwner || (isMaintainer && !changingMaintainers)));
+  const maintainersNote = changingMaintainers && isMaintainer && !isOwner && !isStaff;
   // One shop per owner (3.12): a new owner with a shop elsewhere moves here,
   // and that shop closes. Names match ignoring case, like on the server.
   const typedOwner = mode === 'open' ? values.owner.trim().toLowerCase() : '';
@@ -313,10 +318,14 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
                 <FieldLabel htmlFor={id} label={f.label} edited={marked} onReset={reset(f.key)} />
                 <Input id={id} type={f.multiline ? undefined : 'text'} value={values[f.key]} onChange={set(f.key)}
                   maxLength={f.max}
-                  aria-describedby={[f.hint && `${id}-hint`, f.key === 'owner' && moveNote && `${id}-moving`].filter(Boolean).join(' ') || undefined}
+                  aria-describedby={[f.hint && `${id}-hint`, f.key === 'owner' && moveNote && `${id}-moving`,
+                    f.key === 'maintainers' && maintainersNote && `${id}-review`].filter(Boolean).join(' ') || undefined}
                   aria-required={f.key === 'owner' || undefined}
                   className={marked ? 'shop-edit__input--edited' : undefined} />
                 {f.hint && <p id={`${id}-hint`} className="shop-edit__muted">{f.hint}</p>}
+                {f.key === 'maintainers' && maintainersNote && (
+                  <p id={`${id}-review`} className="shop-edit__muted">Only the owner or a moderator can change this.</p>
+                )}
                 {f.key === 'owner' && moveNote && (
                   <p id={`${id}-moving`} className="shop-edit__warning">
                     {movingFrom.shop.owner} already has a shop at <span className="coord">{movingFrom.id}</span>. Opening this one closes it.

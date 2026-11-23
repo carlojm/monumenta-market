@@ -607,6 +607,12 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
                 <dd>{ownerLabel(shop)}</dd>
               </>
             )}
+            {shop?.maintainers && (
+              <>
+                <dt>Maintainers</dt>
+                <dd>{shop.maintainers}</dd>
+              </>
+            )}
             {categoryTags.length > 0 && (
               <>
                 <dt>{categoryTags.length > 1 ? 'Categories' : 'Category'}</dt>

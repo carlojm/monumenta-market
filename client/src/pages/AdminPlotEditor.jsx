@@ -6,6 +6,7 @@ import ColorInput from '../components/ColorInput';
 
 const FIELDS = [
   { key: 'owner', label: 'Owner (player name, or guild tag without brackets)' },
+  { key: 'maintainers', label: 'Maintainers (Minecraft names, separated by commas)' },
   {
     key: 'shop_name',
     label: 'Shop name',
