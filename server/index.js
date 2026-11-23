@@ -141,7 +141,7 @@ function shopWithDetails(shop) {
 app.get('/api/plots', (req, res) => {
   const rows = db.prepare(`
     SELECT p.*,
-      s.id AS shop_id, s.owner, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
+      s.id AS shop_id, s.owner, s.maintainers, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
       s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
       (SELECT GROUP_CONCAT(body, ' ') FROM comments c
        WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0

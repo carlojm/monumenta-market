@@ -7,7 +7,7 @@ import db from '../db/init.js';
 import { addLogEntry } from './shopLog.js';
 
 // The editable fields of a shop, in display order.
-export const SHOP_FIELDS = ['owner', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
+export const SHOP_FIELDS = ['owner', 'maintainers', 'shop_name', 'guild_name', 'description', 'stock', 'palette',
   'guild_color', 'primary_color', 'secondary_color'];
 
 export const getPlot = db.prepare('SELECT * FROM plots WHERE id = ?');
@@ -15,9 +15,9 @@ export const getCurrentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? 
 export const getShop = db.prepare('SELECT * FROM shops WHERE id = ?');
 
 const insertShop = db.prepare(`
-  INSERT INTO shops (plot_id, owner, shop_name, guild_name, description, stock, palette,
+  INSERT INTO shops (plot_id, owner, maintainers, shop_name, guild_name, description, stock, palette,
     guild_color, primary_color, secondary_color, opened_at)
-  VALUES (@plot_id, @owner, @shop_name, @guild_name, @description, @stock, @palette,
+  VALUES (@plot_id, @owner, @maintainers, @shop_name, @guild_name, @description, @stock, @palette,
     @guild_color, @primary_color, @secondary_color, CURRENT_TIMESTAMP)
 `);
 export const closeShop = db.prepare('UPDATE shops SET closed_at = CURRENT_TIMESTAMP WHERE id = ?');

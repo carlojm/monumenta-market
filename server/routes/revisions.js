@@ -2,12 +2,13 @@
 //
 // Page revisions (Phase 3), mounted at /api. The rules live in lib/revisions.js.
 //   POST /plots/:id/revisions   {action, base?, proposed?, summary?, request_review?}
-//        Owners (edits to their own shop) and staff publish at once, unless
-//        they ask for review; everyone else's edit waits for review. A
-//        player's new suggestion for a plot replaces their earlier pending one.
+//        Owners and maintainers (edits to their own shop; only the owner
+//        changes the maintainers) and staff publish at once, unless they ask
+//        for review; everyone else's edit waits for review. A player's new
+//        suggestion for a plot replaces their earlier pending one.
 //   POST /revisions/:id/withdraw            the author cancels a pending one
-//   GET  /revisions/pending                 the review queue (staff: all; owners: their shop, with
-//                                           can_review false where only a mod may approve)
+//   GET  /revisions/pending                 the review queue (staff: all; owners and maintainers: their
+//                                           shop, with can_review false where only a mod or the owner may approve)
 //   GET  /revisions/mine?offset=&withdrawn= your own edits, newest first, 20 at a time
 //   POST /revisions/:id/approve {values?, note?}  `values` resolves conflicts or fixes typos
 //   POST /revisions/:id/reject  {note?}
@@ -19,8 +20,8 @@ import db from '../db/init.js';
 import { logRevision, shopName, snapshotDiff } from '../lib/revisionLog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
-  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, cleanBase,
-  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, ownersOtherShop, parse, preview, publicRevision,
+  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, changesMaintainers,
+  cleanBase, cleanNote, cleanSnapshot, runsShop, isStaff, isStale, mergeEdit, ownersOtherShop, parse, preview, publicRevision,
   recordDirect, recordMove, recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from '../lib/shops.js';
@@ -121,7 +122,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
   const resolved = cleanResolved(req.body.resolved);
 
   // Publish at once: the owner editing their shop, or staff.
-  if (canPublish(account, action, shop) && !req.body.request_review) {
+  if (canPublish(account, action, shop, action === 'edit' && changesMaintainers(base, proposed)) && !req.body.request_review) {
     let values = proposed;
     if (action === 'edit') {
       const merged = mergeEdit(base, proposed, now);
@@ -182,9 +183,9 @@ router.get('/revisions/pending', (req, res) => {
   for (const r of pendingRevisions.all()) {
     const shop = getCurrentShop.get(r.plot_id) ?? null;
     const reviewable = canReview(req.account, r, shop);
-    // Owners see every suggestion about their own shop, including ones only a
-    // mod can approve (like "this plot is now empty"), so they know about them.
-    if (!staff && !isOwner(req.account, shop)) continue;
+    // Owners and maintainers see every suggestion about their own shop,
+    // including ones only a mod (or the owner) can approve, so they know.
+    if (!staff && !runsShop(req.account, shop)) continue;
     list.push(publicRevision(r, {
       owner: shop?.owner ?? null,
       // The plot's current shop, so the queue can name it (null when vacant).
@@ -363,7 +364,7 @@ router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
   }
   // The same rule as making the change now: an owner can undo an edit to
   // their own shop; closing or replacing a shop needs a moderator.
-  if (!canPublish(account, revision.action === 'edit' ? 'edit' : 'open', shop)) {
+  if (!canPublish(account, revision.action === 'edit' ? 'edit' : 'open', shop, changesMaintainers(row.old_values, row.new_values))) {
     return res.status(403).json({ error: "You can't undo this edit." });
   }
 

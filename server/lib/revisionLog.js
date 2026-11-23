@@ -28,7 +28,7 @@ const tagName = db.prepare('SELECT name FROM tags WHERE id = ?').pluck();
 
 // The names the site shows (client/src/lib/shopFields.js).
 const LABELS = {
-  owner: 'Owner', shop_name: 'Shop name', guild_name: 'Guild name', description: 'About', stock: 'Keywords',
+  owner: 'Owner', maintainers: 'Maintainers', shop_name: 'Shop name', guild_name: 'Guild name', description: 'About', stock: 'Keywords',
   palette: 'Palette', guild_color: 'Guild color', primary_color: 'Primary color', secondary_color: 'Secondary color',
 };
 

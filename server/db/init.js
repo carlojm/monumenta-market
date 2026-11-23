@@ -24,6 +24,7 @@ export function createSchema() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       plot_id TEXT NOT NULL REFERENCES plots(id),
       owner TEXT NOT NULL,
+      maintainers TEXT,               -- players who help run it, "Alice, Bob" (3.8)
       shop_name TEXT,
       guild_name TEXT,
       description TEXT,
@@ -228,6 +229,9 @@ export function createSchema() {
 
   // Nov 2026: one shop per owner; a move closes the old shop as part of the new one (3.12).
   addColumnIfMissing('revisions', 'part_of', 'INTEGER REFERENCES revisions(id)');
+
+  // Nov 2026: shops list the players who help run them (3.8).
+  addColumnIfMissing('shops', 'maintainers', 'TEXT');
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

@@ -23,12 +23,27 @@ export const ACTIONS = ['edit', 'open', 'vacate'];
 export const MAX_PENDING_PER_ACCOUNT = 10;
 export const NOTE_MAX = 300; // edit summaries and review notes
 const FIELD_LIMITS = {
-  owner: 32, shop_name: 80, guild_name: 80, description: 4000, stock: 4000,
+  owner: 32, maintainers: 400, shop_name: 80, guild_name: 80, description: 4000, stock: 4000,
   palette: 200, guild_color: 40, primary_color: 40, secondary_color: 40,
 };
-const LABELS = { shop_name: 'shop name', guild_name: 'guild name', guild_color: 'guild color',
+const LABELS = { maintainers: 'maintainers', shop_name: 'shop name', guild_name: 'guild name', guild_color: 'guild color',
   primary_color: 'primary color', secondary_color: 'secondary color' };
 const label = (f) => LABELS[f] ?? f;
+
+// Maintainers (3.8): Minecraft names, kept as "Alice, Bob". Commas or spaces
+// separate them when typed; repeats (ignoring case) are dropped.
+export const MAX_MAINTAINERS = 10;
+const MINECRAFT_NAME = /^[A-Za-z0-9_]{1,16}$/;
+function cleanMaintainers(text) {
+  const names = [];
+  for (const name of text.split(/[\s,]+/).filter(Boolean)) {
+    if (!MINECRAFT_NAME.test(name)) return { error: `"${name}" isn't a Minecraft name.` };
+    if (!names.some((n) => n.toLowerCase() === name.toLowerCase())) names.push(name);
+  }
+  if (names.length > MAX_MAINTAINERS) return { error: `A shop can have at most ${MAX_MAINTAINERS} maintainers.` };
+  return { value: names.join(', ') || null };
+}
+export const maintainersOf = (shop) => (shop?.maintainers ? shop.maintainers.split(', ') : []);
 
 const tagIdsOf = db.prepare('SELECT tag_id FROM shop_tags WHERE shop_id = ? ORDER BY tag_id');
 const sorted = (ids) => [...ids].sort((a, b) => a - b);
@@ -71,6 +86,12 @@ export function cleanSnapshot(input, fallback) {
     const text = v?.trim() || null;
     if (text && text.length > FIELD_LIMITS[f]) {
       return { error: `The ${label(f)} can be at most ${FIELD_LIMITS[f]} characters.` };
+    }
+    if (f === 'maintainers' && text) {
+      const cleaned = cleanMaintainers(text);
+      if (cleaned.error) return cleaned;
+      snapshot[f] = cleaned.value;
+      continue;
     }
     snapshot[f] = text;
   }
@@ -127,14 +148,25 @@ export function mergeEdit(base, proposed, now) {
 }
 
 // Who may do what. `shop` is the plot's current shop (or null).
+// The check is always here on the server, never only in the browser.
 export const isStaff = (account) => ['moderator', 'admin'].includes(roleOf(account));
 export const isOwner = (account, shop) =>
   !!account && !!shop?.owner && account.name.toLowerCase() === shop.owner.trim().toLowerCase();
-// Owners can only edit their own shop; a new owner or an empty plot needs staff.
-export const canPublish = (account, action, shop) => isStaff(account) || (action === 'edit' && isOwner(account, shop));
+export const isMaintainer = (account, shop) =>
+  !!account && maintainersOf(shop).some((n) => n.toLowerCase() === account.name.toLowerCase());
+// The owner and maintainers run the shop: they see and review its suggestions.
+export const runsShop = (account, shop) => isOwner(account, shop) || isMaintainer(account, shop);
+// Does going from `a` to `b` change who the maintainers are? (Snapshots from
+// before 3.8 have no maintainers, which counts as none.)
+export const changesMaintainers = (a, b) => (a?.maintainers ?? null) !== (b?.maintainers ?? null);
+// The owner and maintainers edit their own shop directly, but only the owner
+// changes who the maintainers are (3.8). A new owner or an empty plot needs staff.
+export const canPublish = (account, action, shop, maintainersChange = false) => isStaff(account)
+  || (action === 'edit' && (isOwner(account, shop) || (!maintainersChange && isMaintainer(account, shop))));
 // You can approve an edit exactly when you could have published it yourself,
 // including your own (a mod who queued an edit to double-check it later).
-export const canReview = (account, revision, shop) => !!account && canPublish(account, revision.action, shop);
+export const canReview = (account, revision, shop) => !!account
+  && canPublish(account, revision.action, shop, changesMaintainers(parse(revision.base), parse(revision.proposed)));
 
 // Is the plot still in the state the revision was made for? An edit or vacate
 // needs the same shop; an open needs the same shop (or still none) it replaces.
