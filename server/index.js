@@ -19,7 +19,7 @@ import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from './lib/shops.js';
-import { applyRevision, authorChanged, cleanSnapshot, pendingForPlot, recordDirect, snapshotOf } from './lib/revisions.js';
+import { applyRevision, authorChanged, cleanSnapshot, ownersOtherShop, pendingForPlot, recordDirect, recordMove, snapshotOf } from './lib/revisions.js';
 import {
   KINDS, cleanTag, listTags, sameName, tagsByShop, tagsForShop,
 } from './lib/tags.js';
@@ -342,14 +342,20 @@ app.put('/api/plots/:id/shop', requireModerator, (req, res) => {
   if (cleaned.error) return res.status(400).json({ error: cleaned.error });
   const values = cleaned.snapshot;
   if (action === 'edit' && !authorChanged(now, values)) return res.json({ updated: false });
+  // One shop per owner (3.12): a new shop moves its owner here, but renaming
+  // this one to someone who has a shop elsewhere would give them two.
+  const elsewhere = action === 'edit' && values.owner !== now.owner && ownersOtherShop(values.owner, plot.id);
+  if (elsewhere) return res.status(400).json({ error: `${values.owner} already has a shop at ${elsewhere.plot_id}.` });
 
   const applied = db.transaction(() => {
     const result = applyRevision({ action, plotId: plot.id, shop: current, values, author: req.account });
-    recordDirect({ plotId: plot.id, shopId: current?.id ?? null, action, base: now, proposed: values, account: req.account, applied: result });
+    const id = recordDirect({ plotId: plot.id, shopId: current?.id ?? null, action, base: now, proposed: values, account: req.account, applied: result });
+    if (result.moved) recordMove({ moved: result.moved, partOf: id, toPlot: plot.id, account: req.account });
     if (action === 'open') {
+      const moved = result.moved ? `, moving them from ${result.moved.shop.plot_id}` : '';
       logModAction(req, 'shop.open', `plot:${plot.id}`, current
-        ? `Closed ${current.owner}'s shop and opened one for ${values.owner}`
-        : `Opened a shop for ${values.owner}`);
+        ? `Closed ${current.owner}'s shop and opened one for ${values.owner}${moved}`
+        : `Opened a shop for ${values.owner}${moved}`);
     } else {
       logModAction(req, 'shop.edit', `plot:${plot.id}`, `Edited ${current.owner}'s shop: ${result.changed.join(', ')}`);
     }

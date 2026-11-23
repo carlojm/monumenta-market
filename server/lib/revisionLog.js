@@ -17,6 +17,8 @@
 //   edited     [{ field, suggested, saved }] text a reviewer fixed while approving
 //   replaced   how many earlier suggestions of theirs this one replaced
 //   undid      the revision an undo reversed
+//   moved_from a new shop's owner had a shop on this plot, now closed (3.12)
+//   moved_back an undo also reopened the owner's shop on this plot
 
 import db from '../db/init.js';
 import { logModAction } from './modlog.js';
@@ -56,7 +58,9 @@ function fieldList({ changes = [], tags }) {
 // What the revision does, as a phrase: "an edit to Slime Shop (About and tags)".
 function what(d) {
   if (d.action === 'vacate') return `closing ${d.shop ?? 'the shop'} (the plot is now empty)`;
-  if (d.action === 'open') return `a new shop by ${d.owner}${d.shop ? `, replacing ${d.shop}` : ''}`;
+  if (d.action === 'open') {
+    return `a new shop by ${d.owner}${d.shop ? `, replacing ${d.shop}` : ''}${d.moved_from ? `, moving from ${d.moved_from}` : ''}`;
+  }
   return `an edit to ${d.shop ?? 'the shop'} (${fieldList(d)})`;
 }
 
@@ -68,7 +72,8 @@ const SENTENCES = {
   reject: (d) => `Rejected ${d.author ?? 'a deleted account'}'s suggestion: ${what(d)}`,
   // An undone new shop or closure is saved as the change it makes.
   undo: (d) => `Undid their Force edit #${d.undid}${
-    d.action === 'edit' ? `: ${what(d)}` : d.action === 'open' ? `, bringing back ${d.owner}'s shop` : `, closing ${d.shop} again`}`,
+    d.action === 'edit' ? `: ${what(d)}` : d.action === 'open' ? `, bringing back ${d.owner}'s shop` : `, closing ${d.shop} again`}${
+    d.moved_back ? ` and reopening their shop at ${d.moved_back}` : ''}`,
 };
 
 // `kind` is one of SENTENCES' keys; `data` is described at the top.

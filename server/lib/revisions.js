@@ -34,6 +34,16 @@ const tagIdsOf = db.prepare('SELECT tag_id FROM shop_tags WHERE shop_id = ? ORDE
 const sorted = (ids) => [...ids].sort((a, b) => a - b);
 const sameTags = (a, b) => a.length === b.length && sorted(a).every((id, i) => id === sorted(b)[i]);
 
+// One shop per owner (3.12), guild tags included: the owner's current shop
+// on any plot other than `plotIds`, or null. Names match ignoring case, like
+// Minecraft names.
+const ownersShops = db.prepare(`
+  SELECT * FROM shops WHERE closed_at IS NULL AND lower(owner) = lower(?) AND plot_id NOT IN (?, ?)
+  ORDER BY id LIMIT 1
+`);
+export const ownersOtherShop = (owner, ...plotIds) =>
+  (owner ? ownersShops.get(owner, plotIds[0], plotIds[1] ?? plotIds[0]) ?? null : null);
+
 // The live shop as a snapshot (null for an empty plot).
 export function snapshotOf(shop) {
   if (!shop) return null;
@@ -149,6 +159,10 @@ export function publicRevision(r, extra = {}) {
 // What approving would do right now: the fields it changes and any conflicts.
 export function preview(revision, shop) {
   if (isStale(revision, shop)) return { stale: true, changes: [], conflicts: [] };
+  if (revision.action === 'open') {
+    const from = ownersOtherShop(parse(revision.proposed).owner, revision.plot_id);
+    return { stale: false, changes: [], conflicts: [], moves_from: from?.plot_id ?? null };
+  }
   if (revision.action !== 'edit') return { stale: false, changes: [], conflicts: [] };
   const now = snapshotOf(shop);
   const { values, conflicts } = mergeEdit(parse(revision.base), parse(revision.proposed), now);
@@ -201,6 +215,21 @@ export function recordDirect({ plotId, shopId, action, base, proposed, summary =
   }).lastInsertRowid;
 }
 
+// The other half of a move (applyRevision's `moved`): the owner's old shop
+// closing, in that plot's history, as part of revision `partOf`. Undoing
+// `partOf` reopens it. `reopen` saves the undo's half the other way round.
+const insertPart = db.prepare('UPDATE revisions SET part_of = ? WHERE id = ?');
+export function recordMove({ moved, partOf, toPlot, account, reopen = false }) {
+  const { shop, old_values: values } = moved;
+  const id = recordDirect({
+    plotId: shop.plot_id, shopId: shop.id, action: reopen ? 'open' : 'vacate', base: reopen ? null : values,
+    proposed: reopen ? values : null, summary: reopen ? `Undo of the move to ${toPlot}` : `${shop.owner} moved to ${toPlot}`,
+    account, applied: reopen ? { old_values: null, new_values: values } : { old_values: values, new_values: null },
+  });
+  insertPart.run(partOf, id);
+  return id;
+}
+
 const updateShop = (shopId, values, fields) => db.prepare(
   `UPDATE shops SET ${[...fields.map((f) => `${f} = @${f}`), 'updated_at = CURRENT_TIMESTAMP'].join(', ')} WHERE id = @id`,
 ).run({ ...Object.fromEntries(fields.map((f) => [f, values[f]])), id: shopId });
@@ -208,7 +237,9 @@ const updateShop = (shopId, values, fields) => db.prepare(
 // Writes a revision to the shop. Call inside a transaction. `values` is the
 // final snapshot for 'edit' and 'open' (unused for 'vacate'). `credit` is
 // appended to each shop log line, e.g. " (approved by Fulan)".
-// Returns { old_values, new_values, changed } for the revisions row.
+// Returns { old_values, new_values, changed } for the revisions row. An
+// 'open' for an owner with a shop elsewhere is a move: that shop closes too,
+// and `moved` is { shop, old_values } for recordMove.
 export function applyRevision({ action, plotId, shop, values, author, credit = '' }) {
   const old = snapshotOf(shop);
   if (action === 'vacate') {
@@ -221,12 +252,18 @@ export function applyRevision({ action, plotId, shop, values, author, credit = '
       closeShop.run(shop.id);
       addLogEntry(shop.id, author, `Shop closed, plot taken over by ${values.owner}${credit}`);
     }
+    const from = ownersOtherShop(values.owner, plotId);
+    const moved = from && { shop: from, old_values: snapshotOf(from) };
+    if (from) {
+      closeShop.run(from.id);
+      addLogEntry(from.id, author, `Shop closed, ${values.owner} moved to ${plotId}${credit}`);
+    }
     const opened = openShop(plotId, values, author);
     if (values.tag_ids.length) {
       const { added } = setShopTags(opened, values.tag_ids);
       addLogEntry(opened, author, `tags set: ${added.join(', ')}${credit}`);
     }
-    return { old_values: old, new_values: { ...values }, changed: ['open'], opened };
+    return { old_values: old, new_values: { ...values }, changed: ['open'], opened, moved };
   }
   // 'edit'
   const fields = SHOP_FIELDS.filter((f) => values[f] !== old[f]);
@@ -246,9 +283,10 @@ export function applyRevision({ action, plotId, shop, values, author, credit = '
 
 // Undoes a direct revision (3.3e). Call inside a transaction, after checking
 // the page is still exactly as it left it. `revision` is the row, with
-// old_values and new_values parsed. Returns { action, old_values, new_values,
-// changed } for the new revisions row: the undo is saved as the change it makes.
-export function applyUndo({ revision, shop, account }) {
+// old_values and new_values parsed; `moved` is the row recordMove saved for
+// it, if any. Returns { action, old_values, new_values, changed } for the new
+// revisions row: the undo is saved as the change it makes.
+export function applyUndo({ revision, shop, account, moved = null }) {
   const credit = ` (undo of #${revision.id})`;
   if (revision.action === 'edit') {
     const applied = applyRevision({ action: 'edit', plotId: revision.plot_id, shop, values: revision.old_values, author: account, credit });
@@ -263,6 +301,11 @@ export function applyUndo({ revision, shop, account }) {
   if (revision.shop_id) {
     reopenShop.run(revision.shop_id);
     addLogEntry(revision.shop_id, account, `Shop reopened${credit}`);
+  }
+  // The owner had moved here: their old shop opens again.
+  if (moved) {
+    reopenShop.run(moved.shop_id);
+    addLogEntry(moved.shop_id, account, `Shop reopened${credit}`);
   }
   return {
     action: revision.shop_id ? 'open' : 'vacate',

@@ -194,6 +194,7 @@ export function createSchema() {
       review_note TEXT,                       -- why it was rejected or changed; shown to the author
       old_values TEXT,                        -- JSON snapshot, set when applied
       new_values TEXT,                        -- JSON snapshot, set when applied
+      part_of INTEGER REFERENCES revisions(id), -- a closure caused by another revision: its owner moved there (3.12)
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       reviewed_at TEXT
     );
@@ -224,6 +225,9 @@ export function createSchema() {
   // Nov 2026: revision entries link their revision and keep what changed (3.13).
   addColumnIfMissing('mod_log', 'revision_id', 'INTEGER');
   addColumnIfMissing('mod_log', 'data', 'TEXT');
+
+  // Nov 2026: one shop per owner; a move closes the old shop as part of the new one (3.12).
+  addColumnIfMissing('revisions', 'part_of', 'INTEGER REFERENCES revisions(id)');
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

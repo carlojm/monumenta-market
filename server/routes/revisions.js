@@ -20,10 +20,10 @@ import { logRevision, shopName, snapshotDiff } from '../lib/revisionLog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
   ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, cleanBase,
-  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, parse, preview, publicRevision, recordDirect,
-  recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
+  cleanNote, cleanSnapshot, isOwner, isStaff, isStale, mergeEdit, ownersOtherShop, parse, preview, publicRevision,
+  recordDirect, recordMove, recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
-import { SHOP_FIELDS, getCurrentShop, getPlot } from '../lib/shops.js';
+import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from '../lib/shops.js';
 import { tagsForShop } from '../lib/tags.js';
 
 const router = express.Router();
@@ -38,6 +38,7 @@ const finishReview = db.prepare(`
     old_values = @old_values, new_values = @new_values, reviewed_at = CURRENT_TIMESTAMP
   WHERE id = @id AND status = 'pending'
 `);
+const movedBy = db.prepare("SELECT * FROM revisions WHERE part_of = ? AND action = 'vacate'");
 const latestApplied = db.prepare(
   "SELECT id FROM revisions WHERE plot_id = ? AND status = 'approved' ORDER BY id DESC LIMIT 1",
 );
@@ -62,8 +63,8 @@ function asked({ action, base, proposed }) {
 }
 
 // What applying a revision did (`applied` is applyRevision's result).
-function made(action, { old_values: before, new_values: after }) {
-  const data = { action, shop: shopName(before) };
+function made(action, { old_values: before, new_values: after, moved }) {
+  const data = { action, shop: shopName(before), moved_from: moved?.shop.plot_id };
   if (action === 'edit') return { ...data, ...snapshotDiff(before, after) };
   if (action === 'open') return { ...data, owner: after.owner, ...snapshotDiff(null, after) };
   return data;
@@ -136,6 +137,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     const result = db.transaction(() => {
       const applied = applyRevision({ action, plotId: plot.id, shop, values, author: account });
       const id = recordDirect({ ...row, applied });
+      if (applied.moved) recordMove({ moved: applied.moved, partOf: id, toPlot: plot.id, account });
       logRevision(req, 'publish', { revisionId: id, plotId: plot.id, ...made(action, applied), summary: row.summary, resolved });
       return { id, changed: applied.changed };
     })();
@@ -200,7 +202,7 @@ router.get('/revisions/pending', (req, res) => {
 const MINE_PAGE = 20;
 const myRevisions = db.prepare(`
   SELECT r.*, rv.name AS reviewer_name FROM revisions r LEFT JOIN accounts rv ON rv.id = r.reviewer_id
-  WHERE r.author_id = @author AND (r.status = 'withdrawn') = @withdrawn
+  WHERE r.author_id = @author AND (r.status = 'withdrawn') = @withdrawn AND r.part_of IS NULL
   ORDER BY r.created_at DESC, r.id DESC LIMIT @limit OFFSET @offset
 `);
 const countWithdrawn = db.prepare("SELECT count(*) FROM revisions WHERE author_id = ? AND status = 'withdrawn'").pluck();
@@ -230,6 +232,7 @@ router.get('/revisions/mine', (req, res) => {
       // A Force edit records its author as the reviewer; no one else reviewed it.
       review_note: r.review_note, reviewer: r.direct ? null : r.reviewer_name ?? null, created_at: r.created_at, reviewed_at: r.reviewed_at,
       ...(applied ? made(r.action, { old_values: parse(r.old_values), new_values: after }) : asked(p)),
+      moved_from: movedBy.get(r.id)?.plot_id ?? null,
       adjusted,
     };
   });
@@ -297,6 +300,7 @@ router.post('/revisions/:id/approve', (req, res) => {
       id: revision.id, status: 'approved', reviewer_id: req.account.id, review_note: cleanNote(req.body.note),
       old_values: json(applied.old_values), new_values: json(applied.new_values),
     });
+    if (applied.moved) recordMove({ moved: applied.moved, partOf: revision.id, toPlot: revision.plot_id, account: req.account });
     logRevision(req, 'approve', {
       revisionId: revision.id, plotId: revision.plot_id, ...made(revision.action, applied),
       author: author?.name, summary: revision.summary, note: cleanNote(req.body.note), resolved, edited,
@@ -334,12 +338,28 @@ router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
   if (!revision || revision.author_id !== account.id || !revision.direct || revision.status !== 'approved') {
     return res.status(404).json({ error: 'Edit not found' });
   }
+  if (revision.part_of) {
+    return res.status(409).json({ error: `This was part of #${revision.part_of}. Undo that instead.` });
+  }
   const shop = getCurrentShop.get(revision.plot_id) ?? null;
   const row = { ...revision, old_values: parse(revision.old_values), new_values: parse(revision.new_values) };
   const changedSince = latestApplied.get(revision.plot_id).id !== revision.id
     || !sameSnapshot(snapshotOf(shop), row.new_values);
   if (changedSince) {
     return res.status(409).json({ error: 'The page has changed since, so this can no longer be undone. Edit it instead.' });
+  }
+  // A move closed the owner's old shop too: that plot must be untouched since.
+  const moved = movedBy.get(revision.id);
+  if (moved && (getCurrentShop.get(moved.plot_id) || latestApplied.get(moved.plot_id)?.id !== moved.id)) {
+    return res.status(409).json({ error: `${moved.plot_id} has changed since, so this can no longer be undone. Edit it instead.` });
+  }
+  // One shop per owner: a shop coming back can't belong to someone who has
+  // opened another since.
+  const back = [revision.action !== 'edit' && revision.shop_id && getShop.get(revision.shop_id), moved && getShop.get(moved.shop_id)]
+    .filter(Boolean);
+  for (const s of back) {
+    const other = ownersOtherShop(s.owner, revision.plot_id, moved?.plot_id);
+    if (other) return res.status(409).json({ error: `${s.owner} has a shop at ${other.plot_id} now, so this can no longer be undone.` });
   }
   // The same rule as making the change now: an owner can undo an edit to
   // their own shop; closing or replacing a shop needs a moderator.
@@ -348,12 +368,20 @@ router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
   }
 
   const result = db.transaction(() => {
-    const applied = applyUndo({ revision: row, shop, account });
+    const applied = applyUndo({ revision: row, shop, account, moved });
     const id = recordDirect({
       plotId: revision.plot_id, shopId: shop?.id ?? null, action: applied.action, base: applied.old_values,
       proposed: applied.new_values, summary: `Undo of #${revision.id}`, account, applied,
     });
-    logRevision(req, 'undo', { revisionId: id, plotId: revision.plot_id, ...made(applied.action, applied), undid: revision.id });
+    if (moved) {
+      recordMove({
+        moved: { shop: getShop.get(moved.shop_id), old_values: parse(moved.old_values) },
+        partOf: id, toPlot: revision.plot_id, account, reopen: true,
+      });
+    }
+    logRevision(req, 'undo', {
+      revisionId: id, plotId: revision.plot_id, ...made(applied.action, applied), undid: revision.id, moved_back: moved?.plot_id,
+    });
     return { id, changed: applied.changed };
   })();
   res.status(201).json({ status: 'undone', ...result });
