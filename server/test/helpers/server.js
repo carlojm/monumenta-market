@@ -29,7 +29,9 @@ function freePort() {
   });
 }
 
-export async function startServer() {
+// `env` adds settings, e.g. { CLIENT_DIST } so it serves the site too (the
+// browser tests in client/e2e).
+export async function startServer({ env = {} } = {}) {
   if (!fs.existsSync(SEED_PATH)) throw new Error('No test database yet. Run `node test/seed.js` (npm test does this).');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'market-test-'));
   const dbPath = path.join(dir, 'test.db');
@@ -42,6 +44,7 @@ export async function startServer() {
     env: {
       PATH: process.env.PATH, TEST_MODE: '1', DB_PATH: dbPath, PORT: String(port), ADMIN_TOKEN,
       ADMIN_UUIDS: ACCOUNTS.filter((a) => a.role === 'admin').map((a) => a.uuid).join(','),
+      ...env,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });

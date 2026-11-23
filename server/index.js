@@ -1,4 +1,4 @@
-import './lib/env.js'; // first: settings (.env, or test mode)
+import { TEST_MODE } from './lib/env.js'; // first: settings (.env, or test mode)
 import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -462,9 +462,10 @@ app.delete('/api/admin/comments/:id', requireModerator, (req, res) => {
 // catch-all below would answer it with the HTML page.
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
-// --- Serve React build in production ---
-if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, 'dist');
+// --- Serve the React build: in production from dist/ (npm run build:ui),
+// and for the browser tests from the build they made (CLIENT_DIST) ---
+const clientDist = process.env.NODE_ENV === 'production' ? path.join(__dirname, 'dist') : TEST_MODE && process.env.CLIENT_DIST;
+if (clientDist) {
   app.use(express.static(clientDist));
   // Express 5 needs a named wildcard; a bare '*' throws at startup.
   app.get('/{*splat}', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
