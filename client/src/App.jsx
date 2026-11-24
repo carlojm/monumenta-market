@@ -34,26 +34,30 @@ function App() {
   const fromApp = !!location.state?.fromApp;
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const listScroll = useRef(0);
+  // The table's own scroll area, in the right column on desktop (App.css).
+  const rowsScroller = () => document.querySelector('.app-main__list .app-main__rows');
   // Stable (useCallback), so the memoized map and table don't re-render for it.
   const openPlot = useCallback((plot) => {
-    if (!plotId) listScroll.current = window.scrollY;
+    if (!plotId) listScroll.current = rowsScroller()?.scrollTop ?? 0;
     navigate(`/plot/${plot.id}`, { replace: !!plotId, state: { fromApp: plotId ? fromApp : true } });
   }, [plotId, fromApp, navigate]);
   const closePlot = () => (fromApp ? navigate(-1) : navigate('/', { replace: true }));
 
-  // Desktop: the card replaces the list, so start the card at the top and
-  // put the list back where it was on "Back", with focus back on the row
-  // that opened the card (phones get this from the card's dialog). Ref
-  // callbacks: they run when the card or the list appears.
+  // Desktop: the card replaces the list, so start the card at the top of its
+  // pane and put the list back where it was on "Back", with focus back on
+  // the row that opened the card (phones get this from the card's dialog).
+  // Ref callbacks: they run when the card or the list appears.
   const lastOpened = useRef(null);
   const cardShown = useCallback((el) => {
     if (!el) return;
-    window.scrollTo(0, 0);
+    const pane = el.closest('section');
+    if (pane) pane.scrollTop = 0;
     lastOpened.current = el.dataset.plotId;
   }, []);
   const listBack = useCallback((el) => {
     if (!el || !lastOpened.current) return;
-    window.scrollTo(0, listScroll.current);
+    const rows = rowsScroller();
+    if (rows) rows.scrollTop = listScroll.current;
     document.querySelector(`.plot-table__open[data-plot-id="${CSS.escape(lastOpened.current)}"]`)
       ?.focus({ preventScroll: true });
     lastOpened.current = null;
@@ -123,17 +127,20 @@ function App() {
         <FilterChips filters={filters} catalog={catalog} zones={zones} openId={openFilterId} onOpen={setOpenFilterId}
           onChange={updateFilter} onRemove={removeFilter} onClear={() => setFilters([])} />
       </div>
-      {filtering && rows.length === 0 ? (
-        <p className="app-main__empty">No shops match these filters.</p>
-      ) : (
-        <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches} tagFiltering={tagFiltering}
-          onSelectPlot={openPlot} />
-      )}
+      {/* On desktop, its own scroll area under the search (App.css). */}
+      <div className="app-main__rows">
+        {filtering && rows.length === 0 ? (
+          <p className="app-main__empty">No shops match these filters.</p>
+        ) : (
+          <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches} tagFiltering={tagFiltering}
+            onSelectPlot={openPlot} />
+        )}
+      </div>
     </div>
   );
 
   return (
-    <div>
+    <div className="app">
       <Navbar />
       <main className="app-main">
         {error && <p className="app-error">{error}</p>}
