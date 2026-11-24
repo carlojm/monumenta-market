@@ -792,7 +792,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
               </div>
               <div role="tabpanel" aria-labelledby="plot-detail-tab-history" className="plot-detail__tabpanel"
                 ref={historyPanel}>
-                {historyOpened && <ShopHistory key={reloads} plotId={plot.id} />}
+                {historyOpened && <ShopHistory key={reloads} plotId={plot.id} shop={shop} account={account} onRestored={handleEditDone} />}
                 <PastShops shops={pastShops} />
               </div>
             </>

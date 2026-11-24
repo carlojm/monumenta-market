@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { startServer } from './helpers/server.js';
-import { apiFor, edit, show, writeDb } from './helpers/api.js';
+import { apiFor, edit, show, snapshot, writeDb } from './helpers/api.js';
 
 let server, as;
 before(async () => { server = await startServer(); as = apiFor(server); });
@@ -120,4 +120,27 @@ test('a deleted account shows as no name', async () => {
   assert.equal(r.status, 200, show(r));
   const [entry] = (await history(P)).changes;
   assert.ok(entry.id === id && entry.author === null && entry.reviewer === 'ShopOwner', JSON.stringify(entry));
+});
+
+test('edits to the current shop carry their version, for Restore', async () => {
+  const first = (await edit(as, 'ShopOwner', P, { palette: 'Version one' })).body.id;
+  await edit(as, 'ShopOwner', P, { palette: 'Version two' });
+  const { changes } = await history(P);
+  const entry = changes.find((c) => c.id === first);
+  assert.equal(entry.version.palette, 'Version one', 'the page right after that change');
+  assert.ok(Array.isArray(entry.version.tag_ids) && entry.version.owner === 'ShopOwner');
+
+  // Restoring is a normal edit: the current page as base, that version proposed.
+  const base = await snapshot(as, P);
+  const r = await as('ShopOwner').post(`/api/plots/${P}/revisions`, { action: 'edit', base, proposed: entry.version, summary: 'Restored the version from today' });
+  assert.ok(r.status === 201 && r.body.status === 'approved', show(r));
+  assert.equal((await as(null).get(`/api/plots/${P}`)).body.shop.palette, 'Version one');
+
+  // Moves and closures carry none, nor do edits to an earlier shop.
+  const A = (await as(null).get('/api/plots')).body.find((p) => !p.shop).id;
+  await as('ModTester').post(`/api/plots/${A}/revisions`, { action: 'open', proposed: { owner: 'Someone', tag_ids: [] } });
+  await edit(as, 'ModTester', A, { palette: 'On the old shop' });
+  await as('ModTester').post(`/api/plots/${A}/revisions`, { action: 'open', proposed: { owner: 'Someone else', tag_ids: [] } });
+  const onA = (await history(A)).changes;
+  assert.ok(onA.every((c) => !('version' in c)), 'nothing to restore across shops');
 });

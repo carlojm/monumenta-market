@@ -146,3 +146,50 @@ test('earlier shops sit under History, with their comments folded', async ({ bro
   await expect(comments.locator('summary'), 'the count matches').toHaveText(`Comments (${shown})`);
   await expectNoProblems(page);
 });
+
+test('Restore this version: owners publish it, players suggest it', async ({ browser }) => {
+  const as = server.as;
+  await edit(as, 'ShopOwner', P, { palette: 'First version' });
+  await edit(as, 'ShopOwner', P, { palette: 'Second version' });
+  const restoreButtons = () => historyPanel().getByRole('button', { name: /^(Restore this version|Suggest restoring this version)$/ });
+
+  // Logged out: nothing to restore with.
+  page = await pageAs(browser, server, null, PHONE);
+  await page.goto(`/plot/${P}`);
+  await tab('History').click();
+  await expect(entries().first()).toContainText('ShopOwner edited Palette');
+  await expect(restoreButtons()).toHaveCount(0);
+  await page.context().close();
+
+  // The owner: the newest entry is the page as it is, so no button there.
+  page = await pageAs(browser, server, 'ShopOwner', PHONE);
+  await page.goto(`/plot/${P}`);
+  await tab('History').click();
+  await expect(entries().first().getByRole('button', { name: 'Restore this version' })).toHaveCount(0);
+  const older = entries().nth(1);
+  await expect(older.locator('.shop-history__head > span')).toHaveText('ShopOwner edited Palette');
+  await older.getByRole('button', { name: 'Restore this version' }).click();
+  await expect(older.getByText('The page goes back to how it was after this change.')).toBeVisible();
+  await expect(older.getByRole('button', { name: 'Cancel' }), 'focus on the safe choice').toBeFocused();
+  await older.getByRole('button', { name: 'Cancel' }).click();
+  await older.getByRole('button', { name: 'Restore this version' }).click();
+  await older.getByRole('button', { name: 'Restore', exact: true }).click();
+  const card = page.locator('dialog');
+  await expect(card.locator('.plot-detail__notice')).toContainText('Edit saved.');
+  await expect(card.locator('.plot-detail__notice').getByRole('button', { name: 'Undo' }), 'undo works for a restore too').toBeVisible();
+  await expect(card.locator('.plot-detail__meta')).toContainText('First version');
+  await expect(entries().first().locator('.shop-history__note')).toContainText('Restored the version from');
+  await expectNoProblems(page);
+  await page.context().close();
+
+  // A player suggests it instead.
+  page = await pageAs(browser, server, 'Player2', PHONE);
+  await page.goto(`/plot/${P}`);
+  await tab('History').click();
+  const suggest = entries().nth(1).getByRole('button', { name: 'Suggest restoring this version' });
+  await suggest.click();
+  await expect(entries().nth(1).getByText('The owner or a moderator reviews it before it shows.')).toBeVisible();
+  await entries().nth(1).getByRole('button', { name: 'Suggest', exact: true }).click();
+  await expect(page.locator('dialog .plot-detail__notice')).toContainText('Sent for review');
+  await expectNoProblems(page);
+});

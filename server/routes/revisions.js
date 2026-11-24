@@ -267,17 +267,21 @@ const earlierLines = db.prepare(`
 // Each: who made it, who approved it (not for a Force edit), when it was
 // saved, the summary and the reviewer's note, and what changed (`made`, the
 // same as the Mod log). The last page adds `earlier`: older Update lines.
+// An edit to the current shop also has `version`: the page as it was right
+// after it, for "Restore this version" (sent as a normal edit).
 router.get('/plots/:id/history', (req, res) => {
   const plot = getPlot.get(req.params.id);
   if (!plot) return res.status(404).json({ error: 'Plot not found' });
   const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
   const rows = plotHistory.all(plot.id, HISTORY_PAGE + 1, offset);
+  const current = getCurrentShop.get(plot.id);
   const changes = rows.slice(0, HISTORY_PAGE).map((r) => ({
     id: r.id, action: r.action, direct: !!r.direct, author: r.author_name ?? null,
     reviewer: r.direct ? null : r.reviewer_name ?? null, summary: r.summary, note: r.review_note,
     saved_at: r.reviewed_at ?? r.created_at, part_of: r.part_of,
     ...made(r.action, { old_values: parse(r.old_values), new_values: parse(r.new_values) }),
     moved_from: movedBy.get(r.id)?.plot_id ?? null,
+    ...(r.action === 'edit' && current && r.shop_id === current.id && { version: parse(r.new_values) }),
   }));
   const hasMore = rows.length > HISTORY_PAGE;
   const earlier = hasMore ? undefined : earlierLines.all({ plot: plot.id, before: firstRevisionAt.get(plot.id), limit: EARLIER_MAX })
