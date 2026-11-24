@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
@@ -87,4 +88,5 @@ function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
   );
 }
 
-export default PlotTable;
+// memo: skipped when its props haven't changed (App, while typing a search).
+export default memo(PlotTable);

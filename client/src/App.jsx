@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MarketMap from './components/MarketMap';
@@ -8,7 +8,7 @@ import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
 import { FilterButton, FilterChips } from './components/Filters';
 import { filterMatches, filterPlots, isActive, newFilter } from './lib/filters';
-import { getSearchResults } from './lib/search';
+import { createSearchIndex, getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
 import { plotsResource, tagsResource, useResource } from './lib/resource';
@@ -34,10 +34,11 @@ function App() {
   const fromApp = !!location.state?.fromApp;
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const listScroll = useRef(0);
-  const openPlot = (plot) => {
+  // Stable (useCallback), so the memoized map and table don't re-render for it.
+  const openPlot = useCallback((plot) => {
     if (!plotId) listScroll.current = window.scrollY;
     navigate(`/plot/${plot.id}`, { replace: !!plotId, state: { fromApp: plotId ? fromApp : true } });
-  };
+  }, [plotId, fromApp, navigate]);
   const closePlot = () => (fromApp ? navigate(-1) : navigate('/', { replace: true }));
 
   // Desktop: the card replaces the list, so start the card at the top and
@@ -69,12 +70,16 @@ function App() {
     if (type !== 'occupied') setOpenFilterId(filter.id); // nothing to choose for "hide vacant"
   };
   // A tag picked from the search bar's suggestions joins the first "has any of"
-  // tag filter (so picks are ORed), or starts one.
-  const addTagFilter = (tagId) => setFilters((list) => {
-    const anyFilter = list.find((f) => f.type === 'tags' && f.mode === 'any');
-    if (!anyFilter) return [...list, { ...newFilter('tags'), tagIds: [tagId] }];
-    return list.map((f) => (f === anyFilter ? { ...f, tagIds: [...f.tagIds, tagId] } : f));
-  });
+  // tag filter (so picks are ORed), or starts one. The text that found it is
+  // cleared: the tag replaces it, rather than narrowing it further.
+  const addTagFilter = (tagId) => {
+    setQuery('');
+    setFilters((list) => {
+      const anyFilter = list.find((f) => f.type === 'tags' && f.mode === 'any');
+      if (!anyFilter) return [...list, { ...newFilter('tags'), tagIds: [tagId] }];
+      return list.map((f) => (f === anyFilter ? { ...f, tagIds: [...f.tagIds, tagId] } : f));
+    });
+  };
   const filteredTagIds = filters.flatMap((f) => (f.type === 'tags' ? f.tagIds : []));
   const zones = useMemo(() => [...new Set(plots.map((p) => p.zone))].sort((a, b) => a.localeCompare(b)), [plots]);
   const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
@@ -82,16 +87,25 @@ function App() {
   const filtering = filters.some(isActive);
   const filteredPlots = useMemo(() => filterPlots(plots, filters), [plots, filters]);
 
-  const searchResults = useMemo(() => getSearchResults(filteredPlots, query), [filteredPlots, query]);
-  const highlightIds = searchResults ? searchResults.matchedIds
-    : filtering ? new Set(filteredPlots.map((p) => p.id)) : null;
+  // Typing stays quick: the box shows each letter at once, and the search,
+  // the table and the map follow with the deferred text, which React works on
+  // in the background and drops if another letter comes first. The map and
+  // table are memoized, so they skip the letter-only render; everything they
+  // get below is made once per real change.
+  const deferredQuery = useDeferredValue(query);
+  const searchIndex = useMemo(() => createSearchIndex(filteredPlots), [filteredPlots]);
+  const searchResults = useMemo(() => getSearchResults(searchIndex, deferredQuery), [searchIndex, deferredQuery]);
+  const highlightIds = useMemo(() => (searchResults ? searchResults.matchedIds
+    : filtering ? new Set(filteredPlots.map((p) => p.id)) : null), [searchResults, filtering, filteredPlots]);
 
   // A sort the player picked stays while they search; otherwise it's newest
   // update first, or best match while searching.
   const [pickedSort, setPickedSort] = useState(null);
   const searching = !!searchResults;
   const sort = pickedSort && (searching || pickedSort.key !== 'best') ? pickedSort : defaultSort(searching);
-  const rows = sortPlots(filteredPlots, searchResults, sort);
+  const rows = useMemo(() => sortPlots(filteredPlots, searchResults, { key: sort.key, reversed: sort.reversed }),
+    [filteredPlots, searchResults, sort.key, sort.reversed]);
+  const tagMatches = useMemo(() => filterMatches(filteredPlots, filters), [filteredPlots, filters]);
 
   const cardOpenOnDesktop = isDesktop && !!selectedPlot;
   const list = (
@@ -110,7 +124,7 @@ function App() {
       {filtering && rows.length === 0 ? (
         <p className="app-main__empty">No shops match these filters.</p>
       ) : (
-        <PlotTable rows={rows} searchResults={searchResults} tagMatches={filterMatches(filteredPlots, filters)}
+        <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches}
           onSelectPlot={openPlot} />
       )}
     </div>
