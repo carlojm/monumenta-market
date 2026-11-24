@@ -6,15 +6,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import './db/applyRestore.js'; // must come before anything that opens the database
 import db from './db/init.js';
-import multer from 'multer';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { r2, R2_BUCKET, R2_PUBLIC_URL } from './lib/r2.js';
+import { R2_PUBLIC_URL } from './lib/r2.js';
 import { requireModerator } from './middleware/adminAuth.js';
 import { startVerifyServer } from './lib/verifyServer.js';
 import { scheduleBackups } from './lib/backup.js';
 import { loadAccount } from './lib/auth.js';
 import { ACCURACY_COLUMNS, NOT_OUTDATED, VOTES } from './lib/comments.js';
-import { imageType } from './lib/imageType.js';
+import { imagesForShop, scheduleImageCleanup } from './lib/images.js';
+import { TEST_UPLOADS } from './lib/imageStore.js';
 import { logModAction } from './lib/modlog.js';
 import * as limits from './lib/rateLimits.js';
 import { addLogEntry } from './lib/shopLog.js';
@@ -27,19 +26,7 @@ import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import adminTagRoutes from './routes/adminTags.js';
 import revisionRoutes from './routes/revisions.js';
-
-const MAX_IMAGE_MB = 8;
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_IMAGE_MB * 1024 * 1024, files: 1 } });
-
-// Reads one uploaded file into req.file. multer reports problems (too big,
-// wrong field name) as errors, which would otherwise become a 500.
-function receiveImage(req, res, next) {
-  upload.single('image')(req, res, (err) => {
-    if (err?.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: `Images can be at most ${MAX_IMAGE_MB} MB.` });
-    if (err) return res.status(400).json({ error: 'Could not read the upload. Send one image.' });
-    next();
-  });
-}
+import imageRoutes from './routes/images.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -80,6 +67,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes); // admin-only account management
 app.use('/api/admin', adminTagRoutes); // tag management (moderators and admins)
 app.use('/api', revisionRoutes); // page revisions: suggest, review, publish
+app.use('/api', imageRoutes); // shop images: upload, review, cover
+// The tests' stand-in for the image host (lib/imageStore.js).
+if (TEST_MODE) app.use('/test-uploads', express.static(TEST_UPLOADS));
 
 const ACTIVITY = ['vacant', 'wip', 'unclear', 'inactive', 'active'];
 const LOCK = ['locked', 'unlocked'];
@@ -103,7 +93,6 @@ const getComment = db.prepare(`
   SELECT ${COMMENT_COLUMNS} FROM comments c LEFT JOIN accounts a ON a.id = c.account_id WHERE c.id = ?
 `);
 const COMMENT_MAX = 2000;
-const getImages = db.prepare('SELECT * FROM images WHERE shop_id = ? ORDER BY sort_order');
 
 // A plot's current status. Reports can leave out a part, so activity and lock
 // each come from the most recent report that has them. created_at is the time
@@ -126,13 +115,14 @@ function latestStatus(plotId) {
   };
 }
 
-function shopWithDetails(shop) {
+// `account` decides which images waiting for review are included.
+function shopWithDetails(shop, account) {
   if (!shop) return null;
   return {
     ...shop,
     tags: tagsForShop(shop.id),
     comments: getApprovedComments.all(shop.id),
-    images: getImages.all(shop.id),
+    ...imagesForShop(shop, account),
   };
 }
 
@@ -143,6 +133,8 @@ app.get('/api/plots', (req, res) => {
     SELECT p.*,
       s.id AS shop_id, s.owner, s.maintainers, s.shop_name, s.guild_name, s.description, s.stock, s.palette,
       s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
+      (SELECT url FROM images i WHERE i.shop_id = s.id AND i.kind = 'icon' AND i.status = 'approved'
+       ORDER BY i.id DESC LIMIT 1) AS icon,
       (SELECT GROUP_CONCAT(body, ' ') FROM comments c
        WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0
          AND ${NOT_OUTDATED}) AS comment_text
@@ -162,6 +154,7 @@ app.get('/api/plots', (req, res) => {
       id: r.shop_id,
       ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, r[f]])),
       updated_at: r.updated_at,
+      icon: r.icon,
       comment_text: r.comment_text,
       tags: shopTags.get(r.shop_id) ?? [],
     } : null,
@@ -186,7 +179,7 @@ app.get('/api/plots/:id', (req, res) => {
   res.json({
     ...plot,
     is_guild: !!plot.is_guild,
-    shop: shopWithDetails(shop),
+    shop: shopWithDetails(shop, req.account),
     pending_edits: pendingForPlot(plot.id, shop ?? null, req.account),
     latest_report: latestStatus(plot.id),
     reports,
@@ -236,7 +229,7 @@ app.post('/api/tags/suggest', limits.tagSuggestions, (req, res) => {
 app.get('/api/shops/:id', (req, res) => {
   const shop = getShop.get(req.params.id);
   if (!shop) return res.status(404).json({ error: 'Shop not found' });
-  res.json(shopWithDetails(shop));
+  res.json(shopWithDetails(shop, req.account));
 });
 
 // Linked accounts only. No approval queue: moderators delete bad comments afterwards.
@@ -378,46 +371,6 @@ app.post('/api/plots/:id/vacate', requireModerator, (req, res) => {
   res.json({ closed: current.id });
 });
 
-// --- Admin: images (attached to the plot's current shop) ---
-
-app.post('/api/plots/:id/image', requireModerator, limits.uploads, receiveImage, async (req, res) => {
-  const shop = getCurrentShop.get(req.params.id);
-  if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to' });
-  if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
-
-  // Trust the file's contents, never its name or claimed type: a file named
-  // photo.png could be a web page, which the image host would then serve.
-  const type = imageType(req.file.buffer);
-  if (!type) return res.status(400).json({ error: 'Only PNG, JPEG, WebP or GIF images can be uploaded.' });
-  const key = `market/${req.params.id}_${shop.id}_${Date.now()}.${type.ext}`;
-
-  await r2.send(new PutObjectCommand({
-    Bucket: R2_BUCKET,
-    Key: key,
-    Body: req.file.buffer,
-    ContentType: type.mime,
-  }));
-
-  const url = `${R2_PUBLIC_URL}/${key}`;
-  const maxOrder = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM images WHERE shop_id = ?')
-    .get(shop.id).m;
-  const result = db.prepare('INSERT INTO images (shop_id, url, sort_order) VALUES (?, ?, ?)')
-    .run(shop.id, url, maxOrder + 1);
-
-  logModAction(req, 'image.add', `plot:${req.params.id}`, `Added an image to ${shop.owner}'s shop`);
-  res.status(201).json({ id: result.lastInsertRowid, url });
-});
-
-app.delete('/api/admin/images/:id', requireModerator, (req, res) => {
-  const image = db.prepare(
-    'SELECT i.id, s.plot_id, s.owner FROM images i JOIN shops s ON s.id = i.shop_id WHERE i.id = ?'
-  ).get(req.params.id);
-  if (!image) return res.status(404).json({ error: 'Image not found' });
-  db.prepare('DELETE FROM images WHERE id = ?').run(image.id);
-  logModAction(req, 'image.delete', `plot:${image.plot_id}`, `Deleted an image from ${image.owner}'s shop`);
-  res.json({ deleted: true });
-});
-
 // --- Admin: comment moderation (after the fact; comments aren't queued) ---
 
 const ADMIN_COMMENTS_PAGE = 50;
@@ -501,3 +454,6 @@ if (process.env.VERIFY_PORT) startVerifyServer(Number(process.env.VERIFY_PORT));
 
 // Nightly database backup to R2, on the live site only.
 if (process.env.NODE_ENV === 'production') scheduleBackups(db);
+
+// Image uploads nobody reviewed in 30 days are deleted, daily.
+scheduleImageCleanup();

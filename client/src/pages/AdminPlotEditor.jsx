@@ -127,7 +127,7 @@ function AdminPlotEditor() {
     if (!file) return;
     const body = new FormData();
     body.append('image', file);
-    const res = await adminFetch(`/api/plots/${selectedId}/image`, { method: 'POST', body });
+    const res = await adminFetch(`/api/plots/${selectedId}/images`, { method: 'POST', body });
     if (res.ok) {
       const image = await res.json();
       setShop((s) => ({ ...s, images: [...s.images, image] }));
@@ -139,7 +139,7 @@ function AdminPlotEditor() {
   };
 
   const handleDeleteImage = async (id) => {
-    await adminFetch(`/api/admin/images/${id}`, { method: 'DELETE' });
+    await adminFetch(`/api/images/${id}`, { method: 'DELETE' });
     setShop((s) => ({ ...s, images: s.images.filter((img) => img.id !== id) }));
   };
 

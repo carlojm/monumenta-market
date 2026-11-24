@@ -141,6 +141,8 @@ const deleteAccount = db.transaction((accountId) => {
   db.prepare('UPDATE comments SET account_id = NULL WHERE account_id = ? AND is_system = 1').run(accountId);
   db.prepare('DELETE FROM comment_votes WHERE account_id = ?').run(accountId);
   db.prepare('UPDATE mod_log SET account_id = NULL WHERE account_id = ?').run(accountId);
+  db.prepare('UPDATE images SET account_id = NULL WHERE account_id = ?').run(accountId);
+  db.prepare('UPDATE images SET reviewer_id = NULL WHERE reviewer_id = ?').run(accountId);
   endAllSessions(accountId);
   db.prepare('DELETE FROM accounts WHERE id = ?').run(accountId);
 });
