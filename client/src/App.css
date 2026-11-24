@@ -165,7 +165,7 @@
   }
 
   .app-main__map .market-map {
-    max-width: min(100%, calc(50svh * 0.875));
+    max-width: min(100%, calc(60svh * 0.875));
   }
 
   .app-error {
