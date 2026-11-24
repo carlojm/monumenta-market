@@ -528,3 +528,10 @@
     padding-block: 0.5rem; /* 36px tall */
   }
 }
+
+/* Long text stays readable on wide screens: about 70 characters a line
+   (Modern Web Guidance: typography). */
+.plot-detail__text,
+.plot-detail__comments p {
+  max-inline-size: 70ch;
+}

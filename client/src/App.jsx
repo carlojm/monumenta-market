@@ -106,6 +106,8 @@ function App() {
   const rows = useMemo(() => sortPlots(filteredPlots, searchResults, { key: sort.key, reversed: sort.reversed }),
     [filteredPlots, searchResults, sort.key, sort.reversed]);
   const tagMatches = useMemo(() => filterMatches(filteredPlots, filters), [filteredPlots, filters]);
+  // Any tag filter, "has none of" included (it has no matches to show).
+  const tagFiltering = filters.some((f) => f.type === 'tags' && isActive(f));
 
   const cardOpenOnDesktop = isDesktop && !!selectedPlot;
   const list = (
@@ -124,7 +126,7 @@ function App() {
       {filtering && rows.length === 0 ? (
         <p className="app-main__empty">No shops match these filters.</p>
       ) : (
-        <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches}
+        <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches} tagFiltering={tagFiltering}
           onSelectPlot={openPlot} />
       )}
     </div>

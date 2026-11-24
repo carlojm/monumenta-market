@@ -141,20 +141,31 @@
 
 /* Desktop: map on the left (always in view), search + table on the right. */
 @media (min-width: 900px) {
+  /* App proportions (unslop): fluid up to 1600 wide, with 32 of padding at
+     the sides. Long text in the card keeps a readable line length on its own
+     (PlotDetail.css). */
   #root {
-    max-width: 1240px;
+    max-width: 1600px;
   }
 
   .navbar {
-    padding-inline: 1.5rem;
+    padding-inline: 2rem;
   }
 
+  /* The columns and the map keep one size, card or not, so nothing moves
+     when a card opens: the map (about half the window's height, centered in
+     its column) on the left; the list, or the card with the list moving
+     under the map, on the right. */
   .app-main {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     align-items: start;
     gap: 1.5rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem 2rem;
+  }
+
+  .app-main__map .market-map {
+    max-width: min(100%, calc(50svh * 0.875));
   }
 
   .app-error {
@@ -183,10 +194,6 @@
     flex-direction: column;
     gap: 0.75rem;
     height: calc(100svh - 6rem);
-  }
-
-  .app-main__map--with-list .market-map {
-    max-width: min(100%, calc(50svh * 0.875));
   }
 
   .app-main__map--with-list .app-main__list-body {
