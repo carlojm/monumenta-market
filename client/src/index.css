@@ -39,6 +39,12 @@
   --code-bg: #1c1f16;
   --sheet-bg: #191c13;
 
+  /* Scrollbars (Modern Web Guidance: adapt scrollbar to contrast
+     preferences): quiet, but the thumb keeps 3:1 against the page (3.5)
+     and the card (3.3), as WCAG 1.4.11 asks. */
+  --scrollbar-thumb: #6b6e61;
+  --scrollbar-track: transparent;
+
   /* Corner radius scale (from unslop): bigger things get rounder corners.
      A corner inside another is the outer radius minus the padding between
      them, never below 4. */
@@ -51,6 +57,7 @@
   --mono: ui-monospace, 'SFMono-Regular', Consolas, 'Courier New', monospace;
 
   color-scheme: dark;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   font: 400 16px/1.5 var(--sans);
   color: var(--text);
   background: var(--bg);
@@ -148,4 +155,10 @@ hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 1rem 0;
+}
+/* Asked for more contrast: a brighter thumb (7.7:1). */
+@media (prefers-contrast: more) {
+  :root {
+    --scrollbar-thumb: #a9a89a;
+  }
 }

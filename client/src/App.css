@@ -196,13 +196,22 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
     padding-bottom: 1.25rem;
   }
 
+  /* A little room between the card (or the table) and the scrollbar beside
+     it, so the card's border doesn't run into it. */
+  .app-main > .app-main__list {
+    padding-inline-end: 0.5rem;
+  }
+
   /* The map's column reserves the scrollbar's room on both sides, so the
-     map stays centered. */
+     map stays centered, and keeps the same room as the right column between
+     its content and the scrollbar (on both sides, for the same reason). */
   .app-main > .app-main__map {
     scrollbar-gutter: stable both-edges;
+    padding-inline: 0.5rem;
   }
 
   /* No card: the search stays on top, and only the table scrolls under it,
@@ -217,6 +226,8 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    padding-inline-end: 0.5rem;
   }
 
   /* The column headers stay visible while the rows scroll. */
