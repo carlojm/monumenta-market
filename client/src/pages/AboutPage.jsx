@@ -10,36 +10,38 @@ function AboutPage() {
       <main className="about-page">
         <h2>About</h2>
         <p>
-          A directory of the player market on Monumenta: every plot on the market island, who runs it, what they sell,
-          and whether it looks open. It started as a Google Doc and moved here so players can keep it up to date
-          together.
+          The Monumenta Market Directory is a website now! Tracks every plot on the market island, who runs it, what they sell,
+          and whether it looks open. This site solves the problems of previous directory iterations by
+          letting players contribute to keep the directory updated.
         </p>
 
-        <h3>Keeping it current</h3>
+        <h3>Ways to contribute</h3>
         <ul>
-          <li>Anyone can report what a shop looks like right now (active, locked, vacant and so on) from its card.</li>
-          <li>With a linked account you can comment on a shop and suggest edits to its page.</li>
-          <li>Moderators or the shop's owner review suggested edits. Owners and maintainers can edit their own shop directly.</li>
-          <li>Every change to a page is kept in its History tab, and can be put back.</li>
+          <li>Anyone can report what a shop looks like right now (active, locked, vacant, etc.) from its card.</li>
+          <li>With a linked account, you can comment on a shop and suggest edits to its page.</li>
+          <li>Just like shops can be marked as locked/unlocked, comments can be marked outdated/still relevant.</li>
+          <li>Moderators or the shop's owner can review suggested edits. Shop owners and shop maintainers can edit their own shop directly.</li>
+          <li>See closed shops and past edits in each plot's History tab.</li>
         </ul>
 
         <h3>Accounts and privacy</h3>
         <p>
-          An account is your Minecraft name and a password. You link it by joining a small verification server, which
-          gives you a one-time code (see <Link to="/account?tab=link">Link a new account</Link>). There is no email
-          address, and none is asked for.
+          An account is your Minecraft name and a password. Open Minecraft and join using this site's URL as the IP to get
+          a one-time code (see <Link to="/account?tab=link">Link a new account</Link>).
         </p>
         <p>
-          The site keeps your Minecraft name and ID, a scrambled copy of your password, and what you post. Votes on
-          comments aren't shown publicly. IP addresses aren't stored. Deleting your account turns your comments
-          anonymous.
+          The site keeps your Minecraft name and ID, an encrypted copy of your password, and a history of your comments and edits. 
+          IP addresses or any other information is not stored. Deleting your account turns your comments
+          and edit attributions anonymous. Votes on comments are not shown publicly. 
         </p>
 
-        <h3>Credits</h3>
+        <h3>Credits and Attribution</h3>
         <p>
-          A fan project, not run by or affiliated with the Monumenta team. The code is open source on{' '}
-          <a href="https://github.com/carlojm/monumenta-market">GitHub</a>.
+          This is a fan project not affiliated with Team Monumenta, Mojang, or Minecraft.
         </p>
+        <p>Thanks to beta testers: weekendtech, Endertective</p>
+        <p>Code written with AI assistance. No generative AI used. Designed and orchestrated by ME! carlo_m</p>
+
       </main>
     </div>
   );

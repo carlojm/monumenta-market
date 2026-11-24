@@ -7,7 +7,7 @@ import './StarButton.css';
 // the table row (which would open the card).
 function StarButton({ plotId, name, starred, className = '' }) {
   return (
-    <button type="button" className={`star-button ${className}`} aria-pressed={starred} aria-label={`Star ${name}`}
+    <button type="button" className={`star-button ${className}`} aria-pressed={starred} aria-label={`Star ${name}`} title="Star"
       onClick={(e) => { e.stopPropagation(); toggleFavorite(plotId); }}>
       <Star size={16} aria-hidden="true" fill={starred ? 'currentColor' : 'none'} />
     </button>

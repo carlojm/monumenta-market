@@ -39,22 +39,6 @@
   overscroll-behavior: contain;
 }
 
-.plot-detail__close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-block-size: 2rem;
-  min-inline-size: 2rem;
-  padding: 0;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
 .plot-detail__carousel {
   position: relative;
   margin: 0.5rem 0 1rem;
@@ -119,37 +103,73 @@
   text-wrap: pretty;
 }
 
-/* The shop name with the Edit button beside it. Baseline alignment keeps the
-   button level with the name's first line, even when a long name wraps. */
+/* The shop name, and its buttons at the end of the row. The name's line
+   height is the buttons' height, so they sit level with its first line even
+   when a long name wraps. */
 .plot-detail__header {
+  --action-size: 2rem;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-/* The star sits right after the name; Edit stays at the end. */
-.plot-detail__header .star-button {
-  align-self: center;
-  margin-inline-end: auto;
+.plot-detail__header h2 {
+  margin: 0;
+  line-height: var(--action-size);
+  text-wrap: balance; /* a long name wraps into even lines */
 }
 
-.plot-detail__dialog .plot-detail__header {
-  padding-inline-end: 2rem; /* room for the close button */
-}
-
-/* A long shop name wraps into even lines instead of leaving one word alone. */
-.plot-detail__sheet h2 {
-  text-wrap: balance;
-}
-
-.plot-detail__edit {
-  display: inline-flex;
+.plot-detail__actions {
+  display: flex;
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
-  padding: 0.25rem 0.5rem;
+  margin-inline: auto -0.25rem; /* pushed to the end; the last icon, not its box, lines up with the text below */
+}
+
+/* Star, Edit and Close: the same quiet icon button (StarButton.css matches). */
+.plot-detail__actions .star-button,
+.plot-detail__icon-button {
+  inline-size: var(--action-size);
+  block-size: var(--action-size);
+  border-radius: var(--radius-control);
+}
+
+.plot-detail__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+}
+
+.plot-detail__icon-button:hover {
+  color: var(--text);
+  background: var(--code-bg);
+}
+
+/* One icon size in the row (the table's stars stay smaller). */
+.plot-detail__actions .star-button svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+.plot-detail__add-shop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  block-size: var(--action-size);
+  padding: 0 0.5rem;
   font-size: 0.875rem;
+}
+
+@media (pointer: coarse) {
+  .plot-detail__header {
+    --action-size: 2.25rem;
+  }
 }
 
 /* What happened to your last edit, or "discard your unsaved edit?". */
@@ -442,7 +462,6 @@
 .plot-detail__comment-actions button,
 .plot-detail__sheet .tag-chip--add,
 .plot-detail__back,
-.plot-detail__edit,
 .plot-detail__notice button {
   min-block-size: 1.5rem;
   min-inline-size: 1.5rem;
@@ -458,7 +477,6 @@
   .plot-detail__comment-actions button,
   .plot-detail__sheet .tag-chip--add,
   .plot-detail__submit,
-  .plot-detail__edit,
   .plot-detail__notice button {
     min-block-size: 2.25rem;
     min-inline-size: 2.25rem;
