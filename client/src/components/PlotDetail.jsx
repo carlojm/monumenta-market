@@ -9,6 +9,8 @@ import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
+import ShopImages from './ShopImages';
+import CoverImage from './CoverImage';
 import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
@@ -377,7 +379,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // Read out by screen readers (visually hidden): "Report sent", etc.
   const [announcement, setAnnouncement] = useState('');
   const [error, setError] = useState(null);
-  const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
   // Editing the shop (ShopEditForm). `editDirty`: it has unsaved changes, so
   // closing the card asks first (`confirmingClose`). `notice`: what happened to
@@ -422,7 +423,8 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   if (!plot) return null;
 
   const shop = detail ? detail.shop : plot.shop;
-  const images = shop?.images || [];
+  // The cover, if one is picked and still in the gallery.
+  const cover = shop?.cover ? (shop.images ?? []).find((i) => i.id === shop.cover.image_id) : null;
   const comments = [...myComments, ...(shop?.comments || [])].filter((c) => !deletedIds.includes(c.id));
   const reports = [...myReports, ...(detail?.reports || [])];
   // The server's latest_report already fills in a missing part from earlier
@@ -657,32 +659,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         ) : (
           <>
 
-          {images.length > 0 && (
-            <div className="plot-detail__carousel">
-              <img src={images[imageIndex].url} alt={`${displayName(shop)} photo ${imageIndex + 1}`} />
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="plot-detail__carousel-nav plot-detail__carousel-nav--prev"
-                    onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
-                    aria-label="Previous image"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    className="plot-detail__carousel-nav plot-detail__carousel-nav--next"
-                    onClick={() => setImageIndex((i) => (i + 1) % images.length)}
-                    aria-label="Next image"
-                  >
-                    ›
-                  </button>
-                  <div className="plot-detail__carousel-count">
-                    {imageIndex + 1} / {images.length}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+          {cover && <CoverImage image={cover} crop={shop.cover.crop} />}
 
           <dl className="plot-detail__meta">
             {shop && (
@@ -744,6 +721,12 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
           </dl>
 
           {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
+
+          {/* Once the full page is here: it has the uploads waiting for review. */}
+          {detail && shop && (
+            <ShopImages plotId={plot.id} shop={shop} account={account}
+              onChanged={(message) => { setAnnouncement(message); reload(); }} />
+          )}
 
           {shop ? (
             <>

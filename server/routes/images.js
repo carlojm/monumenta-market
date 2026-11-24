@@ -2,12 +2,12 @@
 //
 // Shop images (3.11), mounted at /api. The rules live in lib/images.js.
 //   POST   /plots/:id/images        multipart: image (the file), kind (gallery | icon)
-//          Linked accounts. The owner, maintainers and staff publish at once;
-//          anyone else's upload waits for review.
-//   GET    /images/pending          the review queue (staff: every shop; owners and maintainers: theirs)
-//   POST   /images/:id/approve
-//   POST   /images/:id/reject       deletes it
-//   DELETE /images/:id              the owner, maintainers or staff; or the uploader, while it's pending
+//          The owner, maintainers and staff. Staff uploads show at once; the
+//          owner's and maintainers' wait for a moderator.
+//   GET    /images/pending          the review queue, for staff
+//   POST   /images/:id/approve      staff
+//   POST   /images/:id/reject       staff; deletes it
+//   DELETE /images/:id              the owner, maintainers or staff
 //   PUT    /plots/:id/cover {image_id, crop}   the owner, maintainers or staff pick the
 //          card's cover from the gallery; image_id null removes it
 // Every change is recorded in the Mod log.
@@ -21,7 +21,7 @@ import { getCurrentShop, getShop } from '../lib/shops.js';
 import { imageType } from '../lib/imageType.js';
 import {
   ImageError, KINDS, MAX_UPLOAD_MB, addImage, approveImage, cleanCrop, deleteImage, getImage, managesImages, publicImage,
-  setCover, uploadBlocked,
+  reviewsImages, setCover, uploadBlocked,
 } from '../lib/images.js';
 
 const router = express.Router();
@@ -48,6 +48,9 @@ const kindLabel = (kind) => (kind === 'icon' ? 'an icon' : 'a screenshot');
 router.post('/plots/:id/images', needAccount, uploadLimit, receiveImage, async (req, res) => {
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to.' });
+  if (!managesImages(req.account, shop)) {
+    return res.status(403).json({ error: "Only the shop's owner, its maintainers or a moderator can add images." });
+  }
   if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
   // Only these four types reach the image decoder, judged by the file's
   // contents, never its name or claimed type.
@@ -70,7 +73,7 @@ router.post('/plots/:id/images', needAccount, uploadLimit, receiveImage, async (
   res.status(201).json(publicImage(image));
 });
 
-// Pending uploads for current shops; owners and maintainers see their shops'.
+// Pending uploads for current shops.
 const allPending = db.prepare(`
   SELECT i.*, a.name AS uploader, s.plot_id, s.owner, s.maintainers, s.shop_name, s.guild_name
   FROM images i JOIN shops s ON s.id = i.shop_id AND s.closed_at IS NULL
@@ -79,30 +82,31 @@ const allPending = db.prepare(`
 `);
 
 router.get('/images/pending', needAccount, (req, res) => {
-  const rows = allPending.all().filter((r) => managesImages(req.account, r));
+  if (!reviewsImages(req.account)) return res.json([]);
+  const rows = allPending.all();
   res.json(rows.map((r) => ({ ...publicImage(r), plot_id: r.plot_id, shop_name: shopLabel(r) })));
 });
 
-// The image and its shop, if this account manages that shop's images (or,
-// to delete, uploaded it and it's still pending). Otherwise answers with the
-// error and returns null.
-function imageToManage(req, res) {
+// The image and its shop, if this account may act on it: `review` (approve,
+// reject) is for staff; deleting is for the people who run the shop and staff.
+// Otherwise answers with the error and returns null.
+function imageToManage(req, res, { review = false } = {}) {
   const image = getImage.get(req.params.id);
   if (!image) {
     res.status(404).json({ error: 'Image not found.' });
     return null;
   }
   const shop = getShop.get(image.shop_id);
-  const withdrawing = req.method === 'DELETE' && image.status === 'pending' && image.account_id === req.account.id;
-  if (!managesImages(req.account, shop) && !withdrawing) {
-    res.status(403).json({ error: "Only the shop's owner, its maintainers or a moderator can do that." });
+  if (review ? !reviewsImages(req.account) : !managesImages(req.account, shop)) {
+    res.status(403).json({ error: review ? 'Only a moderator can review images.'
+      : "Only the shop's owner, its maintainers or a moderator can do that." });
     return null;
   }
   return { image, shop };
 }
 
 router.post('/images/:id/approve', needAccount, async (req, res) => {
-  const found = imageToManage(req, res);
+  const found = imageToManage(req, res, { review: true });
   if (!found) return;
   const { image, shop } = found;
   if (image.status !== 'pending') return res.status(409).json({ error: 'This image was already reviewed.' });
@@ -114,7 +118,7 @@ router.post('/images/:id/approve', needAccount, async (req, res) => {
 });
 
 router.post('/images/:id/reject', needAccount, async (req, res) => {
-  const found = imageToManage(req, res);
+  const found = imageToManage(req, res, { review: true });
   if (!found) return;
   const { image, shop } = found;
   if (image.status !== 'pending') return res.status(409).json({ error: 'This image was already reviewed.' });

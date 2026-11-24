@@ -6,8 +6,10 @@
 //            cover_crop, set with PUT /plots/:id/cover).
 //   icon     one small square picture that stands for the shop, shown in the
 //            table. A new approved icon replaces the old one.
-// Any linked account can upload. The shop's owner and maintainers, and staff,
-// publish at once; anyone else's upload waits for one of them to approve it.
+// The shop's owner and maintainers, and staff, can upload. Staff uploads show
+// at once; the owner's and maintainers' wait for a moderator to approve them.
+// (Decided 11/24: only the people who run a shop add its pictures, and a
+// moderator checks them.)
 //
 // Every upload is re-encoded to WebP here, whatever it was sent as. That drops
 // EXIF and other metadata (a photo's location, camera, editing software), and
@@ -76,8 +78,10 @@ async function encodeImage(buffer, kind) {
 
 // --- Who may do what (always checked here, never only in the browser) ---
 
-// Publishing at once, approving, deleting any image, and choosing the cover.
+// Uploading, deleting the shop's images, and choosing the cover.
 export const managesImages = (account, shop) => isStaff(account) || runsShop(account, shop);
+// Publishing without review, and approving or rejecting uploads.
+export const reviewsImages = (account) => isStaff(account);
 
 // --- Reading ---
 
@@ -100,11 +104,9 @@ export const publicImage = (i) => ({
 });
 
 // A shop's images for its page: the approved gallery, the icon, the cover,
-// and the uploads waiting for review that this account may see (all of them
-// for someone who can approve them, otherwise their own).
+// and, for the people who run the shop and staff, the uploads waiting for review.
 export function imagesForShop(shop, account) {
-  const pending = pendingForShop.all(shop.id)
-    .filter((i) => managesImages(account, shop) || (account && i.account_id === account.id));
+  const pending = managesImages(account, shop) ? pendingForShop.all(shop.id) : [];
   const crop = shop.cover_crop ? JSON.parse(shop.cover_crop) : null;
   const cover = shop.cover_image_id && crop ? { image_id: shop.cover_image_id, crop } : null;
   return {
@@ -143,7 +145,7 @@ export function uploadBlocked(account, shop, kind) {
   }
   if (isStaff(account)) return null;
   if (countToday.get(account.id).n >= MAX_PER_DAY) return `You can upload ${MAX_PER_DAY} images a day. Try again tomorrow.`;
-  if (!managesImages(account, shop) && countPending.get(account.id).n >= MAX_PENDING) {
+  if (countPending.get(account.id).n >= MAX_PENDING) {
     return `You have ${MAX_PENDING} images waiting for review. Wait until some are reviewed.`;
   }
   return null;
@@ -154,10 +156,10 @@ export async function addImage({ buffer, kind, shop, account }) {
   const encoded = await encode(buffer, kind);
   const key = crypto.randomUUID();
   for (const [suffix, body] of encoded.files) await putFile(`${key}${suffix}.webp`, body, 'image/webp');
-  const direct = managesImages(account, shop);
+  const direct = reviewsImages(account);
 
   const replaced = db.transaction(() => {
-    // A player's new icon for a shop replaces their earlier one still waiting.
+    // A new icon for a shop replaces the uploader's earlier one still waiting.
     const old = direct ? [] : (kind === 'icon' ? myPendingIcons.all(shop.id, account.id) : []);
     for (const image of old) deleteRow.run(image.id);
     const { lastInsertRowid } = insertImage.run({

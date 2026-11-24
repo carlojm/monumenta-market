@@ -1,0 +1,219 @@
+/* The card's Screenshots section (ShopImages.jsx) and the cover. */
+.shop-images {
+  margin-top: 1.5rem;
+}
+
+.shop-images h3:focus {
+  outline: none; /* focused by script after an action, to keep the place */
+}
+
+.shop-images__muted {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Under the current screenshot: who added it, and the manage buttons. */
+.shop-images__about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+.shop-images__credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shop-images__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.shop-images__actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Waiting for review: a small preview beside what it is. */
+.shop-images__pending {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.shop-images__pending li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.shop-images__pending img {
+  inline-size: 6rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.shop-images__pending img.shop-images__icon {
+  inline-size: 3rem;
+  aspect-ratio: 1;
+}
+
+.shop-images__pending p {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+}
+
+.shop-images__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+.shop-images__form {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+}
+
+.shop-images__form ul {
+  margin: 0 0 0.75rem;
+  padding-inline-start: 1.25rem;
+}
+
+.shop-images__form li + li {
+  margin-top: 0.25rem;
+}
+
+/* A real file input, hidden inside a label that looks like a button. */
+.shop-images__file {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  cursor: pointer;
+}
+
+.shop-images__file input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.shop-images__file:focus-within {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.shop-images__file:has(input:disabled) {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (pointer: coarse) {
+  .shop-images__actions button,
+  .shop-images__add,
+  .shop-images__file {
+    min-block-size: 2.25rem;
+  }
+}
+
+/* --- The cover: a banner showing the chosen part of a screenshot --- */
+.cover-image {
+  position: relative;
+  aspect-ratio: 5 / 2; /* COVER_ASPECT in lib/images.js */
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  margin: 0.25rem 0 1rem;
+  background: var(--code-bg);
+}
+
+.cover-image img {
+  position: absolute;
+  max-inline-size: none;
+}
+
+/* --- Choosing the cover (CoverPicker.jsx) --- */
+.cover-picker h4 {
+  margin: 0 0 0.25rem;
+}
+
+.cover-picker__hint {
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.cover-picker__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  user-select: none;
+}
+
+.cover-picker__frame img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* The box: the outside dims (a huge shadow, clipped by the frame). */
+.cover-picker__box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--text);
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55);
+  cursor: move;
+  touch-action: none; /* a drag moves the box instead of scrolling the page */
+}
+
+.cover-picker__box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cover-picker__corner {
+  position: absolute;
+  right: 0.25rem; /* inside: the frame clips anything past its edges */
+  bottom: 0.25rem;
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  border-radius: 50%;
+  background: var(--text);
+  border: 2px solid var(--sheet-bg);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+@media (pointer: coarse) {
+  .cover-picker__corner {
+    inline-size: 1.8rem;
+    block-size: 1.8rem;
+  }
+}
+
+.cover-picker__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
