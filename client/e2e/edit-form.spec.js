@@ -198,7 +198,9 @@ test('the owner publishes on desktop', async ({ browser }) => {
   await oform.getByRole('button', { name: 'Force edit' }).click();
   await expect(card.locator('.plot-detail__notice')).toContainText('Edit saved.');
   await expect(card.locator('.plot-detail__text')).toContainText(fresh);
-  await expect(card.locator('.plot-detail__comment--system').first(), 'shown as an Update').toBeVisible();
+  await card.getByRole('tab', { name: 'History' }).click();
+  await expect(card.locator('.shop-history__item').first(), 'in History').toContainText('ShopOwner edited About');
+  await card.getByRole('tab', { name: 'Comments' }).click();
   const r = lastRevision();
   expect(r).toMatchObject({ status: 'approved', direct: 1 });
   expect(JSON.parse(r.new_values).description).toBe(fresh);

@@ -30,3 +30,12 @@ export const tagNamer = (catalog, shopTags = []) => (id) =>
 
 // Maintainers (3.8) are kept as "Alice, Bob".
 export const maintainersOf = (shop) => (shop?.maintainers ? shop.maintainers.split(', ') : []);
+
+// What a revision changed, for a sentence: "About, Palette and tags". `d` has
+// `changes` ([{ field }]) and `tags` ({ added, removed }), as the server sends.
+export function changedFields(d) {
+  const parts = (d.changes ?? []).map((c) => labelOf(c.field));
+  if (d.tags?.added.length || d.tags?.removed.length) parts.push('tags');
+  if (parts.length < 2) return parts[0] ?? null;
+  return `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`;
+}

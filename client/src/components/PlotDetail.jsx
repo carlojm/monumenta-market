@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
@@ -6,6 +6,7 @@ import { useAccount } from '../lib/account';
 import TagChips from './TagChips';
 import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
+import ShopHistory from './ShopHistory';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -128,7 +129,33 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   );
 }
 
-function CommentList({ comments, interactive = false, onDeleted }) {
+// Left/Right, Home/End move focus between the tabs (Enter or a click selects).
+function moveBetweenTabs(e) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  const tabs = [...e.currentTarget.querySelectorAll('[role="tab"]')];
+  const at = tabs.indexOf(document.activeElement);
+  const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1
+    : (at + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next].focus();
+}
+
+// A tab panel that isn't selected is hidden="until-found": hidden, but Find in
+// page still searches it, and reveals it (firing `beforematch`) on a match.
+// React only renders `hidden` as on or off, so a ref callback sets it.
+// Returns the cleanup, for a ref callback.
+function hideUntilFound(el, hidden, onReveal) {
+  if (!el) return undefined;
+  if (hidden) el.setAttribute('hidden', 'until-found');
+  else el.removeAttribute('hidden');
+  el.addEventListener('beforematch', onReveal);
+  return () => el.removeEventListener('beforematch', onReveal);
+}
+
+// Players' comments. The automatic Update lines (is_system) aren't listed
+// here: History has the changes (3.9).
+function CommentList({ comments: all, interactive = false, onDeleted }) {
+  const comments = all.filter((c) => !c.is_system);
   if (!comments.length) return <p className="plot-detail__empty">No comments yet</p>;
   return (
     <ul className="plot-detail__comments">
@@ -263,7 +290,24 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const [detail, setDetail] = useState(null);
   const dialogRef = useRef(null);
   const headingRef = useRef(null);
-  const commentsHeadingRef = useRef(null);
+  const commentsTabRef = useRef(null);
+  // The Comments / History tabs at the bottom of the card. History mounts
+  // (and loads) the first time it's opened.
+  const [tab, setTab] = useState('comments');
+  const [historyOpened, setHistoryOpened] = useState(false);
+  // Goes up each time the card reloads after a change, so History loads again.
+  const [reloads, setReloads] = useState(0);
+  const showTab = (name) => {
+    setTab(name);
+    if (name === 'history') setHistoryOpened(true);
+  };
+  // The panels: the other tab's is hidden until found; if Find in page
+  // reveals it, its tab is selected to match. Rerun when the tab changes.
+  const commentsPanel = useCallback((el) => hideUntilFound(el, tab !== 'comments', () => setTab('comments')), [tab]);
+  const historyPanel = useCallback((el) => hideUntilFound(el, tab !== 'history', () => {
+    setTab('history');
+    setHistoryOpened(true);
+  }), [tab]);
   // Read out by screen readers (visually hidden): "Report sent", etc.
   const [announcement, setAnnouncement] = useState('');
   // The dialog's close listener is set up once; this always calls the latest onClose.
@@ -394,6 +438,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         setDetail(d);
         setMyComments([]);
         setMyReports([]);
+        setReloads((n) => n + 1);
       })
       .catch((err) => setError(err.message));
     onReported?.();
@@ -474,11 +519,11 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     onReported?.();
   };
 
-  // The deleted comment had focus; move it to the Comments heading.
+  // The deleted comment had focus; move it to the Comments tab.
   const handleDeleted = (id) => {
     setDeletedIds((ids) => [...ids, id]);
     setAnnouncement('Comment deleted.');
-    commentsHeadingRef.current?.focus({ preventScroll: true });
+    commentsTabRef.current?.focus({ preventScroll: true });
   };
 
   // Fallback for browsers without closedby: a click on the dialog itself but
@@ -661,44 +706,68 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
 
           {error && <p className="plot-detail__error" role="alert">{error}</p>}
 
-          {shop && (
+          {shop ? (
             <>
               <hr />
-              <h3 ref={commentsHeadingRef} tabIndex={-1}>Comments</h3>
-              {/* <p className="plot-detail__comment-hint">
-                Leave a comment if this shop is different from described.
-              </p> */}
+              {/* Tabs (Modern Web Guidance): selection on activation, since
+                  History loads when opened; arrow keys move between them. */}
+              <div className="plot-detail__tabs" role="tablist" aria-label="Comments and history" onKeyDown={moveBetweenTabs}>
+                <button type="button" role="tab" id="plot-detail-tab-comments" ref={commentsTabRef}
+                  aria-selected={tab === 'comments'} tabIndex={tab === 'comments' ? 0 : -1} onClick={() => showTab('comments')}>
+                  Comments
+                </button>
+                <button type="button" role="tab" id="plot-detail-tab-history"
+                  aria-selected={tab === 'history'} tabIndex={tab === 'history' ? 0 : -1} onClick={() => showTab('history')}>
+                  History
+                </button>
+              </div>
+              <div role="tabpanel" aria-labelledby="plot-detail-tab-comments" className="plot-detail__tabpanel"
+                ref={commentsPanel}>
+                {/* <p className="plot-detail__comment-hint">
+                  Leave a comment if this shop is different from described.
+                </p> */}
 
-              {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
-              {account === undefined ? null : !account ? (
-                <p className="plot-detail__link-prompt">
-                  <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
-                </p>
-              ) : (
-                <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-                  <label htmlFor="plot-detail-comment">
-                    Add a comment{' '}
-                    <span className="plot-detail__muted">
-                      as <strong className="plot-detail__author--linked">{account.name}</strong>
-                    </span>
-                  </label>
-                  <textarea
-                    id="plot-detail-comment"
-                    value={commentBody}
-                    onChange={(e) => setCommentBody(e.target.value)}
-                    required
-                  />
-                  <button type="submit" disabled={submitting}>
-                    {submitting ? 'Posting…' : 'Post comment'}
-                  </button>
-                </form>
-              )}
+                {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
+                {account === undefined ? null : !account ? (
+                  <p className="plot-detail__link-prompt">
+                    <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
+                  </p>
+                ) : (
+                  <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
+                    <label htmlFor="plot-detail-comment">
+                      Add a comment{' '}
+                      <span className="plot-detail__muted">
+                        as <strong className="plot-detail__author--linked">{account.name}</strong>
+                      </span>
+                    </label>
+                    <textarea
+                      id="plot-detail-comment"
+                      value={commentBody}
+                      onChange={(e) => setCommentBody(e.target.value)}
+                      required
+                    />
+                    <button type="submit" disabled={submitting}>
+                      {submitting ? 'Posting…' : 'Post comment'}
+                    </button>
+                  </form>
+                )}
 
-              <CommentList
-                comments={comments}
-                interactive
-                onDeleted={handleDeleted}
-              />
+                <CommentList
+                  comments={comments}
+                  interactive
+                  onDeleted={handleDeleted}
+                />
+              </div>
+              <div role="tabpanel" aria-labelledby="plot-detail-tab-history" className="plot-detail__tabpanel"
+                ref={historyPanel}>
+                {historyOpened && <ShopHistory key={reloads} plotId={plot.id} />}
+              </div>
+            </>
+          ) : (
+            <>
+              <hr />
+              <h3>History</h3>
+              <ShopHistory key={reloads} plotId={plot.id} />
             </>
           )}
 

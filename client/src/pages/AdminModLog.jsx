@@ -1,6 +1,6 @@
 import { Suspense, use, useRef, useState, useTransition } from 'react';
 import RevisionChanges from '../components/RevisionChanges';
-import { labelOf } from '../lib/shopFields';
+import { changedFields } from '../lib/shopFields';
 import { dayLabel, loadLog } from '../lib/modLog';
 import { parseUtc } from '../lib/reports';
 
@@ -132,13 +132,6 @@ function verb(kind, d) {
   }
 }
 
-// "About, Palette and tags"
-function fieldList(d) {
-  const parts = (d.changes ?? []).map((c) => labelOf(c.field));
-  if (d.tags) parts.push('tags');
-  if (parts.length < 2) return parts[0] ?? 'nothing left to change';
-  return `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`;
-}
 
 // Which shop and what about it.
 function subject(kind, d) {
@@ -149,7 +142,7 @@ function subject(kind, d) {
     return `New shop by ${d.owner}${d.shop ? `, replacing ${d.shop}` : ''}${d.moved_from ? `, moved from ${d.moved_from}` : ''}`;
   }
   if (d.action === 'vacate') return `${d.shop} closed, the plot is now empty`;
-  return `${d.shop}: ${fieldList(d)}`;
+  return `${d.shop}: ${changedFields(d) ?? 'nothing left to change'}`;
 }
 
 function LogEntry({ entry: e }) {

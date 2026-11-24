@@ -1,0 +1,45 @@
+/* The card's History tab (ShopHistory.jsx). */
+.shop-history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shop-history__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.shop-history__item p {
+  margin: 0;
+}
+
+.shop-history__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.shop-history__head time {
+  flex-shrink: 0;
+}
+
+.shop-history__note {
+  white-space: pre-wrap;
+}
+
+.shop-history__more {
+  margin-top: 0.75rem;
+}
+
+.shop-history__earlier {
+  margin: 1.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
