@@ -500,3 +500,31 @@
   inset: auto 0 -1px;
   border-block-end: 2px solid var(--accent);
 }
+
+/* Earlier shops, at the end of the History tab. */
+.plot-detail__past-shops {
+  margin-top: 1.25rem;
+}
+
+.plot-detail__past-shops h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.plot-detail__past-comments {
+  margin-top: 0.5rem;
+}
+
+.plot-detail__past-comments summary {
+  cursor: pointer;
+  color: var(--link);
+  font-size: 0.875rem;
+  padding-block: 0.125rem; /* 24px tall */
+}
+
+@media (pointer: coarse) {
+  .plot-detail__past-comments summary {
+    padding-block: 0.5rem; /* 36px tall */
+  }
+}

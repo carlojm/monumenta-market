@@ -118,3 +118,31 @@ test('a vacant plot shows its history', async ({ browser }) => {
   await expect(page.locator('.shop-history__head > span')).toHaveText(['ModTester closed Visitor', 'ModTester opened a new shop for Visitor']);
   await expectNoProblems(page);
 });
+
+test('earlier shops sit under History, with their comments folded', async ({ browser }) => {
+  // corridors-5 has past shops in the imported data; give its last one a name
+  // that differs from the owner, and a comment.
+  const db = writeDb(server);
+  const past = db.prepare("SELECT * FROM shops WHERE plot_id = 'corridors-5' AND closed_at IS NOT NULL ORDER BY closed_at DESC").get();
+  db.prepare("UPDATE shops SET shop_name = 'Old Barrels', stock = 'barrels' WHERE id = ?").run(past.id);
+  db.prepare("INSERT INTO comments (shop_id, author, body, is_system, status) VALUES (?, 'Tester', 'Loved the review wall', 0, 'approved'), (?, NULL, 'palette updated', 1, 'approved')").run(past.id, past.id);
+  db.close();
+  page = await pageAs(browser, server, null, PHONE);
+  await page.goto('/plot/corridors-5');
+  const section = page.getByRole('region', { name: 'Earlier shops on this plot' });
+  await expect(section).toBeVisible(); // a vacant plot: History is the only section
+  await expect(page.getByRole('heading', { name: 'Past shops' }), 'the old section is gone').toHaveCount(0);
+  const shop = section.locator('.plot-detail__past-shop').first();
+  await shop.locator(':scope > summary').click();
+  await expect(shop.locator(':scope > summary')).toContainText('Old Barrels');
+  await expect(shop.locator('.plot-detail__meta dt')).toContainText(['Owner', 'About', 'Keywords']);
+  await expect(shop.locator('.plot-detail__meta dd').first()).toHaveText(past.owner);
+  const comments = shop.locator('.plot-detail__past-comments');
+  await expect(comments, 'folded at first').not.toHaveAttribute('open');
+  await comments.locator('summary').click();
+  await expect(comments).toContainText('Loved the review wall');
+  await expect(comments, 'players\' comments only').not.toContainText('palette updated');
+  const shown = await comments.locator('.plot-detail__comments > li').count();
+  await expect(comments.locator('summary'), 'the count matches').toHaveText(`Comments (${shown})`);
+  await expectNoProblems(page);
+});

@@ -192,13 +192,26 @@ function ShopText({ shop, tags }) {
   );
 }
 
-// A past shop, loaded the first time it's expanded.
+// Earlier shops on this plot, in the History tab (3.9).
+function PastShops({ shops }) {
+  if (!shops.length) return null;
+  return (
+    <section className="plot-detail__past-shops" aria-labelledby="plot-detail-past-shops">
+      <h4 id="plot-detail-past-shops">Earlier shops on this plot</h4>
+      {shops.map((s) => <PastShop key={s.id} summary={s} />)}
+    </section>
+  );
+}
+
+// A past shop, loaded the first time it's expanded: who ran it (when its
+// name isn't the owner's), what it said, and its comments, folded.
 function PastShop({ summary }) {
   const [shop, setShop] = useState(null);
   const load = (e) => {
     if (!e.currentTarget.open || shop) return;
     fetch(`/api/shops/${summary.id}`).then((res) => res.json()).then(setShop);
   };
+  const comments = shop?.comments.filter((c) => !c.is_system) ?? [];
   return (
     <details className="plot-detail__past-shop" onToggle={load}>
       <summary>
@@ -209,8 +222,27 @@ function PastShop({ summary }) {
         <p className="plot-detail__muted">Loading…</p>
       ) : (
         <>
-          <dl className="plot-detail__meta"><ShopText shop={shop} tags={shop.tags} /></dl>
-          <CommentList comments={shop.comments} />
+          <dl className="plot-detail__meta">
+            {displayName(shop) !== shop.owner && (
+              <>
+                <dt>{shop.guild_name ? 'Guild' : 'Owner'}</dt>
+                <dd>{ownerLabel(shop)}</dd>
+              </>
+            )}
+            <ShopText shop={shop} tags={shop.tags} />
+            {shop.palette && (
+              <>
+                <dt>Palette</dt>
+                <dd>{shop.palette}</dd>
+              </>
+            )}
+          </dl>
+          {comments.length > 0 && (
+            <details className="plot-detail__past-comments">
+              <summary>Comments ({comments.length})</summary>
+              <CommentList comments={comments} />
+            </details>
+          )}
         </>
       )}
     </details>
@@ -761,6 +793,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
               <div role="tabpanel" aria-labelledby="plot-detail-tab-history" className="plot-detail__tabpanel"
                 ref={historyPanel}>
                 {historyOpened && <ShopHistory key={reloads} plotId={plot.id} />}
+                <PastShops shops={pastShops} />
               </div>
             </>
           ) : (
@@ -768,16 +801,10 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
               <hr />
               <h3>History</h3>
               <ShopHistory key={reloads} plotId={plot.id} />
+              <PastShops shops={pastShops} />
             </>
           )}
 
-          {pastShops.length > 0 && (
-            <>
-              <hr />
-              <h3>Past shops</h3>
-              {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
-            </>
-          )}
           </>
         )}
       </>
