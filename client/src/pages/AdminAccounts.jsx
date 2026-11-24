@@ -1,41 +1,55 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import { formatDate } from '../lib/reports';
+import { createResource, useResource } from '../lib/resource';
 
 const ROLE_LABELS = { player: 'Player', moderator: 'Moderator', admin: 'Admin' };
 
 // Admin only: look up accounts, make or remove moderators, and ban or unban. Admins
 // themselves are set in ADMIN_UUIDS in the server's .env.
+const fetchAccounts = (q, offset) => adminFetch(`/api/admin/accounts?q=${encodeURIComponent(q)}&offset=${offset}`)
+  .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Could not load accounts.'))));
+
+// The first page for the current search (lib/resource.js: loads when the page
+// opens, and again for each search). Load more and changes update it in place.
+let search = '';
+const resultsResource = createResource(() => fetchAccounts(search, 0));
+
 function AdminAccounts() {
-  const [query, setQuery] = useState('');
-  const [accounts, setAccounts] = useState([]);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { data, error: loadError } = useResource(resultsResource);
+  const accounts = data?.accounts ?? [];
+  const setAccounts = (update) => resultsResource.set({ ...data, accounts: update(accounts) });
+  const [query, setQuery] = useState(search);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const typing = useRef(null);
   const [busyId, setBusyId] = useState(null);
   const [banningId, setBanningId] = useState(null); // row with the ban form open
   const [banReason, setBanReason] = useState('');
   const [banDeleteComments, setBanDeleteComments] = useState(false);
   const [error, setError] = useState(null);
 
-  const load = async (q, offset) => {
-    setLoading(true);
-    setError(null);
-    const res = await adminFetch(`/api/admin/accounts?q=${encodeURIComponent(q)}&offset=${offset}`);
-    if (!res.ok) {
-      setLoading(false);
-      return setError('Could not load accounts.');
-    }
-    const data = await res.json();
-    setAccounts((prev) => (offset === 0 ? data.accounts : [...prev, ...data.accounts]));
-    setHasMore(data.hasMore);
-    setLoading(false);
+  // Search as you type, after a short pause.
+  const type = (e) => {
+    setQuery(e.target.value);
+    clearTimeout(typing.current);
+    const q = e.target.value.trim();
+    typing.current = setTimeout(() => {
+      search = q;
+      resultsResource.refresh();
+    }, 300);
   };
 
-  // Search as you type, after a short pause.
-  useEffect(() => {
-    const timer = setTimeout(() => load(query.trim(), 0), 300);
-    return () => clearTimeout(timer);
-  }, [query]);
+  const loadMore = async () => {
+    setLoadingMore(true);
+    setError(null);
+    try {
+      const next = await fetchAccounts(search, accounts.length);
+      resultsResource.set({ accounts: [...accounts, ...next.accounts], hasMore: next.hasMore });
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoadingMore(false);
+  };
 
   const setRole = async (account, role) => {
     setBusyId(account.id);
@@ -81,10 +95,10 @@ function AdminAccounts() {
         type="text"
         placeholder="Search by Minecraft name or UUID…"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={type}
       />
-      {error && <p className="admin-comments__error">{error}</p>}
-      {!loading && accounts.length === 0 && <p>No accounts found.</p>}
+      {(error || loadError) && <p className="admin-comments__error">{error || loadError}</p>}
+      {data && accounts.length === 0 && <p>No accounts found.</p>}
 
       <ul>
         {accounts.map((a) => (
@@ -141,9 +155,9 @@ function AdminAccounts() {
         ))}
       </ul>
 
-      {hasMore && (
-        <button type="button" disabled={loading} onClick={() => load(query.trim(), accounts.length)}>
-          {loading ? 'Loading…' : 'Load more'}
+      {data?.hasMore && (
+        <button type="button" disabled={loadingMore} onClick={loadMore}>
+          {loadingMore ? 'Loading…' : 'Load more'}
         </button>
       )}
     </div>

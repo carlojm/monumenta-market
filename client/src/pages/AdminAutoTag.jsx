@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { adminFetch } from '../lib/adminAuth';
 import { displayName } from '../lib/plots';
 import { matchTags } from '../lib/tagSuggestions';
+import { plotsResource, tagsResource, useResource } from '../lib/resource';
 import '../components/TagChips.css';
 
 // Admin → Tags: tag many shops at once from their description and stock text,
@@ -11,11 +12,6 @@ import '../components/TagChips.css';
 // Applying only adds tags.
 
 const CONFIDENT = 2;
-
-const load = () => Promise.all([
-  fetch('/api/plots').then((res) => res.json()),
-  fetch('/api/tags').then((res) => res.json()),
-]);
 
 function proposalsFor(plots, catalog) {
   return plots
@@ -33,31 +29,29 @@ const initialTicks = (proposals) => Object.fromEntries(proposals.map((p) => [
 ]));
 
 function AdminAutoTag() {
-  const [data, setData] = useState(null);
-  const [ticked, setTicked] = useState({}); // plot id -> tag ids
+  // The shared plot and tag lists (lib/resource.js), loaded when this opens.
+  const plots = useResource(plotsResource);
+  const catalog = useResource(tagsResource);
+  // plot id -> tag ids. Until you change one, the confident matches are
+  // ticked (null). After adding, what's left was unticked on purpose (or is a
+  // short alias), so it all starts unticked ({}).
+  const [picked, setPicked] = useState(null);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
-  const proposals = useMemo(() => (data ? proposalsFor(data.plots, data.catalog) : []), [data]);
+  const loaded = plots.data.length > 0 && catalog.data;
+  const proposals = useMemo(() => (loaded ? proposalsFor(plots.data, catalog.data) : []), [loaded, plots.data, catalog.data]);
+  const ticked = picked ?? initialTicks(proposals);
 
-  // After adding, what's left was unticked on purpose (or is a short alias),
-  // so it starts unticked instead of coming back ticked.
-  const reload = useCallback((tickConfident = true) => load()
-    .then(([plots, catalog]) => {
-      setData({ plots, catalog });
-      setTicked(tickConfident ? initialTicks(proposalsFor(plots, catalog)) : {});
-    })
-    .catch(() => setError('Could not load shops and tags.')), []);
-  useEffect(() => {
-    reload();
-  }, [reload]);
+  const loadError = plots.error || catalog.error ? 'Could not load shops and tags.' : null;
+  if (error || loadError) return <p className="admin-comments__error">{error || loadError}</p>;
+  if (!loaded) return <p>Finding tags…</p>;
 
-  if (error) return <p className="admin-comments__error">{error}</p>;
-  if (!data) return <p>Finding tags…</p>;
-
-  const toggle = (plotId, tagId) => setTicked((t) => {
+  // The first change starts from the default ticks (`picked` is null until then).
+  const toggle = (plotId, tagId) => setPicked((prev) => {
+    const t = prev ?? ticked;
     const ids = t[plotId] ?? [];
     return { ...t, [plotId]: ids.includes(tagId) ? ids.filter((id) => id !== tagId) : [...ids, tagId] };
   });
@@ -77,7 +71,8 @@ function AdminAutoTag() {
       if (!res.ok) throw new Error(result.error || 'Could not add the tags.');
       setMessage(`Added ${result.tags} tags to ${result.shops} shops.`);
       setConfirming(false);
-      await reload(false);
+      setPicked({});
+      await plotsResource.refresh();
     } catch (err) {
       setError(err.message);
     } finally {

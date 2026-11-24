@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MarketMap from './components/MarketMap';
@@ -11,11 +11,14 @@ import { filterMatches, filterPlots, isActive, newFilter } from './lib/filters';
 import { getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
+import { plotsResource, tagsResource, useResource } from './lib/resource';
 
 function App() {
-  const [plots, setPlots] = useState([]);
+  // The plots and the tag list load when the page first shows (lib/resource.js).
+  const { data: plots, error } = useResource(plotsResource);
+  const catalog = useResource(tagsResource).data;
+  const loadPlots = () => plotsResource.refresh();
   const [query, setQuery] = useState('');
-  const [error, setError] = useState(null);
   // The open card comes from the URL (/plot/:plotId), so it can be shared
   // and the back button closes it.
   const { plotId } = useParams();
@@ -39,35 +42,22 @@ function App() {
 
   // Desktop: the card replaces the list, so start the card at the top and
   // put the list back where it was on "Back", with focus back on the row
-  // that opened the card (phones get this from the card's dialog).
+  // that opened the card (phones get this from the card's dialog). Ref
+  // callbacks: they run when the card or the list appears.
   const lastOpened = useRef(null);
-  useLayoutEffect(() => {
-    if (!isDesktop) return;
-    window.scrollTo(0, plotId ? 0 : listScroll.current);
-    if (plotId) {
-      lastOpened.current = plotId;
-    } else if (lastOpened.current) {
-      document.querySelector(`.plot-table__open[data-plot-id="${CSS.escape(lastOpened.current)}"]`)
-        ?.focus({ preventScroll: true });
-      lastOpened.current = null;
-    }
-  }, [plotId, isDesktop]);
-
-  const loadPlots = () =>
-    fetch('/api/plots')
-      .then((res) => res.json())
-      .then(setPlots)
-      .catch((err) => setError(err.message));
-
-  useEffect(() => {
-    loadPlots();
+  const cardShown = useCallback((el) => {
+    if (!el) return;
+    window.scrollTo(0, 0);
+    lastOpened.current = el.dataset.plotId;
+  }, []);
+  const listBack = useCallback((el) => {
+    if (!el || !lastOpened.current) return;
+    window.scrollTo(0, listScroll.current);
+    document.querySelector(`.plot-table__open[data-plot-id="${CSS.escape(lastOpened.current)}"]`)
+      ?.focus({ preventScroll: true });
+    lastOpened.current = null;
   }, []);
 
-  // Tags, for the filter popup and the shop edit form.
-  const [catalog, setCatalog] = useState(null);
-  useEffect(() => {
-    fetch('/api/tags').then((res) => res.json()).then(setCatalog).catch(() => {});
-  }, []);
 
   // Filters hide plots from the list; search then ranks and dims what's left.
   // The map dims everything outside both.
@@ -140,10 +130,14 @@ function App() {
         </section>
         <section className="app-main__list">
           {cardOpenOnDesktop ? (
-            <PlotDetail inline key={selectedPlot.id} plot={selectedPlot} plots={plots} catalog={catalog} onClose={closePlot} onReported={loadPlots}
-              openedInApp={fromApp} />
+            // A new wrapper per card (its key), so cardShown runs for each one.
+            <div className="app-main__card" key={selectedPlot.id} ref={cardShown} data-plot-id={selectedPlot.id}>
+              <PlotDetail inline plot={selectedPlot} plots={plots} catalog={catalog} onClose={closePlot} onReported={loadPlots}
+                openedInApp={fromApp} />
+            </div>
           ) : (
-            list
+            // Its own wrapper, so listBack runs when the list comes back.
+            <div className="app-main__list-wrap" ref={listBack}>{list}</div>
           )}
         </section>
         {/* Phones: the card is a bottom sheet over the page. */}

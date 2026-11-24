@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
+import { plotDetailResource, useResource } from '../lib/resource';
 import TagChips from './TagChips';
 import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
@@ -31,14 +32,14 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   const [error, setError] = useState(null);
   // Cancelling the delete confirmation puts focus back on the Delete button
   // (it was replaced by the confirmation, so focus would otherwise be lost).
-  const deleteButton = useRef(null);
+  // The button's ref callback does it when the button comes back.
   const refocusDelete = useRef(false);
-  useEffect(() => {
-    if (!confirmingDelete && refocusDelete.current) {
+  const deleteButtonMounted = (el) => {
+    if (el && refocusDelete.current) {
       refocusDelete.current = false;
-      deleteButton.current?.focus();
+      el.focus();
     }
-  }, [confirmingDelete]);
+  };
   const isOwn = !!account && !!c.verified && c.author === account.name;
   const isStaff = account?.role === 'moderator' || account?.role === 'admin';
   const canAct = interactive && !!account && !c.is_system;
@@ -119,7 +120,7 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
               Outdated
             </button>
             {canDelete && (
-              <button type="button" ref={deleteButton} onClick={() => setConfirmingDelete(true)}>Delete</button>
+              <button type="button" ref={deleteButtonMounted} onClick={() => setConfirmingDelete(true)}>Delete</button>
             )}
           </div>
         )
@@ -128,6 +129,11 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
     </li>
   );
 }
+
+// The phone card while no plot is open: nothing to load. `get` returns the
+// same object every time, as useSyncExternalStore requires.
+const NOTHING = { data: null, error: null };
+const NO_DETAIL = { subscribe: () => () => {}, get: () => NOTHING };
 
 // Left/Right, Home/End move focus between the tabs (Enter or a click selects).
 function moveBetweenTabs(e) {
@@ -319,9 +325,34 @@ function ReportForm({ plotId, onReported }) {
 const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
 
 function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inline = false, openedInApp = false }) {
-  const [detail, setDetail] = useState(null);
-  const dialogRef = useRef(null);
-  const headingRef = useRef(null);
+  // The plot's details (comments, reports, pending edits, past shops). The
+  // card shows right away from the map's data and fills in when they arrive
+  // (lib/resource.js). The phone card is mounted with no plot while closed.
+  const detailResource = plot ? plotDetailResource(plot.id) : NO_DETAIL;
+  const { data: detail, error: loadError } = useResource(detailResource);
+  // Phones: the card is a native modal dialog. The browser keeps focus inside
+  // it, closes it on Esc (and on a tap outside, with closedby="any"), and
+  // tells screen readers it opened. Closing it closes the card (onClose
+  // updates the URL). It's removed rather than closed when the URL changes
+  // (e.g. the Back button), so focus is put back on what opened it by hand.
+  // A ref callback: it runs when the dialog appears; its cleanup, when it goes.
+  const dialogMounted = useCallback((dialog) => {
+    if (!dialog) return undefined;
+    const opener = document.activeElement;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
+  }, []);
+  // Desktop: the card replaces the list, so focus moves to its title, or
+  // keyboard and screen reader users wouldn't know it opened. Not on a page
+  // opened straight from a link: the card is already the page, and the
+  // browser would draw a focus ring on the title. Stable, so it runs only
+  // when the title first appears.
+  const headingMounted = useCallback((el) => {
+    if (el && inline && openedInApp) el.focus({ preventScroll: true });
+  }, [inline, openedInApp]);
   const commentsTabRef = useRef(null);
   // The Comments / History tabs at the bottom of the card. History mounts
   // (and loads) the first time it's opened.
@@ -342,8 +373,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   }), [tab]);
   // Read out by screen readers (visually hidden): "Report sent", etc.
   const [announcement, setAnnouncement] = useState('');
-  // The dialog's close listener is set up once; this always calls the latest onClose.
-  const onDialogClose = useEffectEvent(() => onClose());
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
@@ -358,11 +387,16 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const editButtonRef = useRef(null);
   // Esc or a tap outside with unsaved edits asks first. (Browsers may skip
   // this when the page hasn't been interacted with since the last time.)
-  const onDialogCancel = useEffectEvent((e) => {
+  const handleDialogCancel = (e) => {
     if (!(editing && editDirty)) return;
     e.preventDefault();
     setConfirmingClose(true);
-  });
+  };
+  // A close event arrives a moment after the close. If the dialog has been
+  // opened again since (React mounts it twice in development), it's stale.
+  const handleDialogClose = (e) => {
+    if (!e.currentTarget.open) onClose();
+  };
   // Back on the card, focus returns to the Edit button. It's only rendered
   // again after the form closes, so its ref callback does the focusing.
   const refocusEdit = useRef(false);
@@ -380,45 +414,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const [deletedIds, setDeletedIds] = useState([]);
   const [myReports, setMyReports] = useState([]);
 
-  useEffect(() => {
-    if (!plot) return;
-    fetch(`/api/plots/${plot.id}`)
-      .then((res) => res.json())
-      .then(setDetail)
-      .catch((err) => setError(err.message));
-  }, [plot]);
 
-  // Phones: the card is a native modal dialog. The browser keeps focus inside
-  // it, closes it on Esc (and on a tap outside, with closedby="any"), and
-  // tells screen readers it opened. Closing it closes the card (onClose
-  // updates the URL). It's removed rather than closed when the URL changes
-  // (e.g. the Back button), so focus is put back on what opened it by hand.
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const opener = document.activeElement;
-    dialog.showModal();
-    // A close event arrives a moment after the close. If the dialog has been
-    // reopened since (React re-runs this setup in development), it's stale.
-    const handleClose = () => { if (!dialog.open) onDialogClose(); };
-    const handleCancel = (e) => onDialogCancel(e);
-    dialog.addEventListener('close', handleClose);
-    dialog.addEventListener('cancel', handleCancel);
-    return () => {
-      dialog.removeEventListener('close', handleClose);
-      dialog.removeEventListener('cancel', handleCancel);
-      if (dialog.open) dialog.close();
-      if (opener?.isConnected) opener.focus({ preventScroll: true });
-    };
-  }, []);
-
-  // Desktop: the card replaces the list, so move focus to its title, or
-  // keyboard and screen reader users wouldn't know it opened. Not on a page
-  // opened straight from a link: the card is already the page, and the
-  // browser would draw a focus ring on the title.
-  useEffect(() => {
-    if (inline && openedInApp) headingRef.current?.focus({ preventScroll: true });
-  }, [inline, openedInApp]);
 
   if (!plot) return null;
 
@@ -464,15 +460,11 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // Loads the page again after a change. Comments and reports added here
   // come back with it. The plot list is refreshed too, so search sees it.
   const reload = () => {
-    fetch(`/api/plots/${plot.id}`)
-      .then((res) => res.json())
-      .then((d) => {
-        setDetail(d);
-        setMyComments([]);
-        setMyReports([]);
-        setReloads((n) => n + 1);
-      })
-      .catch((err) => setError(err.message));
+    detailResource.refresh().then(() => {
+      setMyComments([]);
+      setMyReports([]);
+      setReloads((n) => n + 1);
+    });
     onReported?.();
   };
 
@@ -581,7 +573,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         )}
 
         <div className="plot-detail__header">
-          <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
+          <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
           {/* Shown once the full page has loaded: an edit starts from it.
               A vacant plot's form starts at "A new shop is here". */}
           {detail && account !== undefined && !editing && (
@@ -736,7 +728,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
             {shop && <ShopText shop={shop} tags={stockTags} />}
           </dl>
 
-          {error && <p className="plot-detail__error" role="alert">{error}</p>}
+          {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
 
           {shop ? (
             <>
@@ -818,8 +810,8 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     );
   }
   return (
-    <dialog ref={dialogRef} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
-      closedby="any" onClick={handleBackdropClick}>
+    <dialog ref={dialogMounted} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
+      closedby="any" onClick={handleBackdropClick} onCancel={handleDialogCancel} onClose={handleDialogClose}>
       {content}
     </dialog>
   );

@@ -10,7 +10,7 @@ function SortMenu({ sort, onChange, searching }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const close = useCallback(() => setOpen(false), []);
-  useDismiss(ref, open, close);
+  const dismissRef = useDismiss(ref, close);
 
   const options = SORTS.filter((s) => searching || !s.searchOnly);
   const current = SORTS.find((s) => s.key === sort.key);
@@ -24,7 +24,7 @@ function SortMenu({ sort, onChange, searching }) {
         <span className="toolbar__label--narrow">Sort</span>
       </button>
       {open && (
-        <div className="toolbar__menu" role="menu">
+        <div className="toolbar__menu" role="menu" ref={dismissRef}>
           <p className="toolbar__menu-heading">Sort by</p>
           {options.map((s) => (
             <button key={s.key} type="button" role="menuitemradio" aria-checked={s.key === sort.key}

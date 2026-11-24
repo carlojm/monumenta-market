@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
+import { createResource, useResource } from '../lib/resource';
 import { AccountContext } from '../lib/account';
 
-// Asks the server who's logged in once when the site loads (which also keeps
-// the 90-day login fresh), and shares the answer with every component.
-function AccountProvider({ children }) {
-  const [account, setAccount] = useState(undefined);
+// Who's logged in: asked once when the site loads (which also keeps the
+// 90-day login fresh), and shared with every component. undefined while
+// loading, null when logged out (lib/resource.js loads it, no effect).
+const accountResource = createResource(
+  () => fetch('/api/auth/me').then((res) => res.json()).then((data) => data.account).catch(() => null),
+  undefined,
+);
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then((data) => setAccount(data.account))
-      .catch(() => setAccount(null));
-  }, []);
+function AccountProvider({ children }) {
+  const account = useResource(accountResource).data;
+  const setAccount = accountResource.set;
 
   const logout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });

@@ -11,7 +11,7 @@ export function FilterButton({ filters, onAdd }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const close = useCallback(() => setOpen(false), []);
-  useDismiss(ref, open, close);
+  const dismissRef = useDismiss(ref, close);
   const hidingVacant = filters.some((f) => f.type === 'occupied');
 
   const add = (type) => {
@@ -26,7 +26,7 @@ export function FilterButton({ filters, onAdd }) {
         Filter
       </button>
       {open && (
-        <div className="toolbar__menu" role="menu">
+        <div className="toolbar__menu" role="menu" ref={dismissRef}>
           <p className="toolbar__menu-heading">Filter by</p>
           {FILTER_TYPES.map((t) => (
             <button key={t.type} type="button" role="menuitem" className="toolbar__menu-item" onClick={() => add(t.type)}>
@@ -73,7 +73,7 @@ export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange,
     if (open && !isActive(open)) onRemove(open.id);
     onOpen(null);
   }, [open, onOpen, onRemove]);
-  useDismiss(ref, !!open, close);
+  const dismissRef = useDismiss(ref, close);
 
   if (filters.length === 0) return null;
   const update = (changes) => onChange({ ...open, ...changes });
@@ -105,7 +105,7 @@ export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange,
       </ul>
 
       {open && (
-        <div className="filters__popup" role="dialog" aria-label={`${open.type} filter`}>
+        <div className="filters__popup" role="dialog" aria-label={`${open.type} filter`} ref={dismissRef}>
           <div className="filters__popup-head">
             {open.type === 'tags' ? (
               <div className="toolbar__directions filters__modes">
