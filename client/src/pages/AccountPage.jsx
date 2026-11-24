@@ -347,8 +347,8 @@ function CommentList({ first }) {
 }
 
 const TABS = [
-  { id: 'login', label: 'Log In' },
-  { id: 'link', label: 'Link New Account' },
+  { id: 'login', label: 'Log in' },
+  { id: 'link', label: 'Link a new account' },
 ];
 
 function AccountPage() {

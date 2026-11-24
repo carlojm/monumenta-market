@@ -8,6 +8,8 @@ import TagChips from './TagChips';
 import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
+import StarButton from './StarButton';
+import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -330,6 +332,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // (lib/resource.js). The phone card is mounted with no plot while closed.
   const detailResource = plot ? plotDetailResource(plot.id) : NO_DETAIL;
   const { data: detail, error: loadError } = useResource(detailResource);
+  const starred = useFavorites();
   // Phones: the card is a native modal dialog. The browser keeps focus inside
   // it, closes it on Esc (and on a tap outside, with closedby="any"), and
   // tells screen readers it opened. Closing it closes the card (onClose
@@ -574,6 +577,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
 
         <div className="plot-detail__header">
           <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
+          {shop && <StarButton plotId={plot.id} name={displayName(shop)} starred={starred.has(plot.id)} />}
           {/* Shown once the full page has loaded: an edit starts from it.
               A vacant plot's form starts at "A new shop is here". */}
           {detail && account !== undefined && !editing && (

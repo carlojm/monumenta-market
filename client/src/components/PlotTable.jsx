@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
+import StarButton from './StarButton';
 import './PlotTable.css';
 
 function Snippet({ snippet }) {
@@ -21,7 +22,8 @@ function Snippet({ snippet }) {
 // The third column depends on what's narrowing the list: searching shows
 // where the text matched; a tag filter alone (any kind, "has none of" too)
 // shows what each shop says it is (About, cut to 3 lines); otherwise, the zone.
-function PlotTable({ rows, searchResults, tagMatches, tagFiltering, onSelectPlot }) {
+// `starred`: the starred plot ids; each shop's row has a star button.
+function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onSelectPlot }) {
   const third = searchResults ? 'match' : tagFiltering ? 'about' : 'zone';
   return (
     <table className="plot-table">
@@ -54,10 +56,16 @@ function PlotTable({ rows, searchResults, tagMatches, tagFiltering, onSelectPlot
               {/* The row is clickable; this button is how the keyboard (and screen
                   readers) open it. data-plot-id lets the page return focus here. */}
               <td className="plot-table__shop">
-                <button type="button" className="plot-table__open" data-plot-id={plot.id}
-                  onClick={(e) => { e.stopPropagation(); onSelectPlot(plot); }}>
-                  {displayName(plot.shop)}
-                </button>
+                <div className="plot-table__shop-cell">
+                  {/* Stars in one column; a vacant plot keeps the space, so names line up. */}
+                  {plot.shop
+                    ? <StarButton plotId={plot.id} name={displayName(plot.shop)} starred={starred.has(plot.id)} />
+                    : <span className="plot-table__no-star" />}
+                  <button type="button" className="plot-table__open" data-plot-id={plot.id}
+                    onClick={(e) => { e.stopPropagation(); onSelectPlot(plot); }}>
+                    {displayName(plot.shop)}
+                  </button>
+                </div>
               </td>
               {third === 'zone' && <td>{plot.zone}</td>}
               <td>

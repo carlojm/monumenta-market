@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { ListFilter, X } from 'lucide-react';
 import TagPicker from './TagPicker';
-import { FILTER_TYPES, STATUS_OPTIONS, TAG_MODES, filterLabel, isActive } from '../lib/filters';
+import { FILTER_TYPES, STATUS_OPTIONS, TAG_MODES, filterLabel, hasChoices, isActive } from '../lib/filters';
 import { useDismiss } from '../lib/useDismiss';
 import './Toolbar.css';
 
@@ -13,6 +13,7 @@ export function FilterButton({ filters, onAdd }) {
   const close = useCallback(() => setOpen(false), []);
   const dismissRef = useDismiss(ref, close);
   const hidingVacant = filters.some((f) => f.type === 'occupied');
+  const onlyStarred = filters.some((f) => f.type === 'starred');
 
   const add = (type) => {
     setOpen(false);
@@ -37,6 +38,10 @@ export function FilterButton({ filters, onAdd }) {
           <button type="button" role="menuitem" className="toolbar__menu-item" disabled={hidingVacant}
             onClick={() => add('occupied')}>
             Hide vacant plots
+          </button>
+          <button type="button" role="menuitem" className="toolbar__menu-item" disabled={onlyStarred}
+            onClick={() => add('starred')}>
+            Only starred shops
           </button>
         </div>
       )}
@@ -83,7 +88,7 @@ export function FilterChips({ filters, catalog, zones, openId, onOpen, onChange,
       <ul className="filters__chips">
         {filters.map((f) => (
           <li key={f.id} className={`filters__chip${f.id === openId ? ' filters__chip--open' : ''}`}>
-            {f.type === 'occupied' ? (
+            {!hasChoices(f.type) ? (
               <span className="filters__chip-label">{filterLabel(f)}</span>
             ) : (
               <button type="button" className="filters__chip-label" aria-expanded={f.id === openId}

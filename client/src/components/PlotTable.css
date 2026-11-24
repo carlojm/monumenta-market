@@ -89,3 +89,22 @@
   font-size: 0.8rem;
   white-space: nowrap;
 }
+
+/* The star, then the name (StarButton.jsx). */
+.plot-table__shop-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: -0.25rem;
+}
+
+.plot-table__no-star {
+  flex-shrink: 0;
+  inline-size: 1.75rem;
+}
+
+@media (pointer: coarse) {
+  .plot-table__no-star {
+    inline-size: 2.25rem;
+  }
+}

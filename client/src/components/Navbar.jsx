@@ -13,7 +13,8 @@ function Navbar() {
         <span className="navbar__subtitle">Monumenta Market Directory</span>
       </Link>
       <div className="navbar__right">
-        {isStaff && <Link to="/admin" className="navbar__admin">Admin</Link>}
+        <Link to="/about" className="navbar__link">About</Link>
+        {isStaff && <Link to="/admin" className="navbar__link">Admin</Link>}
         <Link to="/account" className="navbar__account" aria-label={account ? `Account: ${account.name}` : 'Log in'}>
           <User size={18} aria-hidden="true" />
           {/* Empty while loading, so it doesn't flash "Log in" for someone logged in. */}

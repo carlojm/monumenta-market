@@ -99,13 +99,67 @@ function toSearchRecord(plot) {
 // it's made once per list (App keeps it in a useMemo), not per keystroke.
 export const createSearchIndex = (plots) => new Fuse(plots.map(toSearchRecord), FUSE_OPTIONS);
 
+// --- Exact words first (4.4) ---
+// Fuse matches loosely ("lime" finds "slime", "fish" finds "Refurbished").
+// Its results are then ranked by how each word of the search sits in the
+// shop's text: as a whole word (0), at the start of a word (1, "fish" in
+// "fishing"), or only loosely (2). Fuse's order is kept within each tier.
+
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const NOT_WORD = '[^\\p{L}\\p{N}]';
+
+// Where `word` is in the record, best tier first, fields in FIELD_PRIORITY
+// order: { tier, key, value, start, end, refIndex } or null.
+function findWord(record, word) {
+  const whole = new RegExp(`(^|${NOT_WORD})(${escape(word)})(?=$|${NOT_WORD})`, 'iu');
+  const start = new RegExp(`(^|${NOT_WORD})(${escape(word)})`, 'iu');
+  for (const [tier, pattern] of [[0, whole], [1, start]]) {
+    for (const key of FIELD_PRIORITY) {
+      const values = key === 'tag_terms' ? record.tag_terms : [record[key]];
+      for (const [refIndex, value] of values.entries()) {
+        if (typeof value !== 'string') continue;
+        const m = pattern.exec(value);
+        if (m) {
+          const at = m.index + m[1].length;
+          return { tier, key, value, start: at, end: at + word.length, refIndex };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// The tier of the worst-placed word, and where the first word is.
+function exactness(record, words) {
+  let tier = 0;
+  let first = null;
+  for (const word of words) {
+    const found = findWord(record, word);
+    tier = Math.max(tier, found ? found.tier : 2);
+    first ??= found;
+  }
+  return { tier, first };
+}
+
+function exactSnippet(found, record) {
+  if (found.key === 'tag_terms') {
+    const tagName = record.tag_term_names[found.refIndex];
+    return { field: FIELD_LABELS.tag_terms, before: '', highlight: tagName, after: found.value === tagName ? '' : ` (${found.value})` };
+  }
+  return textSnippet(found.key, found.value, found.start, found.end);
+}
+
 export function getSearchResults(index, query) {
   if (!query.trim()) return null;
-  const results = index.search(query);
+  const words = query.trim().split(/\s+/);
+  const ranked = index.search(query).map((r, order) => ({ r, order, ...exactness(r.item, words) }))
+    .sort((a, b) => a.tier - b.tier || a.order - b.order);
 
-  const orderedIds = results.map((r) => r.item.id);
+  const orderedIds = ranked.map(({ r }) => r.item.id);
   const snippets = {};
-  for (const r of results) snippets[r.item.id] = buildSnippet(r.matches, r.item);
+  for (const { r, tier, first } of ranked) {
+    snippets[r.item.id] = tier < 2 && first ? exactSnippet(first, r.item) : buildSnippet(r.matches, r.item);
+  }
 
   return { matchedIds: new Set(orderedIds), orderedIds, snippets };
 }

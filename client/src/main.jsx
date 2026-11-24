@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
+import AboutPage from './pages/AboutPage.jsx';
 import AccountProvider from './components/AccountProvider.jsx';
 import './index.css';
 import './App.css';
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/plot/:plotId" element={<App />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/about" element={<AboutPage />} />
         </Routes>
       </AccountProvider>
     </BrowserRouter>
