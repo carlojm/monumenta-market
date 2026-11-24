@@ -10,6 +10,7 @@
 //   GET  /revisions/pending                 the review queue (staff: all; owners and maintainers: their
 //                                           shop, with can_review false where only a mod or the owner may approve)
 //   GET  /revisions/mine?offset=&withdrawn= your own edits, newest first, 20 at a time
+//   GET  /plots/:id/history?offset=         a plot's saved changes, public, newest first, 20 at a time
 //   POST /revisions/:id/approve {values?, note?}  `values` resolves conflicts or fixes typos
 //   POST /revisions/:id/reject  {note?}
 //   POST /revisions/:id/undo                the author of a Force edit puts the page back
@@ -238,6 +239,54 @@ router.get('/revisions/mine', (req, res) => {
     };
   });
   res.json({ edits, hasMore: rows.length > MINE_PAGE, withdrawn: countWithdrawn.get(req.account.id) });
+});
+
+// --- A plot's history (3.9) ---
+
+const HISTORY_PAGE = 20;
+const EARLIER_MAX = 200;
+const plotHistory = db.prepare(`
+  SELECT r.*, a.name AS author_name, rv.name AS reviewer_name FROM revisions r
+  LEFT JOIN accounts a ON a.id = r.author_id LEFT JOIN accounts rv ON rv.id = r.reviewer_id
+  WHERE r.plot_id = ? AND r.status = 'approved'
+  ORDER BY r.reviewed_at DESC, r.id DESC LIMIT ? OFFSET ?
+`);
+const firstRevisionAt = db.prepare("SELECT min(reviewed_at) FROM revisions WHERE plot_id = ? AND status = 'approved'").pluck();
+// The card's Update lines from before this plot's first saved revision
+// (revisions started 11/20), so older changes still show. Newest first.
+const earlierLines = db.prepare(`
+  SELECT c.id, c.body, c.author, c.created_at, s.owner, s.shop_name, s.guild_name FROM comments c
+  JOIN shops s ON s.id = c.shop_id
+  WHERE s.plot_id = @plot AND c.is_system = 1 AND (@before IS NULL OR c.created_at < @before)
+  ORDER BY c.created_at DESC, c.id DESC LIMIT @limit
+`);
+
+// Public, like a wiki's History tab: only saved changes (approved
+// suggestions, Force edits, undos, moves). Suggestions that were rejected or
+// withdrawn stay with their author (Your edits) and staff (the Mod log).
+// Each: who made it, who approved it (not for a Force edit), when it was
+// saved, the summary and the reviewer's note, and what changed (`made`, the
+// same as the Mod log). The last page adds `earlier`: older Update lines.
+// An edit to the current shop also has `version`: the page as it was right
+// after it, for "Restore this version" (sent as a normal edit).
+router.get('/plots/:id/history', (req, res) => {
+  const plot = getPlot.get(req.params.id);
+  if (!plot) return res.status(404).json({ error: 'Plot not found' });
+  const offset = Math.max(0, Number.parseInt(req.query.offset, 10) || 0);
+  const rows = plotHistory.all(plot.id, HISTORY_PAGE + 1, offset);
+  const current = getCurrentShop.get(plot.id);
+  const changes = rows.slice(0, HISTORY_PAGE).map((r) => ({
+    id: r.id, action: r.action, direct: !!r.direct, author: r.author_name ?? null,
+    reviewer: r.direct ? null : r.reviewer_name ?? null, summary: r.summary, note: r.review_note,
+    saved_at: r.reviewed_at ?? r.created_at, part_of: r.part_of,
+    ...made(r.action, { old_values: parse(r.old_values), new_values: parse(r.new_values) }),
+    moved_from: movedBy.get(r.id)?.plot_id ?? null,
+    ...(r.action === 'edit' && current && r.shop_id === current.id && { version: parse(r.new_values) }),
+  }));
+  const hasMore = rows.length > HISTORY_PAGE;
+  const earlier = hasMore ? undefined : earlierLines.all({ plot: plot.id, before: firstRevisionAt.get(plot.id), limit: EARLIER_MAX })
+    .map(({ id, body, author, created_at: at, ...shop }) => ({ id, body, author, created_at: at, shop: shopName(shop) }));
+  res.json({ changes, hasMore, ...(earlier && { earlier }) });
 });
 
 // --- Approve and reject ---

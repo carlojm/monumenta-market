@@ -286,7 +286,7 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
         ) : (
           <>
             <p className="shop-edit__warning">
-              {displayName(shop)} closes and moves to Past shops, with its comments.
+              {displayName(shop)} closes. It stays under History, with its comments.
             </p>
             <button type="button" className="shop-edit__toggle" onClick={() => switchMode('edit')}>
               Edit {displayName(shop)} instead

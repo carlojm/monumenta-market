@@ -463,3 +463,75 @@
     padding-block: 0.5rem;
   }
 }
+
+/* Comments / History tabs (Modern Web Guidance: tabs). The selected tab has
+   an underline, not only a color, drawn with a border so forced-colors mode
+   keeps it; nothing changes a tab's size. */
+.plot-detail__tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.plot-detail__tabs [role='tab'] {
+  position: relative;
+  flex: none;
+  min-block-size: 2.25rem;
+  padding: 0.25rem 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--text-muted);
+  font: 600 1rem/1.3 var(--sans);
+}
+
+.plot-detail__tabs [role='tab']:hover {
+  color: var(--text);
+}
+
+.plot-detail__tabs [role='tab'][aria-selected='true'] {
+  color: var(--text);
+}
+
+.plot-detail__tabs [role='tab'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  border-block-end: 2px solid var(--accent);
+}
+
+/* Earlier shops, at the end of the History tab. */
+.plot-detail__past-shops {
+  margin-top: 1.25rem;
+}
+
+.plot-detail__past-shops h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.plot-detail__past-comments {
+  margin-top: 0.5rem;
+}
+
+.plot-detail__past-comments summary {
+  cursor: pointer;
+  color: var(--link);
+  font-size: 0.875rem;
+  padding-block: 0.125rem; /* 24px tall */
+}
+
+@media (pointer: coarse) {
+  .plot-detail__past-comments summary {
+    padding-block: 0.5rem; /* 36px tall */
+  }
+}
+
+/* Long text stays readable on wide screens: about 70 characters a line
+   (Modern Web Guidance: typography). */
+.plot-detail__text,
+.plot-detail__comments p {
+  max-inline-size: 70ch;
+}

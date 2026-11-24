@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import mapImage from '../assets/market_map.png';
 import { plotRect } from '../lib/coordTransform';
@@ -74,4 +74,5 @@ function MarketMap({ plots, highlightIds, selectedId, onSelectPlot }) {
   );
 }
 
-export default MarketMap;
+// memo: skipped when its props haven't changed (App, while typing a search).
+export default memo(MarketMap);

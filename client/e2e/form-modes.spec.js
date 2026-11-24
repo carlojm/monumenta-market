@@ -34,7 +34,7 @@ test('a player: the plot is now empty', async ({ browser }) => {
   await expect(heading).toHaveText('The plot is now empty');
   await expect(heading, 'focus moves to the new heading').toBeFocused();
   await expect(form.getByText('A moderator reviews it before it shows.')).toBeVisible();
-  await expect(form.getByText('skelajon closes and moves to Past shops, with its comments.')).toBeVisible();
+  await expect(form.getByText('skelajon closes. It stays under History, with its comments.')).toBeVisible();
   await expect(form.locator('textarea')).toHaveCount(0);
   await expect(form.getByRole('button', { name: 'Show changes' })).toHaveCount(0);
   await expect(form.getByLabel('How do you know?')).toBeVisible();
@@ -56,7 +56,7 @@ test('a player: a new shop is here', async () => {
   await card.getByRole('button', { name: 'Edit', exact: true }).click();
   await form.getByRole('button', { name: 'A new shop is here' }).click();
   await expect(form.locator('h3')).toHaveText('A new shop is here');
-  await expect(form.getByText('skelajon closes and moves to Past shops')).toBeVisible();
+  await expect(form.getByText('skelajon closes. It stays under History')).toBeVisible();
   await expect(textbox(form, 'Owner')).toHaveValue('');
   await expect(textbox(form, 'About')).toHaveValue('');
   await expect(form.locator('.tag-picker__chosen')).toContainText('No tags yet');
@@ -130,8 +130,10 @@ test('a moderator publishes a new shop, then closes it', async ({ browser }) => 
   await expect(card.locator('h2')).toContainText('Fresh Finds');
   expect(query('SELECT closed_at FROM shops WHERE id = ?', old.id).closed_at).toBeTruthy();
   expect(currentShop('corridors-7').owner).toBe('FreshOwner');
-  await expect(card.getByText('Past shops')).toBeVisible();
   await expect(card.getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+  await card.getByRole('tab', { name: 'History' }).click();
+  await expect(card.getByRole('heading', { name: 'Earlier shops on this plot' }), 'the old shop is under History').toBeVisible();
+  await card.getByRole('tab', { name: 'Comments' }).click();
 
   await card.getByRole('button', { name: 'Edit', exact: true }).click();
   await form.getByRole('button', { name: 'The plot is now empty' }).click();

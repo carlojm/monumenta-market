@@ -141,63 +141,118 @@
 
 /* Desktop: map on the left (always in view), search + table on the right. */
 @media (min-width: 900px) {
+  /* App proportions (unslop): fluid up to 1600 wide, with 32 of padding at
+     the sides. Long text in the card keeps a readable line length on its own
+     (PlotDetail.css). */
   #root {
-    max-width: 1240px;
+    max-width: 1600px;
   }
 
   .navbar {
-    padding-inline: 1.5rem;
+    padding-inline: 2rem;
   }
 
+  /* The columns and the map keep one size, card or not, so nothing moves
+     when a card opens: the map (about half the window's height, centered in
+     its column) on the left; the list, or the card with the list moving
+     under the map, on the right. */
   .app-main {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     align-items: start;
     gap: 1.5rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem 2rem;
+  }
+
+  .app-main__map .market-map {
+    max-width: min(100%, calc(60svh * 0.875));
   }
 
   .app-error {
     grid-column: 1 / -1;
   }
 
-  .app-main__map {
-    position: sticky;
-    top: 1.25rem;
+  /* Panes (Modern Web Guidance: CSS layout). The page fills the window and
+     doesn't scroll; the header stays, and each column scrolls on its own.
+     overscroll-behavior: reaching the end of a pane doesn't scroll anything
+     else. scrollbar-gutter: room for the scrollbar is kept, so nothing shifts
+     sideways when one appears. */
+  .app {
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Search stays reachable while the table scrolls under it. */
-  .app-main__search {
+  .app-main {
+    flex: 1;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    padding-bottom: 0;
+  }
+
+  .app-main > section {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    padding-bottom: 1.25rem;
+  }
+
+  /* A little room between the card (or the table) and the scrollbar beside
+     it, so the card's border doesn't run into it. */
+  .app-main > .app-main__list {
+    padding-inline-end: 0.5rem;
+  }
+
+  /* The map's column reserves the scrollbar's room on both sides, so the
+     map stays centered, and keeps the same room as the right column between
+     its content and the scrollbar (on both sides, for the same reason). */
+  .app-main > .app-main__map {
+    scrollbar-gutter: stable both-edges;
+    padding-inline: 0.5rem;
+  }
+
+  /* No card: the search stays on top, and only the table scrolls under it,
+     so its scrollbar starts at the table. */
+  .app-main__list .app-main__list-body {
+    height: 100%;
+  }
+
+  .app-main__list .app-main__rows {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    padding-inline-end: 0.5rem;
+  }
+
+  /* The column headers stay visible while the rows scroll. */
+  .app-main__list .plot-table thead th {
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 1;
     background: var(--bg);
-    padding-block: 0.75rem 0.25rem;
-    margin-top: -0.75rem;
   }
 
-  /* Card open: the left column holds a smaller map with the search + table
-     under it. The column fits the window, and the table scrolls inside it. */
+  /* Card open: the left column holds the map, then the search and the whole
+     list, scrolling together, so the map slides up out of the way. The
+     search sticks to the top of the column. */
   .app-main__map--with-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    height: calc(100svh - 6rem);
-  }
-
-  .app-main__map--with-list .market-map {
-    max-width: min(100%, calc(50svh * 0.875));
-  }
-
-  .app-main__map--with-list .app-main__list-body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
   }
 
   .app-main__map--with-list .app-main__search {
-    margin-top: 0;
-    padding-top: 0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg);
+    padding-block: 0.5rem 0.25rem;
   }
 }
 /* --- Admin (functional only; visual cleanup is a TODO) --- */
@@ -897,4 +952,11 @@
   margin-left: 0.3rem;
   font-size: 0.7rem;
   opacity: 0.75;
+}
+
+/* Wraps the desktop card, and the list in its own column, only so App can
+   tell when one appears (ref callbacks); it adds no box of its own. */
+.app-main__card,
+.app-main__list-wrap {
+  display: contents;
 }

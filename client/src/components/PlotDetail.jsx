@@ -1,11 +1,13 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
+import { plotDetailResource, useResource } from '../lib/resource';
 import TagChips from './TagChips';
 import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
+import ShopHistory from './ShopHistory';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -30,14 +32,14 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   const [error, setError] = useState(null);
   // Cancelling the delete confirmation puts focus back on the Delete button
   // (it was replaced by the confirmation, so focus would otherwise be lost).
-  const deleteButton = useRef(null);
+  // The button's ref callback does it when the button comes back.
   const refocusDelete = useRef(false);
-  useEffect(() => {
-    if (!confirmingDelete && refocusDelete.current) {
+  const deleteButtonMounted = (el) => {
+    if (el && refocusDelete.current) {
       refocusDelete.current = false;
-      deleteButton.current?.focus();
+      el.focus();
     }
-  }, [confirmingDelete]);
+  };
   const isOwn = !!account && !!c.verified && c.author === account.name;
   const isStaff = account?.role === 'moderator' || account?.role === 'admin';
   const canAct = interactive && !!account && !c.is_system;
@@ -118,7 +120,7 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
               Outdated
             </button>
             {canDelete && (
-              <button type="button" ref={deleteButton} onClick={() => setConfirmingDelete(true)}>Delete</button>
+              <button type="button" ref={deleteButtonMounted} onClick={() => setConfirmingDelete(true)}>Delete</button>
             )}
           </div>
         )
@@ -128,7 +130,38 @@ function CommentItem({ comment: c, interactive, onDeleted }) {
   );
 }
 
-function CommentList({ comments, interactive = false, onDeleted }) {
+// The phone card while no plot is open: nothing to load. `get` returns the
+// same object every time, as useSyncExternalStore requires.
+const NOTHING = { data: null, error: null };
+const NO_DETAIL = { subscribe: () => () => {}, get: () => NOTHING };
+
+// Left/Right, Home/End move focus between the tabs (Enter or a click selects).
+function moveBetweenTabs(e) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  const tabs = [...e.currentTarget.querySelectorAll('[role="tab"]')];
+  const at = tabs.indexOf(document.activeElement);
+  const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1
+    : (at + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next].focus();
+}
+
+// A tab panel that isn't selected is hidden="until-found": hidden, but Find in
+// page still searches it, and reveals it (firing `beforematch`) on a match.
+// React only renders `hidden` as on or off, so a ref callback sets it.
+// Returns the cleanup, for a ref callback.
+function hideUntilFound(el, hidden, onReveal) {
+  if (!el) return undefined;
+  if (hidden) el.setAttribute('hidden', 'until-found');
+  else el.removeAttribute('hidden');
+  el.addEventListener('beforematch', onReveal);
+  return () => el.removeEventListener('beforematch', onReveal);
+}
+
+// Players' comments. The automatic Update lines (is_system) aren't listed
+// here: History has the changes (3.9).
+function CommentList({ comments: all, interactive = false, onDeleted }) {
+  const comments = all.filter((c) => !c.is_system);
   if (!comments.length) return <p className="plot-detail__empty">No comments yet</p>;
   return (
     <ul className="plot-detail__comments">
@@ -165,13 +198,26 @@ function ShopText({ shop, tags }) {
   );
 }
 
-// A past shop, loaded the first time it's expanded.
+// Earlier shops on this plot, in the History tab (3.9).
+function PastShops({ shops }) {
+  if (!shops.length) return null;
+  return (
+    <section className="plot-detail__past-shops" aria-labelledby="plot-detail-past-shops">
+      <h4 id="plot-detail-past-shops">Earlier shops on this plot</h4>
+      {shops.map((s) => <PastShop key={s.id} summary={s} />)}
+    </section>
+  );
+}
+
+// A past shop, loaded the first time it's expanded: who ran it (when its
+// name isn't the owner's), what it said, and its comments, folded.
 function PastShop({ summary }) {
   const [shop, setShop] = useState(null);
   const load = (e) => {
     if (!e.currentTarget.open || shop) return;
     fetch(`/api/shops/${summary.id}`).then((res) => res.json()).then(setShop);
   };
+  const comments = shop?.comments.filter((c) => !c.is_system) ?? [];
   return (
     <details className="plot-detail__past-shop" onToggle={load}>
       <summary>
@@ -182,8 +228,27 @@ function PastShop({ summary }) {
         <p className="plot-detail__muted">Loading…</p>
       ) : (
         <>
-          <dl className="plot-detail__meta"><ShopText shop={shop} tags={shop.tags} /></dl>
-          <CommentList comments={shop.comments} />
+          <dl className="plot-detail__meta">
+            {displayName(shop) !== shop.owner && (
+              <>
+                <dt>{shop.guild_name ? 'Guild' : 'Owner'}</dt>
+                <dd>{ownerLabel(shop)}</dd>
+              </>
+            )}
+            <ShopText shop={shop} tags={shop.tags} />
+            {shop.palette && (
+              <>
+                <dt>Palette</dt>
+                <dd>{shop.palette}</dd>
+              </>
+            )}
+          </dl>
+          {comments.length > 0 && (
+            <details className="plot-detail__past-comments">
+              <summary>Comments ({comments.length})</summary>
+              <CommentList comments={comments} />
+            </details>
+          )}
         </>
       )}
     </details>
@@ -260,14 +325,54 @@ function ReportForm({ plotId, onReported }) {
 const SUPPORTS_CLOSEDBY = typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
 
 function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inline = false, openedInApp = false }) {
-  const [detail, setDetail] = useState(null);
-  const dialogRef = useRef(null);
-  const headingRef = useRef(null);
-  const commentsHeadingRef = useRef(null);
+  // The plot's details (comments, reports, pending edits, past shops). The
+  // card shows right away from the map's data and fills in when they arrive
+  // (lib/resource.js). The phone card is mounted with no plot while closed.
+  const detailResource = plot ? plotDetailResource(plot.id) : NO_DETAIL;
+  const { data: detail, error: loadError } = useResource(detailResource);
+  // Phones: the card is a native modal dialog. The browser keeps focus inside
+  // it, closes it on Esc (and on a tap outside, with closedby="any"), and
+  // tells screen readers it opened. Closing it closes the card (onClose
+  // updates the URL). It's removed rather than closed when the URL changes
+  // (e.g. the Back button), so focus is put back on what opened it by hand.
+  // A ref callback: it runs when the dialog appears; its cleanup, when it goes.
+  const dialogMounted = useCallback((dialog) => {
+    if (!dialog) return undefined;
+    const opener = document.activeElement;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
+  }, []);
+  // Desktop: the card replaces the list, so focus moves to its title, or
+  // keyboard and screen reader users wouldn't know it opened. Not on a page
+  // opened straight from a link: the card is already the page, and the
+  // browser would draw a focus ring on the title. Stable, so it runs only
+  // when the title first appears.
+  const headingMounted = useCallback((el) => {
+    if (el && inline && openedInApp) el.focus({ preventScroll: true });
+  }, [inline, openedInApp]);
+  const commentsTabRef = useRef(null);
+  // The Comments / History tabs at the bottom of the card. History mounts
+  // (and loads) the first time it's opened.
+  const [tab, setTab] = useState('comments');
+  const [historyOpened, setHistoryOpened] = useState(false);
+  // Goes up each time the card reloads after a change, so History loads again.
+  const [reloads, setReloads] = useState(0);
+  const showTab = (name) => {
+    setTab(name);
+    if (name === 'history') setHistoryOpened(true);
+  };
+  // The panels: the other tab's is hidden until found; if Find in page
+  // reveals it, its tab is selected to match. Rerun when the tab changes.
+  const commentsPanel = useCallback((el) => hideUntilFound(el, tab !== 'comments', () => setTab('comments')), [tab]);
+  const historyPanel = useCallback((el) => hideUntilFound(el, tab !== 'history', () => {
+    setTab('history');
+    setHistoryOpened(true);
+  }), [tab]);
   // Read out by screen readers (visually hidden): "Report sent", etc.
   const [announcement, setAnnouncement] = useState('');
-  // The dialog's close listener is set up once; this always calls the latest onClose.
-  const onDialogClose = useEffectEvent(() => onClose());
   const [error, setError] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
@@ -282,11 +387,16 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const editButtonRef = useRef(null);
   // Esc or a tap outside with unsaved edits asks first. (Browsers may skip
   // this when the page hasn't been interacted with since the last time.)
-  const onDialogCancel = useEffectEvent((e) => {
+  const handleDialogCancel = (e) => {
     if (!(editing && editDirty)) return;
     e.preventDefault();
     setConfirmingClose(true);
-  });
+  };
+  // A close event arrives a moment after the close. If the dialog has been
+  // opened again since (React mounts it twice in development), it's stale.
+  const handleDialogClose = (e) => {
+    if (!e.currentTarget.open) onClose();
+  };
   // Back on the card, focus returns to the Edit button. It's only rendered
   // again after the form closes, so its ref callback does the focusing.
   const refocusEdit = useRef(false);
@@ -304,45 +414,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const [deletedIds, setDeletedIds] = useState([]);
   const [myReports, setMyReports] = useState([]);
 
-  useEffect(() => {
-    if (!plot) return;
-    fetch(`/api/plots/${plot.id}`)
-      .then((res) => res.json())
-      .then(setDetail)
-      .catch((err) => setError(err.message));
-  }, [plot]);
 
-  // Phones: the card is a native modal dialog. The browser keeps focus inside
-  // it, closes it on Esc (and on a tap outside, with closedby="any"), and
-  // tells screen readers it opened. Closing it closes the card (onClose
-  // updates the URL). It's removed rather than closed when the URL changes
-  // (e.g. the Back button), so focus is put back on what opened it by hand.
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const opener = document.activeElement;
-    dialog.showModal();
-    // A close event arrives a moment after the close. If the dialog has been
-    // reopened since (React re-runs this setup in development), it's stale.
-    const handleClose = () => { if (!dialog.open) onDialogClose(); };
-    const handleCancel = (e) => onDialogCancel(e);
-    dialog.addEventListener('close', handleClose);
-    dialog.addEventListener('cancel', handleCancel);
-    return () => {
-      dialog.removeEventListener('close', handleClose);
-      dialog.removeEventListener('cancel', handleCancel);
-      if (dialog.open) dialog.close();
-      if (opener?.isConnected) opener.focus({ preventScroll: true });
-    };
-  }, []);
-
-  // Desktop: the card replaces the list, so move focus to its title, or
-  // keyboard and screen reader users wouldn't know it opened. Not on a page
-  // opened straight from a link: the card is already the page, and the
-  // browser would draw a focus ring on the title.
-  useEffect(() => {
-    if (inline && openedInApp) headingRef.current?.focus({ preventScroll: true });
-  }, [inline, openedInApp]);
 
   if (!plot) return null;
 
@@ -388,14 +460,11 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // Loads the page again after a change. Comments and reports added here
   // come back with it. The plot list is refreshed too, so search sees it.
   const reload = () => {
-    fetch(`/api/plots/${plot.id}`)
-      .then((res) => res.json())
-      .then((d) => {
-        setDetail(d);
-        setMyComments([]);
-        setMyReports([]);
-      })
-      .catch((err) => setError(err.message));
+    detailResource.refresh().then(() => {
+      setMyComments([]);
+      setMyReports([]);
+      setReloads((n) => n + 1);
+    });
     onReported?.();
   };
 
@@ -474,11 +543,11 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     onReported?.();
   };
 
-  // The deleted comment had focus; move it to the Comments heading.
+  // The deleted comment had focus; move it to the Comments tab.
   const handleDeleted = (id) => {
     setDeletedIds((ids) => [...ids, id]);
     setAnnouncement('Comment deleted.');
-    commentsHeadingRef.current?.focus({ preventScroll: true });
+    commentsTabRef.current?.focus({ preventScroll: true });
   };
 
   // Fallback for browsers without closedby: a click on the dialog itself but
@@ -504,7 +573,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         )}
 
         <div className="plot-detail__header">
-          <h2 id="plot-detail-title" ref={headingRef} tabIndex={-1}>{displayName(shop)}</h2>
+          <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
           {/* Shown once the full page has loaded: an edit starts from it.
               A vacant plot's form starts at "A new shop is here". */}
           {detail && account !== undefined && !editing && (
@@ -659,56 +728,75 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
             {shop && <ShopText shop={shop} tags={stockTags} />}
           </dl>
 
-          {error && <p className="plot-detail__error" role="alert">{error}</p>}
+          {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
 
-          {shop && (
+          {shop ? (
             <>
               <hr />
-              <h3 ref={commentsHeadingRef} tabIndex={-1}>Comments</h3>
-              {/* <p className="plot-detail__comment-hint">
-                Leave a comment if this shop is different from described.
-              </p> */}
+              {/* Tabs (Modern Web Guidance): selection on activation, since
+                  History loads when opened; arrow keys move between them. */}
+              <div className="plot-detail__tabs" role="tablist" aria-label="Comments and history" onKeyDown={moveBetweenTabs}>
+                <button type="button" role="tab" id="plot-detail-tab-comments" ref={commentsTabRef}
+                  aria-selected={tab === 'comments'} tabIndex={tab === 'comments' ? 0 : -1} onClick={() => showTab('comments')}>
+                  Comments
+                </button>
+                <button type="button" role="tab" id="plot-detail-tab-history"
+                  aria-selected={tab === 'history'} tabIndex={tab === 'history' ? 0 : -1} onClick={() => showTab('history')}>
+                  History
+                </button>
+              </div>
+              <div role="tabpanel" aria-labelledby="plot-detail-tab-comments" className="plot-detail__tabpanel"
+                ref={commentsPanel}>
+                {/* <p className="plot-detail__comment-hint">
+                  Leave a comment if this shop is different from described.
+                </p> */}
 
-              {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
-              {account === undefined ? null : !account ? (
-                <p className="plot-detail__link-prompt">
-                  <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
-                </p>
-              ) : (
-                <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
-                  <label htmlFor="plot-detail-comment">
-                    Add a comment{' '}
-                    <span className="plot-detail__muted">
-                      as <strong className="plot-detail__author--linked">{account.name}</strong>
-                    </span>
-                  </label>
-                  <textarea
-                    id="plot-detail-comment"
-                    value={commentBody}
-                    onChange={(e) => setCommentBody(e.target.value)}
-                    required
-                  />
-                  <button type="submit" disabled={submitting}>
-                    {submitting ? 'Posting…' : 'Post comment'}
-                  </button>
-                </form>
-              )}
+                {/* Commenting needs a linked account. Nothing shows while that's still loading. */}
+                {account === undefined ? null : !account ? (
+                  <p className="plot-detail__link-prompt">
+                    <Link to="/account?tab=link">Link your Minecraft account</Link> to comment.
+                  </p>
+                ) : (
+                  <form className="plot-detail__comment-form" onSubmit={handleSubmitComment}>
+                    <label htmlFor="plot-detail-comment">
+                      Add a comment{' '}
+                      <span className="plot-detail__muted">
+                        as <strong className="plot-detail__author--linked">{account.name}</strong>
+                      </span>
+                    </label>
+                    <textarea
+                      id="plot-detail-comment"
+                      value={commentBody}
+                      onChange={(e) => setCommentBody(e.target.value)}
+                      required
+                    />
+                    <button type="submit" disabled={submitting}>
+                      {submitting ? 'Posting…' : 'Post comment'}
+                    </button>
+                  </form>
+                )}
 
-              <CommentList
-                comments={comments}
-                interactive
-                onDeleted={handleDeleted}
-              />
+                <CommentList
+                  comments={comments}
+                  interactive
+                  onDeleted={handleDeleted}
+                />
+              </div>
+              <div role="tabpanel" aria-labelledby="plot-detail-tab-history" className="plot-detail__tabpanel"
+                ref={historyPanel}>
+                {historyOpened && <ShopHistory key={reloads} plotId={plot.id} shop={shop} account={account} onRestored={handleEditDone} />}
+                <PastShops shops={pastShops} />
+              </div>
+            </>
+          ) : (
+            <>
+              <hr />
+              <h3>History</h3>
+              <ShopHistory key={reloads} plotId={plot.id} />
+              <PastShops shops={pastShops} />
             </>
           )}
 
-          {pastShops.length > 0 && (
-            <>
-              <hr />
-              <h3>Past shops</h3>
-              {pastShops.map((s) => <PastShop key={s.id} summary={s} />)}
-            </>
-          )}
           </>
         )}
       </>
@@ -722,8 +810,8 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     );
   }
   return (
-    <dialog ref={dialogRef} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
-      closedby="any" onClick={handleBackdropClick}>
+    <dialog ref={dialogMounted} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
+      closedby="any" onClick={handleBackdropClick} onCancel={handleDialogCancel} onClose={handleDialogClose}>
       {content}
     </dialog>
   );

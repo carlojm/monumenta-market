@@ -1,6 +1,7 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import { displayName } from '../lib/plots';
+import { plotsResource, tagsResource, useResource } from '../lib/resource';
 import TagPicker from '../components/TagPicker';
 import ColorInput from '../components/ColorInput';
 
@@ -21,10 +22,15 @@ const FIELDS = [
   { key: 'secondary_color', label: 'Secondary color', color: true },
 ];
 
+const warnBeforeLeaving = (e) => {
+  e.preventDefault();
+  e.returnValue = ''; // some browsers only prompt when this is set
+};
+
 const emptyForm = () => Object.fromEntries(FIELDS.map((f) => [f.key, '']));
 
 function AdminPlotEditor() {
-  const [plots, setPlots] = useState([]);
+  const plots = useResource(plotsResource).data;
   const [filter, setFilter] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [shop, setShop] = useState(null);
@@ -36,30 +42,25 @@ function AdminPlotEditor() {
   const [message, setMessage] = useState(null);
 
   // Tags are kept apart from the text fields: a list of tag ids.
-  const [tagCatalog, setTagCatalog] = useState(null);
+  const tagCatalog = useResource(tagsResource).data;
   const [tagIds, setTagIds] = useState([]);
   const [originalTagIds, setOriginalTagIds] = useState([]);
 
-  const loadPlots = () => fetch('/api/plots').then((res) => res.json()).then(setPlots);
-  useEffect(() => {
-    loadPlots();
-    fetch('/api/tags').then((res) => res.json()).then(setTagCatalog);
-  }, []);
+  const loadPlots = () => plotsResource.refresh();
 
   const sameIds = (a, b) => a.length === b.length && a.every((id) => b.includes(id));
   const tagsChanged = !sameIds(tagIds, originalTagIds);
   const changedFields = FIELDS.filter((f) => form[f.key] !== original[f.key]).map((f) => f.key);
   const dirty = changedFields.length > 0 || tagsChanged;
 
-  // Closing or reloading the tab with unsaved edits asks the browser to confirm.
-  useEffect(() => {
-    if (!dirty) return;
-    const warn = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; // some browsers only prompt when this is set
-    };
-    window.addEventListener('beforeunload', warn);
-    return () => window.removeEventListener('beforeunload', warn);
+  // Closing or reloading the tab with unsaved edits asks the browser to
+  // confirm. A ref callback on the editor: it runs again whenever `dirty`
+  // changes (and its cleanup when the editor goes), so the warning is on
+  // exactly while there are unsaved edits.
+  const warnWhileDirty = useCallback((el) => {
+    if (!el || !dirty) return undefined;
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
   }, [dirty]);
 
   const loadPlot = async (id) => {
@@ -149,7 +150,7 @@ function AdminPlotEditor() {
     : plots;
 
   return (
-    <div className="admin-editor">
+    <div className="admin-editor" ref={warnWhileDirty}>
       <div className="admin-editor__list">
         <h3>Plots</h3>
         <input type="text" placeholder="Filter by id, zone, owner…" value={filter} onChange={(e) => setFilter(e.target.value)} />

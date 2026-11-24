@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { adminFetch } from '../lib/adminAuth';
 import ColorInput from '../components/ColorInput';
 import AdminAutoTag from './AdminAutoTag';
 import { timeAgo } from '../lib/reports';
+import { createResource, tagsResource, useResource } from '../lib/resource';
 import '../components/TagChips.css';
 
 // Moderators and admins: manage the tag lists. Tags show in this order
@@ -21,10 +22,12 @@ async function send(url, method, body) {
   return data;
 }
 
-const getTags = () => adminFetch('/api/admin/tags').then((res) => {
+// Every tag, with suggestions and groups (lib/resource.js: loads when the
+// page opens, and on refresh after each change).
+const adminTagsResource = createResource(() => adminFetch('/api/admin/tags').then((res) => {
   if (!res.ok) throw new Error('Could not load tags.');
   return res.json();
-});
+}));
 
 function Chip({ tag }) {
   const color = tag.effective_color;
@@ -263,17 +266,14 @@ function GroupColor({ group, onChanged }) {
 const newDraft = (groups) => ({ kind: 'stock', name: '', aliases: '', group_id: groups[0]?.id ?? '', color: '' });
 
 function AdminTags() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const { data, error } = useResource(adminTagsResource);
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState(null); // the "Add a tag" draft, or null when closed
   const [addError, setAddError] = useState(null);
   const [autoTagOpen, setAutoTagOpen] = useState(false); // only load it when opened
 
-  const reload = () => getTags().then(setData).catch((err) => setError(err.message));
-  useEffect(() => {
-    getTags().then(setData).catch((err) => setError(err.message));
-  }, []);
+  // The public tag list too, so the filters and the edit form see the change.
+  const reload = () => Promise.all([adminTagsResource.refresh(), tagsResource.refresh()]);
 
   if (error) return <p className="admin-comments__error">{error}</p>;
   if (!data) return <p>Loading tags…</p>;

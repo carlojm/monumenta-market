@@ -95,10 +95,13 @@ function toSearchRecord(plot) {
 }
 
 // Returns { matchedIds: Set, orderedIds: string[], snippets: Record<plotId, snippet> } | null
-export function getSearchResults(plots, query) {
+// The search index for a list of plots. Building it is the slow part, so
+// it's made once per list (App keeps it in a useMemo), not per keystroke.
+export const createSearchIndex = (plots) => new Fuse(plots.map(toSearchRecord), FUSE_OPTIONS);
+
+export function getSearchResults(index, query) {
   if (!query.trim()) return null;
-  const fuse = new Fuse(plots.map(toSearchRecord), FUSE_OPTIONS);
-  const results = fuse.search(query);
+  const results = index.search(query);
 
   const orderedIds = results.map((r) => r.item.id);
   const snippets = {};

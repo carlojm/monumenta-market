@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { displayName, reportLabel } from '../lib/plots';
 import { timeAgo } from '../lib/reports';
 import './PlotTable.css';
@@ -17,17 +18,20 @@ function Snippet({ snippet }) {
 // { names, context }) is set while a tag filter is on; the Match column shows
 // the matching tags, then where they appear in the shop's text. A search
 // snippet, if any, comes first instead.
-function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
-  const showMatch = !!(searchResults || tagMatches);
+// The third column depends on what's narrowing the list: searching shows
+// where the text matched; a tag filter alone (any kind, "has none of" too)
+// shows what each shop says it is (About, cut to 3 lines); otherwise, the zone.
+function PlotTable({ rows, searchResults, tagMatches, tagFiltering, onSelectPlot }) {
+  const third = searchResults ? 'match' : tagFiltering ? 'about' : 'zone';
   return (
     <table className="plot-table">
       <thead>
         <tr>
           <th className="plot-table__shop">Shop</th>
-          {/* Zone only without a search or filter, so the Match column gets the room. */}
-          {!showMatch && <th>Zone</th>}
+          {third === 'zone' && <th>Zone</th>}
           <th>Status</th>
-          {showMatch && <th>Match</th>}
+          {third === 'match' && <th>Match</th>}
+          {third === 'about' && <th>About</th>}
         </tr>
       </thead>
       <tbody>
@@ -55,7 +59,7 @@ function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
                   {displayName(plot.shop)}
                 </button>
               </td>
-              {!showMatch && <td>{plot.zone}</td>}
+              {third === 'zone' && <td>{plot.zone}</td>}
               <td>
                 {!plot.shop ? 'Vacant' : report ? (
                   <>
@@ -64,7 +68,12 @@ function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
                   </>
                 ) : '—'}
               </td>
-              {showMatch && (
+              {third === 'about' && (
+                // Cut to 3 lines by CSS only, so the whole text is still there
+                // for Find in page and screen readers.
+                <td><div className="plot-table__about">{plot.shop?.description || '—'}</div></td>
+              )}
+              {third === 'match' && (
                 <td className="plot-table__match">
                   {snippet && <Snippet snippet={snippet} />}
                   {tagNames.length > 0 && (
@@ -87,4 +96,5 @@ function PlotTable({ rows, searchResults, tagMatches, onSelectPlot }) {
   );
 }
 
-export default PlotTable;
+// memo: skipped when its props haven't changed (App, while typing a search).
+export default memo(PlotTable);

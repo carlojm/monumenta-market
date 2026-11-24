@@ -19,6 +19,7 @@ import { requireModerator } from '../middleware/adminAuth.js';
 import { logModAction } from '../lib/modlog.js';
 import { KINDS, checkTagIds, cleanTag, endOfGroup, isHex, sameName, setShopTags } from '../lib/tags.js';
 import { addLogEntry } from '../lib/shopLog.js';
+import { recordDirect, snapshotOf } from '../lib/revisions.js';
 
 // requireModerator goes on each route: other /api/admin routes have their own checks.
 const router = express.Router();
@@ -118,7 +119,8 @@ router.post('/tags/:id/move', requireModerator, (req, res) => {
 
 // Approving a suggestion puts it at the end of its group. With add_to_shop, it's
 // also added to the shop it was suggested for (if that shop is still open),
-// logged on the card as added by the player who suggested it.
+// logged on the card as added by the player who suggested it, and saved as a
+// revision by the moderator, so it's in the page's history (3.9).
 router.post('/tags/:id/approve', requireModerator, (req, res) => {
   const tag = getTag.get(req.params.id);
   if (!tag || tag.status !== 'pending') return res.status(404).json({ error: 'Suggestion not found' });
@@ -130,9 +132,16 @@ router.post('/tags/:id/approve', requireModerator, (req, res) => {
     if (req.body.add_to_shop && tag.suggested_for_shop_id) {
       shop = db.prepare('SELECT * FROM shops WHERE id = ? AND closed_at IS NULL').get(tag.suggested_for_shop_id);
       if (shop) {
+        const before = snapshotOf(shop);
         db.prepare('INSERT OR IGNORE INTO shop_tags (shop_id, tag_id) VALUES (?, ?)').run(shop.id, tag.id);
         const suggester = tag.suggested_by ? db.prepare('SELECT id, name FROM accounts WHERE id = ?').get(tag.suggested_by) : null;
         addLogEntry(shop.id, suggester, `tag added: ${tag.name}`);
+        const after = snapshotOf(shop);
+        recordDirect({
+          plotId: shop.plot_id, shopId: shop.id, action: 'edit', base: before, proposed: after, account: req.account,
+          summary: `Added the suggested tag "${tag.name}"${suggester ? ` (suggested by ${suggester.name})` : ''}`,
+          applied: { old_values: before, new_values: after },
+        });
       }
     }
     logModAction(req, 'tag.approve', `tag:${tag.id}`,
@@ -153,8 +162,8 @@ router.post('/tags/:id/reject', requireModerator, (req, res) => {
 // Auto-tagging from descriptions: the matching runs in the browser (the same
 // as the Edit tags popup's suggestions) and staff tick which ones to keep.
 // This only adds tags, never removes them. Each shop gets a log line on its
-// card; the mod log gets one summary. updated_at isn't touched, since nothing
-// about the shop itself changed.
+// card and a revision (its history, 3.9); the mod log gets one summary.
+// updated_at isn't touched, since nothing about the shop itself changed.
 const MAX_AUTO_TAG_SHOPS = 500;
 const currentShop = db.prepare('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL');
 const shopTagIds = db.prepare('SELECT tag_id FROM shop_tags WHERE shop_id = ?');
@@ -177,10 +186,16 @@ router.post('/tags/auto-apply', requireModerator, (req, res) => {
     let shops = 0;
     let tags = 0;
     for (const { shop, ids } of work) {
+      const before = snapshotOf(shop);
       const current = shopTagIds.all(shop.id).map((r) => r.tag_id);
       const { added } = setShopTags(shop.id, [...new Set([...current, ...ids])]);
       if (!added.length) continue;
       addLogEntry(shop.id, req.account, `tags added: ${added.join(', ')}`);
+      const after = snapshotOf(shop);
+      recordDirect({
+        plotId: shop.plot_id, shopId: shop.id, action: 'edit', base: before, proposed: after, account: req.account,
+        summary: 'Auto-tagged from the description', applied: { old_values: before, new_values: after },
+      });
       shops++;
       tags += added.length;
     }
