@@ -40,11 +40,14 @@ test('other players: a plain banner, and no images in the edit form', async ({ b
   page = await pageAs(browser, server, 'Tester', PHONE);
   await page.goto(`/plot/${P}`);
   await expect(page.locator('.plot-detail__meta')).toBeVisible();
+  await expect(page.locator('.plot-detail__meta'), 'never edited (only imported): no last edit').not.toContainText('Last edit');
   await expect(gallery(), 'no screenshots yet').toHaveCount(0);
   // A plain banner instead, with the card's buttons over it, like a card with screenshots.
   const [banner, close] = await Promise.all([page.locator('.plot-detail__banner').boundingBox(),
     page.getByRole('button', { name: 'Close' }).boundingBox()]);
   expect(close.y + close.height).toBeLessThan(banner.y + banner.height);
+  await expect(page.locator('.plot-detail__banner'), "no color picked: the zone's (Ephemeral Corridors)")
+    .toHaveCSS('background-color', 'rgb(137, 0, 0)');
   await edit();
   await expect(form()).toBeVisible();
   await expect(form().getByText('Add screenshots')).toHaveCount(0);
@@ -61,6 +64,9 @@ test("the owner picks a banner color: a Force edit, shown while there are no scr
   await button('Force edit').click();
   await expect(page.getByRole('status').filter({ hasText: 'Edit saved.' })).toBeAttached();
   await expect(page.locator('.plot-detail__banner')).toHaveCSS('background-color', 'rgb(58, 123, 213)');
+  // At the end of the details: when the page was last edited.
+  await expect(page.locator('.plot-detail__meta dt').last()).toHaveText('Last edit');
+  await expect(page.locator('.plot-detail__meta dd').last()).toHaveText('just now');
   await expectNoProblems(page);
   await page.context().close();
 });
@@ -225,12 +231,12 @@ test('icons: the owner suggests one, a moderator approves it, and it shows in th
   const icon = row.locator('img.plot-table__icon');
   await expect(icon).toBeVisible();
   expect(await icon.evaluate((img) => [img.naturalWidth, img.naturalHeight])).toEqual([128, 128]);
-  // Shops without one keep the space, so the names line up.
+  // Shops without one take no room for it: their name starts further left.
   const [mine, other] = await Promise.all([
     row.locator('.plot-table__open').boundingBox(),
     page.getByRole('row').filter({ has: page.locator('[data-plot-id="corridors-1"]') }).locator('.plot-table__open').boundingBox(),
   ]);
-  expect(Math.abs(mine.x - other.x)).toBeLessThan(1);
+  expect(mine.x - other.x).toBeGreaterThan(20);
   await expectNoProblems(page);
   await page.context().close();
 

@@ -409,7 +409,7 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
                   onReset={reset('primary_color')} />
                 <ColorInput id="shop-edit-primary_color" value={values.primary_color}
                   onChange={(v) => setValue('primary_color', v)} />
-                <p className="shop-edit__muted">Shown at the top of the card while it has no screenshots.</p>
+                <p className="shop-edit__muted">Shown at the top of the card while it has no screenshots. Left empty, it&apos;s the zone&apos;s color.</p>
               </div>
             </ShopImages>
           )}

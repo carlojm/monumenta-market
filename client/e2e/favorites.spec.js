@@ -1,27 +1,29 @@
-// Starred shops (4.7): a star on each row and on the card, kept in this
-// browser, pinned to the top of the list, and an "Only starred shops" filter.
+// Starred shops (4.7): starred from the card, kept in this browser, pinned
+// to the top of the list with a star (to unstar), and an "Only starred
+// shops" filter.
 
 import { expect, test } from '@playwright/test';
 import { DESKTOP, expectNoProblems, pageAs, serverForFile } from './helpers.js';
 
 const server = serverForFile();
 let page;
+let lastId; // starred in the first test
 const rows = () => page.locator('.plot-table__open');
 const rowStar = (id) => page.locator('tr').filter({ has: page.locator(`.plot-table__open[data-plot-id="${id}"]`) }).locator('.star-button');
 
-test('starring a row pins it to the top, and it stays after a reload', async ({ browser }) => {
+test('starring a shop on its card pins its row to the top, and it stays after a reload', async ({ browser }) => {
   page = await pageAs(browser, server, null, DESKTOP);
   await page.goto('/');
   await expect(rows()).toHaveCount(168);
+  await expect(page.locator('.plot-table .star-button'), 'no stars until something is starred').toHaveCount(0);
   // The last shop in the list (vacant plots come after the shops).
-  const lastId = await page.locator('tr').filter({ has: page.locator('.star-button') }).last()
-    .locator('.plot-table__open').getAttribute('data-plot-id');
-  const star = rowStar(lastId);
-  await expect(star).toHaveAttribute('aria-pressed', 'false');
-  await star.click();
+  lastId = await page.locator('tr:not(.plot-table__row--vacant) .plot-table__open').last().getAttribute('data-plot-id');
+  await page.goto(`/plot/${lastId}`);
+  await page.locator('.plot-detail__header .star-button').click();
+  await page.getByRole('button', { name: 'Close' }).click();
   await expect(rows().first(), 'pinned to the top').toHaveAttribute('data-plot-id', lastId);
   await expect(rowStar(lastId)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page, 'the click starred, it did not open the card').toHaveURL(/\/$/);
+  await expect(page.locator('.plot-table .star-button'), 'only on the starred row').toHaveCount(1);
   await page.reload();
   await expect(rows().first(), 'kept in this browser').toHaveAttribute('data-plot-id', lastId);
   await expectNoProblems(page);
@@ -52,11 +54,16 @@ test('"Only starred shops" shows just the starred ones', async () => {
   await page.getByRole('button', { name: 'Filter', exact: true }).click();
   await expect(page.getByRole('menuitem', { name: /Only starred shops/ }), 'one at a time').toBeDisabled();
   await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Remove filter Only starred shops' }).click();
+  await expect(rowStar('corridors-2'), 'and its star').toHaveCount(0);
+  // Unstarring in the full list: the star goes, and focus moves to the name.
+  await rowStar(lastId).click();
+  await expect(rowStar(lastId)).toHaveCount(0);
+  await expect(page.locator(`.plot-table__open[data-plot-id="${lastId}"]`), 'focus goes to its name').toBeFocused();
   await expectNoProblems(page);
 });
 
 test('vacant plots have no star', async () => {
-  await page.getByRole('button', { name: 'Remove filter Only starred shops' }).click();
   const vacant = page.locator('.plot-table__row--vacant').first();
   await expect(vacant).toBeVisible();
   await expect(vacant.locator('.star-button')).toHaveCount(0);

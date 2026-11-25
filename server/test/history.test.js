@@ -144,3 +144,18 @@ test('edits to the current shop carry their version, for Restore', async () => {
   const onA = (await history(A)).changes;
   assert.ok(onA.every((c) => !('version' in c)), 'nothing to restore across shops');
 });
+
+test("the card's last edit: the old Update lines, then saved revisions", async () => {
+  const plot = 'corridors-1';
+  const lastEdit = async () => (await as(null).get(`/api/plots/${plot}`)).body.shop.last_edit_at;
+  assert.equal(await lastEdit(), null, 'imported and never edited: none (not the import time)');
+  const db = writeDb(server);
+  db.prepare(`INSERT INTO comments (shop_id, author, body, is_system, status, created_at)
+    SELECT id, 'carlo_m', 'Update: restocked', 1, 'approved', '2026-10-05 12:00:00' FROM shops WHERE plot_id = ? AND closed_at IS NULL`)
+    .run(plot);
+  db.close();
+  assert.equal(await lastEdit(), '2026-10-05 12:00:00', 'an Update line from before revisions');
+  const r = await edit(as, 'ModTester', plot, { palette: 'Slime green' });
+  assert.equal(r.status, 201, show(r));
+  assert.ok(await lastEdit() > '2026-10-05 12:00:00', 'a saved edit is newer');
+});

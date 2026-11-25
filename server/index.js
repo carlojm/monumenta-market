@@ -115,14 +115,24 @@ function latestStatus(plotId) {
   };
 }
 
-// `account` decides which images waiting for review are included.
-function shopWithDetails(shop, account) {
+// When the shop's page was last edited: its latest saved revision, or the
+// latest of the card's old Update lines (the edits from before revisions,
+// shown under History as earlier changes). Not updated_at, which for
+// imported shops is when they were imported.
+const lastEditOf = db.prepare(`
+  SELECT max(at) FROM (
+    SELECT COALESCE(reviewed_at, created_at) AS at FROM revisions WHERE shop_id = @id AND status = 'approved'
+    UNION ALL SELECT created_at FROM comments WHERE shop_id = @id AND is_system = 1)
+`).pluck();
+
+function shopWithDetails(shop) {
   if (!shop) return null;
   return {
     ...shop,
     tags: tagsForShop(shop.id),
     comments: getApprovedComments.all(shop.id),
     ...imagesForShop(shop),
+    last_edit_at: lastEditOf.get({ id: shop.id }) ?? null,
   };
 }
 
@@ -181,7 +191,7 @@ app.get('/api/plots/:id', (req, res) => {
   res.json({
     ...plot,
     is_guild: !!plot.is_guild,
-    shop: shopWithDetails(shop, req.account),
+    shop: shopWithDetails(shop),
     pending_edits: pendingForPlot(plot.id, shop ?? null, req.account),
     latest_report: latestStatus(plot.id),
     reports,
@@ -231,7 +241,7 @@ app.post('/api/tags/suggest', limits.tagSuggestions, (req, res) => {
 app.get('/api/shops/:id', (req, res) => {
   const shop = getShop.get(req.params.id);
   if (!shop) return res.status(404).json({ error: 'Shop not found' });
-  res.json(shopWithDetails(shop, req.account));
+  res.json(shopWithDetails(shop));
 });
 
 // Linked accounts only. No approval queue: moderators delete bad comments afterwards.

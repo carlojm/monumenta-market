@@ -11,6 +11,7 @@ import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
 import ShopGallery from './ShopGallery';
 import { useFavorites } from '../lib/favorites';
+import { ZONE_COLORS } from '../lib/zones';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -561,8 +562,9 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   };
 
   // The banner's color: the shop's own, when it's a real color (some are
-  // still words from the old notes).
-  const bannerColor = [shop?.primary_color, shop?.guild_color].find((c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c ?? '')) ?? null;
+  // still words from the old notes), or else its zone's.
+  const bannerColor = [shop?.primary_color, shop?.guild_color].find((c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c ?? ''))
+    ?? ZONE_COLORS[plot.zone] ?? null;
 
   // `inline` (desktop): the card sits in the page's right column. Otherwise
   // (phones): a bottom sheet dialog over the page.
@@ -722,6 +724,12 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
               {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
             </dd>
             {shop && <ShopText shop={shop} tags={stockTags} />}
+            {shop?.last_edit_at && (
+              <>
+                <dt>Last edit</dt>
+                <dd className="plot-detail__muted">{timeAgo(shop.last_edit_at)}</dd>
+              </>
+            )}
           </dl>
 
           {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
