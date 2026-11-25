@@ -64,7 +64,10 @@ export const show = (r) => `${r.status} ${JSON.stringify(r.body)?.slice(0, 300)}
 export async function snapshot(as, plot) {
   const { shop } = (await as(null).get(`/api/plots/${plot}`)).body;
   if (!shop) return null;
-  return { ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])), tag_ids: shop.tags.map((t) => t.id) };
+  return {
+    ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])), tag_ids: shop.tags.map((t) => t.id),
+    image_ids: shop.images.map((i) => i.id), icon_id: shop.icon_id,
+  };
 }
 
 // An edit to a plot's shop, from the page as it is now.

@@ -10,6 +10,8 @@
 //   author     who made the revision, when someone else reviews it
 //   changes    [{ field, from, to }]
 //   tags       { added: [name], removed: [name] }
+//   images     { added: [image], removed: [image] } screenshots, each { id, kind, url, card_url }
+//   icon       { from: image, to: image } when the icon changed
 //   summary    the author's "What did you change?" note
 //   note       the reviewer's note (a reason, when rejecting)
 //   resolved   [{ field, kept: 'mine' | 'current' | 'edited' }] where the page
@@ -23,13 +25,14 @@
 import db from '../db/init.js';
 import { logModAction } from './modlog.js';
 import { SHOP_FIELDS } from './shops.js';
+import { imageChanges } from './revisions.js';
 
 const tagName = db.prepare('SELECT name FROM tags WHERE id = ?').pluck();
 
 // The names the site shows (client/src/lib/shopFields.js).
 const LABELS = {
   owner: 'Owner', maintainers: 'Maintainers', shop_name: 'Shop name', guild_name: 'Guild name', description: 'About', stock: 'Keywords',
-  palette: 'Palette', guild_color: 'Guild color', primary_color: 'Primary color', secondary_color: 'Secondary color',
+  palette: 'Palette', guild_color: 'Guild color', primary_color: 'Banner color', secondary_color: 'Secondary color',
 };
 
 export const shopName = (s) => s?.shop_name || s?.guild_name || s?.owner || null;
@@ -44,13 +47,16 @@ export function snapshotDiff(before, after) {
   return {
     changes,
     tags: { added: names(now.filter((id) => !was.includes(id))), removed: names(was.filter((id) => !now.includes(id))) },
+    ...imageChanges(before, after),
   };
 }
 
 // "About, Palette and tags"
-function fieldList({ changes = [], tags }) {
+function fieldList({ changes = [], tags, images, icon }) {
   const parts = changes.map((c) => LABELS[c.field] ?? c.field);
   if (tags?.added.length || tags?.removed.length) parts.push('tags');
+  if (images?.added.length || images?.removed.length) parts.push('screenshots');
+  if (icon) parts.push('icon');
   if (parts.length < 2) return parts[0] ?? 'nothing';
   return `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`;
 }
@@ -81,6 +87,7 @@ const SENTENCES = {
 export function logRevision(req, kind, { revisionId, plotId, ...data }) {
   const kept = Object.fromEntries(Object.entries(data).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)));
   if (kept.tags && !kept.tags.added.length && !kept.tags.removed.length) delete kept.tags;
+  if (kept.images && !kept.images.added.length && !kept.images.removed.length) delete kept.images;
   let line = SENTENCES[kind](kept);
   if (kept.note) line += `. ${kind === 'reject' ? 'Reason' : 'Note'}: "${kept.note}"`;
   logModAction(req, `revision.${kind}`, `plot:${plotId}`, line, { revisionId, data: kept });

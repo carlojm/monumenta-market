@@ -2,24 +2,19 @@
 //
 // Shop images (3.11), mounted at /api. The rules live in lib/images.js.
 //   POST   /plots/:id/images        multipart: image (the file), kind (gallery | icon)
-//          The owner, maintainers and staff. Staff uploads show at once; the
-//          owner's and maintainers' wait for a moderator.
-//   GET    /images/pending          the review queue, for staff
-//   POST   /images/:id/approve      staff
-//   POST   /images/:id/reject       staff; deletes it
-//   DELETE /images/:id              the owner, maintainers or staff
-// Every change is recorded in the Mod log.
+//          The owner, maintainers and staff. Saved as the uploader's draft:
+//          it reaches the card only through an edit (routes/revisions.js).
+//   DELETE /images/:id              the uploader takes back their own draft
+// Uploads aren't in the Mod log: a draft is private until it's part of an
+// edit, and edits are logged.
 
 import express from 'express';
 import multer from 'multer';
-import db from '../db/init.js';
 import { uploads as uploadLimit } from '../lib/rateLimits.js';
-import { logModAction } from '../lib/modlog.js';
-import { getCurrentShop, getShop } from '../lib/shops.js';
+import { getCurrentShop } from '../lib/shops.js';
 import { imageType } from '../lib/imageType.js';
 import {
-  ImageError, KINDS, MAX_UPLOAD_MB, addImage, approveImage, deleteImage, getImage, managesImages, publicImage,
-  reviewsImages, uploadBlocked,
+  ImageError, KINDS, MAX_UPLOAD_MB, addImage, deleteDraft, getImage, managesImages, publicImage, uploadBlocked,
 } from '../lib/images.js';
 
 const router = express.Router();
@@ -40,9 +35,6 @@ function receiveImage(req, res, next) {
 const needAccount = (req, res, next) => (req.account ? next()
   : res.status(401).json({ error: 'Link your Minecraft account to add images.' }));
 
-const shopLabel = (shop) => shop.shop_name || shop.guild_name || shop.owner;
-const kindLabel = (kind) => (kind === 'icon' ? 'an icon' : 'a screenshot');
-
 router.post('/plots/:id/images', needAccount, uploadLimit, receiveImage, async (req, res) => {
   const shop = getCurrentShop.get(req.params.id);
   if (!shop) return res.status(409).json({ error: 'This plot has no shop to add images to.' });
@@ -55,7 +47,7 @@ router.post('/plots/:id/images', needAccount, uploadLimit, receiveImage, async (
   if (!imageType(req.file.buffer)) return res.status(400).json({ error: 'Only PNG, JPEG, WebP or GIF images can be uploaded.' });
   const kind = req.body?.kind ?? 'gallery';
   if (!KINDS.includes(kind)) return res.status(400).json({ error: 'kind must be gallery or icon.' });
-  const blocked = uploadBlocked(req.account, shop, kind);
+  const blocked = uploadBlocked(req.account);
   if (blocked) return res.status(409).json({ error: blocked });
 
   let image;
@@ -65,75 +57,15 @@ router.post('/plots/:id/images', needAccount, uploadLimit, receiveImage, async (
     if (err instanceof ImageError) return res.status(400).json({ error: err.message });
     throw err;
   }
-  const waiting = image.status === 'pending';
-  logModAction(req, waiting ? 'image.suggest' : 'image.add', `plot:${shop.plot_id}`,
-    `${waiting ? 'Suggested' : 'Added'} ${kindLabel(kind)} for ${shopLabel(shop)}`, { data: { image_id: image.id } });
   res.status(201).json(publicImage(image));
 });
 
-// Pending uploads for current shops.
-const allPending = db.prepare(`
-  SELECT i.*, a.name AS uploader, s.plot_id, s.owner, s.maintainers, s.shop_name, s.guild_name
-  FROM images i JOIN shops s ON s.id = i.shop_id AND s.closed_at IS NULL
-  LEFT JOIN accounts a ON a.id = i.account_id
-  WHERE i.status = 'pending' ORDER BY i.id
-`);
-
-router.get('/images/pending', needAccount, (req, res) => {
-  if (!reviewsImages(req.account)) return res.json([]);
-  const rows = allPending.all();
-  res.json(rows.map((r) => ({ ...publicImage(r), plot_id: r.plot_id, shop_name: shopLabel(r) })));
-});
-
-// The image and its shop, if this account may act on it: `review` (approve,
-// reject) is for staff; deleting is for the people who run the shop and staff.
-// Otherwise answers with the error and returns null.
-function imageToManage(req, res, { review = false } = {}) {
-  const image = getImage.get(req.params.id);
-  if (!image) {
-    res.status(404).json({ error: 'Image not found.' });
-    return null;
-  }
-  const shop = getShop.get(image.shop_id);
-  if (review ? !reviewsImages(req.account) : !managesImages(req.account, shop)) {
-    res.status(403).json({ error: review ? 'Only a moderator can review images.'
-      : "Only the shop's owner, its maintainers or a moderator can do that." });
-    return null;
-  }
-  return { image, shop };
-}
-
-router.post('/images/:id/approve', needAccount, async (req, res) => {
-  const found = imageToManage(req, res, { review: true });
-  if (!found) return;
-  const { image, shop } = found;
-  if (image.status !== 'pending') return res.status(409).json({ error: 'This image was already reviewed.' });
-  if (shop.closed_at) return res.status(409).json({ error: 'That shop has closed since this was uploaded.' });
-  await approveImage(image, req.account);
-  logModAction(req, 'image.approve', `plot:${shop.plot_id}`,
-    `Approved ${kindLabel(image.kind)} by ${image.uploader ?? 'a deleted account'} for ${shopLabel(shop)}`, { data: { image_id: image.id } });
-  res.json(publicImage(getImage.get(image.id)));
-});
-
-router.post('/images/:id/reject', needAccount, async (req, res) => {
-  const found = imageToManage(req, res, { review: true });
-  if (!found) return;
-  const { image, shop } = found;
-  if (image.status !== 'pending') return res.status(409).json({ error: 'This image was already reviewed.' });
-  await deleteImage(image);
-  logModAction(req, 'image.reject', `plot:${shop.plot_id}`,
-    `Rejected ${kindLabel(image.kind)} by ${image.uploader ?? 'a deleted account'} for ${shopLabel(shop)}`);
-  res.json({ deleted: true });
-});
-
 router.delete('/images/:id', needAccount, async (req, res) => {
-  const found = imageToManage(req, res);
-  if (!found) return;
-  const { image, shop } = found;
-  await deleteImage(image);
-  const withdrawn = image.status === 'pending' && image.account_id === req.account.id;
-  logModAction(req, withdrawn ? 'image.withdraw' : 'image.delete', `plot:${shop.plot_id}`,
-    `${withdrawn ? 'Withdrew' : 'Deleted'} ${kindLabel(image.kind)} for ${shopLabel(shop)}`);
+  const image = getImage.get(req.params.id);
+  if (!image || image.account_id !== req.account.id || image.status !== 'draft') {
+    return res.status(404).json({ error: 'Image not found.' });
+  }
+  await deleteDraft(image);
   res.json({ deleted: true });
 });
 

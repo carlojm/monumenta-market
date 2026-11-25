@@ -122,7 +122,7 @@ function shopWithDetails(shop, account) {
     ...shop,
     tags: tagsForShop(shop.id),
     comments: getApprovedComments.all(shop.id),
-    ...imagesForShop(shop, account),
+    ...imagesForShop(shop),
   };
 }
 

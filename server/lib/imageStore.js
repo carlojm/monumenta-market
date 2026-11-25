@@ -34,3 +34,13 @@ export async function removeFiles(names) {
   }
   await r2.send(new DeleteObjectsCommand({ Bucket: R2_BUCKET, Delete: { Objects: names.map((n) => ({ Key: PREFIX + n })) } }));
 }
+
+// The files that make up an image, by its storage key (images made before
+// 3.11 have none, and their files are left alone).
+export const filesOf = (image) => (!image.storage_key ? []
+  : image.kind === 'icon' ? [`${image.storage_key}.webp`] : [`${image.storage_key}.webp`, `${image.storage_key}-card.webp`]);
+
+// Deletes image rows' files, logging instead of failing: the rows are
+// already gone, and a leftover file is harmless.
+export const removeImageFiles = (images) => removeFiles(images.flatMap(filesOf))
+  .catch((err) => console.error('Could not delete image files:', err.message));

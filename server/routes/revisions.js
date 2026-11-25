@@ -4,8 +4,10 @@
 //   POST /plots/:id/revisions   {action, base?, proposed?, summary?, request_review?}
 //        Owners and maintainers (edits to their own shop; only the owner
 //        changes the maintainers) and staff publish at once, unless they ask
-//        for review; everyone else's edit waits for review. A player's new
-//        suggestion for a plot replaces their earlier pending one.
+//        for review; everyone else's edit waits for review. An edit that adds
+//        images (uploaded first as drafts, lib/images.js) always waits for a
+//        moderator, unless a moderator made it. A player's new suggestion for
+//        a plot replaces their earlier pending one.
 //   POST /revisions/:id/withdraw            the author cancels a pending one
 //   GET  /revisions/pending                 the review queue (staff: all; owners and maintainers: their
 //                                           shop, with can_review false where only a mod or the owner may approve)
@@ -21,9 +23,9 @@ import db from '../db/init.js';
 import { logRevision, shopName, snapshotDiff } from '../lib/revisionLog.js';
 import { revisions as revisionLimit } from '../lib/rateLimits.js';
 import {
-  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublish, canReview, changesMaintainers,
-  cleanBase, cleanNote, cleanSnapshot, runsShop, isStaff, isStale, mergeEdit, ownersOtherShop, parse, preview, publicRevision,
-  recordDirect, recordMove, recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
+  ACTIONS, MAX_PENDING_PER_ACCOUNT, applyRevision, applyUndo, authorChanged, canPublishEdit, canReview, checkImages,
+  cleanBase, cleanNote, cleanSnapshot, discardImages, holdImages, runsShop, isStaff, isStale, mergeEdit, ownersOtherShop,
+  parse, preview, publicRevision, recordDirect, recordMove, recordSuggestion, sameSnapshot, snapshotOf, getAccountName,
 } from '../lib/revisions.js';
 import { SHOP_FIELDS, getCurrentShop, getPlot, getShop } from '../lib/shops.js';
 import { tagsForShop } from '../lib/tags.js';
@@ -31,6 +33,7 @@ import { tagsForShop } from '../lib/tags.js';
 const router = express.Router();
 
 const getRevision = db.prepare('SELECT * FROM revisions WHERE id = ?');
+const myPendingHere = db.prepare("SELECT * FROM revisions WHERE author_id = ? AND plot_id = ? AND status = 'pending'");
 const withdrawMine = db.prepare(
   "UPDATE revisions SET status = 'withdrawn' WHERE author_id = ? AND plot_id = ? AND status = 'pending'",
 );
@@ -107,10 +110,12 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
     if (proposed.owner !== base.owner) {
       return res.status(400).json({ error: 'To change the owner, use "A new shop is here" instead.' });
     }
+    const imageProblem = checkImages(base, proposed, shop, account);
+    if (imageProblem) return res.status(imageProblem.status).json({ error: imageProblem.error });
   } else if (action === 'open') {
     const cleaned = cleanSnapshot(req.body.proposed, null);
     if (cleaned.error) return res.status(400).json({ error: cleaned.error });
-    proposed = cleaned.snapshot;
+    proposed = { ...cleaned.snapshot, image_ids: [], icon_id: null }; // a new shop starts without images
     if (!proposed.owner) return res.status(400).json({ error: 'A new shop needs an owner.' });
     if (shop && proposed.owner.toLowerCase() === shop.owner.toLowerCase()) {
       return res.status(400).json({ error: `${shop.owner} already owns this shop. To change its details, edit it instead.` });
@@ -123,7 +128,7 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
   const resolved = cleanResolved(req.body.resolved);
 
   // Publish at once: the owner editing their shop, or staff.
-  if (canPublish(account, action, shop, action === 'edit' && changesMaintainers(base, proposed)) && !req.body.request_review) {
+  if (canPublishEdit(account, action, shop, base, action === 'edit' ? proposed : base) && !req.body.request_review) {
     let values = proposed;
     if (action === 'edit') {
       const merged = mergeEdit(base, proposed, now);
@@ -149,10 +154,15 @@ router.post('/plots/:id/revisions', revisionLimit, (req, res) => {
   // Otherwise it waits for review. Their earlier pending edit to this plot is
   // replaced, so reviewers never see near-duplicates.
   const result = db.transaction(() => {
+    const earlier = myPendingHere.all(account.id, plot.id);
     const replaced = withdrawMine.run(account.id, plot.id).changes;
     if (countPending.get(account.id).n >= MAX_PENDING_PER_ACCOUNT) {
       return { error: `You have ${MAX_PENDING_PER_ACCOUNT} edits waiting for review. Please wait for some of those first.` };
     }
+    // The replaced suggestions' new images go, unless this one keeps them.
+    const keep = [...(proposed?.image_ids ?? []), proposed?.icon_id];
+    for (const r of earlier) discardImages(parse(r.proposed), keep);
+    if (proposed) holdImages(proposed);
     const id = recordSuggestion(row);
     logRevision(req, 'suggest', { revisionId: id, plotId: plot.id, ...asked(row), summary: row.summary, replaced: replaced || null, resolved });
     return { id, replaced };
@@ -168,7 +178,10 @@ router.post('/revisions/:id/withdraw', (req, res) => {
   const revision = getRevision.get(req.params.id);
   if (!revision || revision.author_id !== req.account.id) return res.status(404).json({ error: 'Edit not found' });
   if (revision.status !== 'pending') return res.status(409).json({ error: 'This edit has already been reviewed.' });
-  db.prepare("UPDATE revisions SET status = 'withdrawn' WHERE id = ?").run(revision.id);
+  db.transaction(() => {
+    db.prepare("UPDATE revisions SET status = 'withdrawn' WHERE id = ?").run(revision.id);
+    discardImages(parse(revision.proposed));
+  })();
   logRevision(req, 'withdraw', {
     revisionId: revision.id, plotId: revision.plot_id, ...asked(parsed(revision)), summary: revision.summary,
   });
@@ -365,10 +378,13 @@ router.post('/revisions/:id/reject', (req, res) => {
   if (!found) return;
   const { revision } = found;
   const note = cleanNote(req.body.note);
-  finishReview.run({
-    id: revision.id, status: 'rejected', reviewer_id: req.account.id, review_note: note,
-    old_values: null, new_values: null,
-  });
+  db.transaction(() => {
+    finishReview.run({
+      id: revision.id, status: 'rejected', reviewer_id: req.account.id, review_note: note,
+      old_values: null, new_values: null,
+    });
+    discardImages(parse(revision.proposed));
+  })();
   logRevision(req, 'reject', {
     revisionId: revision.id, plotId: revision.plot_id, ...asked(parsed(revision)),
     author: getAccountName.get(revision.author_id)?.name, summary: revision.summary, note,
@@ -413,7 +429,7 @@ router.post('/revisions/:id/undo', revisionLimit, (req, res) => {
   }
   // The same rule as making the change now: an owner can undo an edit to
   // their own shop; closing or replacing a shop needs a moderator.
-  if (!canPublish(account, revision.action === 'edit' ? 'edit' : 'open', shop, changesMaintainers(row.old_values, row.new_values))) {
+  if (!canPublishEdit(account, revision.action === 'edit' ? 'edit' : 'open', shop, row.new_values, row.old_values)) {
     return res.status(403).json({ error: "You can't undo this edit." });
   }
 

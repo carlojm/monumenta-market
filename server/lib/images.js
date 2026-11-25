@@ -3,11 +3,11 @@
 // Shop images (3.10/3.11). Two kinds:
 //   gallery  screenshots of the shop, shown in the card's carousel.
 //   icon     one small square picture that stands for the shop, shown in the
-//            table. A new approved icon replaces the old one.
-// The shop's owner and maintainers, and staff, can upload. Staff uploads show
-// at once; the owner's and maintainers' wait for a moderator to approve them.
-// (Decided 11/24: only the people who run a shop add its pictures, and a
-// moderator checks them.)
+//            table and on the card.
+// The shop's owner and maintainers, and staff, can upload. An upload is a
+// draft: it only reaches the card through an edit (lib/revisions.js), and an
+// edit that adds one waits for a moderator unless a moderator made it.
+// (Decided 11/24.) Drafts never sent are deleted after DRAFT_HOURS.
 //
 // Every upload is re-encoded to WebP here, whatever it was sent as. That drops
 // EXIF and other metadata (a photo's location, camera, editing software), and
@@ -18,23 +18,16 @@ import crypto from 'node:crypto';
 import sharp from 'sharp';
 import db from '../db/init.js';
 import { isStaff, runsShop } from './revisions.js';
-import { putFile, removeFiles, urlFor } from './imageStore.js';
+import { putFile, removeImageFiles, urlFor } from './imageStore.js';
 
 export const KINDS = ['gallery', 'icon'];
 export const MAX_UPLOAD_MB = 10;
-export const MAX_GALLERY = 10; // approved and pending, per shop
 export const MAX_PER_DAY = 20; // uploads per account, staff excepted
-export const MAX_PENDING = 10; // waiting for review, per account
-export const PENDING_DAYS = 30; // unreviewed uploads are deleted after this
+export const DRAFT_HOURS = 24; // uploads never sent in an edit are deleted after this
 const MIN_SIZE = { gallery: [640, 360], icon: [64, 64] };
 const FULL_SIZE = 1920; // longest side, for the full-size viewer
 const CARD_WIDTH = 960; // the card's carousel (twice its width, for sharp screens)
 const ICON_SIZE = 128;
-
-// The files that make up an image, by its storage key (images made before
-// 3.11 have none, and their files are left alone).
-const filesOf = (image) => (!image.storage_key ? []
-  : image.kind === 'icon' ? [`${image.storage_key}.webp`] : [`${image.storage_key}.webp`, `${image.storage_key}-card.webp`]);
 
 // A problem with the uploaded file; its message is for the uploader.
 export class ImageError extends Error {}
@@ -76,10 +69,8 @@ async function encodeImage(buffer, kind) {
 
 // --- Who may do what (always checked here, never only in the browser) ---
 
-// Uploading, and deleting the shop's images.
+// Uploading, and changing the shop's images in an edit.
 export const managesImages = (account, shop) => isStaff(account) || runsShop(account, shop);
-// Publishing without review, and approving or rejecting uploads.
-export const reviewsImages = (account) => isStaff(account);
 
 // --- Reading ---
 
@@ -90,8 +81,6 @@ const approvedGallery = db.prepare(`SELECT ${IMAGE_COLUMNS} FROM images i LEFT J
   WHERE i.shop_id = ? AND i.kind = 'gallery' AND i.status = 'approved' ORDER BY i.sort_order, i.id`);
 const approvedIcon = db.prepare(`SELECT ${IMAGE_COLUMNS} FROM images i LEFT JOIN accounts a ON a.id = i.account_id
   WHERE i.shop_id = ? AND i.kind = 'icon' AND i.status = 'approved' ORDER BY i.id DESC LIMIT 1`);
-const pendingForShop = db.prepare(`SELECT ${IMAGE_COLUMNS} FROM images i LEFT JOIN accounts a ON a.id = i.account_id
-  WHERE i.shop_id = ? AND i.status = 'pending' ORDER BY i.id`);
 
 export { getImage };
 
@@ -101,120 +90,72 @@ export const publicImage = (i) => ({
   width: i.width, height: i.height, uploader: i.uploader ?? null, created_at: i.created_at,
 });
 
-// A shop's images for its page: the approved gallery, the icon, and, for the people who run the shop and staff, the uploads waiting for review.
-export function imagesForShop(shop, account) {
-  const pending = managesImages(account, shop) ? pendingForShop.all(shop.id) : [];
+// A shop's images for its page: the screenshots on the card and the icon.
+// (Images in suggestions show with the suggestion, lib/revisions.js.)
+export function imagesForShop(shop) {
   const icon = approvedIcon.get(shop.id);
   return {
     images: approvedGallery.all(shop.id).map(publicImage),
     icon: icon?.url ?? null,
-    icon_id: icon?.id ?? null, // to delete it
-    pending_images: pending.map(publicImage),
+    icon_id: icon?.id ?? null, // for the edit form
   };
 }
 
 // --- Uploading ---
 
-const countGallery = db.prepare(
-  "SELECT count(*) AS n FROM images WHERE shop_id = ? AND kind = 'gallery' AND status IN ('pending', 'approved')",
-);
 const countToday = db.prepare("SELECT count(*) AS n FROM images WHERE account_id = ? AND created_at > datetime('now', '-1 day')");
-const countPending = db.prepare("SELECT count(*) AS n FROM images WHERE account_id = ? AND status = 'pending'");
-const myPendingIcons = db.prepare(
-  "SELECT * FROM images WHERE shop_id = ? AND account_id = ? AND kind = 'icon' AND status = 'pending'",
-);
 const nextOrder = db.prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 AS n FROM images WHERE shop_id = ?');
 const insertImage = db.prepare(`
-  INSERT INTO images (shop_id, kind, status, url, card_url, storage_key, width, height, sort_order, account_id,
-    created_at, reviewer_id, reviewed_at)
-  VALUES (@shop_id, @kind, @status, @url, @card_url, @storage_key, @width, @height, @sort_order, @account_id,
-    CURRENT_TIMESTAMP, @reviewer_id, CASE WHEN @reviewer_id IS NULL THEN NULL ELSE CURRENT_TIMESTAMP END)
+  INSERT INTO images (shop_id, kind, status, url, card_url, storage_key, width, height, sort_order, account_id, created_at)
+  VALUES (@shop_id, @kind, 'draft', @url, @card_url, @storage_key, @width, @height, @sort_order, @account_id, CURRENT_TIMESTAMP)
 `);
 const deleteRow = db.prepare('DELETE FROM images WHERE id = ?');
-const otherIcons = db.prepare("SELECT * FROM images WHERE shop_id = ? AND kind = 'icon' AND status = 'approved' AND id != ?");
 
-// Why this account can't upload this kind of image to this shop now, or null.
-export function uploadBlocked(account, shop, kind) {
-  if (kind === 'gallery' && countGallery.get(shop.id).n >= MAX_GALLERY) {
-    return `This shop has ${MAX_GALLERY} screenshots already. Ask its owner or a moderator to remove one first.`;
-  }
+// Why this account can't upload now, or null. (How many screenshots a shop
+// may have is checked when the edit is sent.)
+export function uploadBlocked(account) {
   if (isStaff(account)) return null;
   if (countToday.get(account.id).n >= MAX_PER_DAY) return `You can upload ${MAX_PER_DAY} images a day. Try again tomorrow.`;
-  if (countPending.get(account.id).n >= MAX_PENDING) {
-    return `You have ${MAX_PENDING} images waiting for review. Wait until some are reviewed.`;
-  }
   return null;
 }
 
-// Re-encodes and stores an upload. Returns the new image row.
+// Re-encodes and stores an upload, as the account's draft. Returns the row.
 export async function addImage({ buffer, kind, shop, account }) {
   const encoded = await encode(buffer, kind);
   const key = crypto.randomUUID();
   for (const [suffix, body] of encoded.files) await putFile(`${key}${suffix}.webp`, body, 'image/webp');
-  const direct = reviewsImages(account);
-
-  const replaced = db.transaction(() => {
-    // A new icon for a shop replaces the uploader's earlier one still waiting.
-    const old = direct ? [] : (kind === 'icon' ? myPendingIcons.all(shop.id, account.id) : []);
-    for (const image of old) deleteRow.run(image.id);
-    const { lastInsertRowid } = insertImage.run({
-      shop_id: shop.id, kind, status: direct ? 'approved' : 'pending', storage_key: key,
-      url: urlFor(`${key}.webp`), card_url: kind === 'gallery' ? urlFor(`${key}-card.webp`) : null,
-      width: encoded.width, height: encoded.height, sort_order: nextOrder.get(shop.id).n,
-      account_id: account.id, reviewer_id: direct ? account.id : null,
-    });
-    return { id: lastInsertRowid, old: [...old, ...(direct && kind === 'icon' ? retireIcons(shop.id, lastInsertRowid) : [])] };
-  })();
-  await removeFiles(replaced.old.flatMap(filesOf));
-  return getImage.get(replaced.id);
+  const { lastInsertRowid } = insertImage.run({
+    shop_id: shop.id, kind, storage_key: key,
+    url: urlFor(`${key}.webp`), card_url: kind === 'gallery' ? urlFor(`${key}-card.webp`) : null,
+    width: encoded.width, height: encoded.height, sort_order: nextOrder.get(shop.id).n, account_id: account.id,
+  });
+  return getImage.get(lastInsertRowid);
 }
 
-// An approved icon replaces the shop's earlier ones. Returns the rows removed
-// (their files still need deleting).
-function retireIcons(shopId, keepId) {
-  const old = otherIcons.all(shopId, keepId);
-  for (const image of old) deleteRow.run(image.id);
-  return old;
-}
-
-// --- Reviewing and removing ---
-
-const approveRow = db.prepare(
-  "UPDATE images SET status = 'approved', reviewer_id = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ?",
-);
-
-export async function approveImage(image, account) {
-  const old = db.transaction(() => {
-    approveRow.run(account?.id ?? null, image.id);
-    return image.kind === 'icon' ? retireIcons(image.shop_id, image.id) : [];
-  })();
-  await removeFiles(old.flatMap(filesOf));
-}
-
-// Rejecting and deleting both remove the image and its files.
-export async function deleteImage(image) {
+// Deletes a draft (taken back out of the edit form) and its files.
+export async function deleteDraft(image) {
   deleteRow.run(image.id);
-  await removeFiles(filesOf(image));
+  await removeImageFiles([image]);
 }
 
-// --- Clean-up: uploads nobody reviewed in PENDING_DAYS are deleted ---
+// --- Clean-up: drafts never sent in an edit are deleted after DRAFT_HOURS ---
 
-const expiredPending = db.prepare(
-  `SELECT * FROM images WHERE status = 'pending' AND created_at < datetime('now', '-${PENDING_DAYS} days')`,
+const expiredDrafts = db.prepare(
+  `SELECT * FROM images WHERE status = 'draft' AND created_at < datetime('now', '-${DRAFT_HOURS} hours')`,
 );
 
-export async function deleteExpiredPending() {
-  const expired = expiredPending.all();
+export async function deleteExpiredDrafts() {
+  const expired = expiredDrafts.all();
   for (const image of expired) deleteRow.run(image.id);
-  await removeFiles(expired.flatMap(filesOf));
+  await removeImageFiles(expired);
   return expired.length;
 }
 
-// At startup and then once a day.
+// At startup and then every hour.
 export function scheduleImageCleanup() {
-  const run = () => deleteExpiredPending()
-    .then((n) => { if (n) console.log(`Deleted ${n} unreviewed image uploads older than ${PENDING_DAYS} days`); })
+  const run = () => deleteExpiredDrafts()
+    .then((n) => { if (n) console.log(`Deleted ${n} image drafts older than ${DRAFT_HOURS} hours`); })
     .catch((err) => console.error('Image clean-up failed:', err.message));
   run();
-  setInterval(run, 24 * 60 * 60 * 1000).unref();
+  setInterval(run, 60 * 60 * 1000).unref();
 }
