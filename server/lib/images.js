@@ -104,9 +104,11 @@ export const publicImage = (i) => ({
 // A shop's images for its page: the approved gallery, the icon, and, for the people who run the shop and staff, the uploads waiting for review.
 export function imagesForShop(shop, account) {
   const pending = managesImages(account, shop) ? pendingForShop.all(shop.id) : [];
+  const icon = approvedIcon.get(shop.id);
   return {
     images: approvedGallery.all(shop.id).map(publicImage),
-    icon: approvedIcon.get(shop.id)?.url ?? null,
+    icon: icon?.url ?? null,
+    icon_id: icon?.id ?? null, // to delete it
     pending_images: pending.map(publicImage),
   };
 }

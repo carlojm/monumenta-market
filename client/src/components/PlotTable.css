@@ -103,6 +103,16 @@
   inline-size: 1.75rem;
 }
 
+/* The shop's icon, before its name. It's beside the name, so screen readers
+   skip it (alt=""). */
+.plot-table__icon {
+  flex-shrink: 0;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline-end: 0.25rem;
+  border-radius: var(--radius-sm);
+}
+
 @media (pointer: coarse) {
   .plot-table__no-star {
     inline-size: 2.25rem;

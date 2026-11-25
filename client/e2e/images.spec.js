@@ -52,7 +52,7 @@ test('the owner adds a screenshot in the edit view: the guidelines, then it wait
   await expect(manager()).toContainText('Images must be approved by a moderator before being shown');
   await manager().getByLabel('Add screenshots').setInputFiles(await png(page, 'shop.png'));
   await expect(page.getByRole('status').filter({ hasText: '1 screenshot sent for review.' })).toBeAttached();
-  const waiting = manager().getByRole('list', { name: 'Waiting for review' });
+  const waiting = manager().getByRole('list', { name: 'Screenshots waiting for review' });
   await expect(waiting).toContainText('Screenshot from ShopOwner, waiting for review');
   await expect(waiting.getByRole('button', { name: 'Withdraw' })).toBeVisible();
   await expect(waiting.getByRole('button', { name: 'Approve' }), 'only moderators approve').toHaveCount(0);
@@ -71,11 +71,11 @@ test('a moderator approves it in the edit view; players see it, with who added i
   page = await pageAs(browser, server, 'ModTester', DESKTOP);
   await page.goto(`/plot/${P}`);
   await edit();
-  await manager().getByRole('list', { name: 'Waiting for review' }).getByRole('button', { name: 'Approve' }).click();
+  await manager().getByRole('list', { name: 'Screenshots waiting for review' }).getByRole('button', { name: 'Approve' }).click();
   const live = manager().getByRole('list', { name: 'On the card' });
   await expect(live).toContainText('By ShopOwner');
   await expect(live.getByRole('button', { name: 'Delete screenshot 1' })).toBeVisible();
-  await expect(manager().getByRole('list', { name: 'Waiting for review' })).toHaveCount(0);
+  await expect(manager().getByRole('list', { name: 'Screenshots waiting for review' })).toHaveCount(0);
   await stopEditing();
   await expect(gallery().getByRole('img', { name: 'Screenshot 1 of 1' })).toBeVisible();
   await expectNoProblems(page);
@@ -103,7 +103,7 @@ test('the admin queue lists waiting images; approving one removes it', async ({ 
   await page.goto(`/plot/${P}`);
   await edit();
   await manager().getByLabel('Add screenshots').setInputFiles(await png(page, 'second.png', 1920, 1080, '#47a'));
-  await expect(manager().getByRole('list', { name: 'Waiting for review' })).toBeVisible();
+  await expect(manager().getByRole('list', { name: 'Screenshots waiting for review' })).toBeVisible();
   await page.context().close();
 
   page = await pageAs(browser, server, 'ModTester', DESKTOP);
@@ -154,5 +154,49 @@ test('the owner deletes a screenshot in the edit view, after a confirm', async (
   await expect(page.getByRole('status').filter({ hasText: 'Screenshot deleted.' })).toBeAttached();
   await expect(live.getByRole('listitem')).toHaveCount(2);
   await expectNoProblems(page);
+  await page.context().close();
+});
+
+test('icons: the owner adds one, a moderator approves it, and it shows in the list', async ({ browser }) => {
+  page = await pageAs(browser, server, 'ShopOwner', PHONE);
+  await page.goto(`/plot/${P}`);
+  await edit();
+  await expect(manager()).toContainText('Must be some kind of icon representing your shop');
+  // Not square: cut to one.
+  await manager().getByLabel('Add icon').setInputFiles(await png(page, 'icon.png', 200, 100, '#c33'));
+  await expect(page.getByRole('status').filter({ hasText: 'Icon sent for review.' })).toBeAttached();
+  await expect(manager().getByRole('list', { name: 'Icons waiting for review' })).toContainText('Icon from ShopOwner');
+  await page.context().close();
+
+  page = await pageAs(browser, server, 'ModTester', DESKTOP);
+  await page.goto('/');
+  const row = page.getByRole('row').filter({ has: page.locator(`[data-plot-id="${P}"]`) });
+  await expect(row).toBeVisible();
+  await expect(page.locator('.plot-table__icon'), 'no shop has one yet: no icon space').toHaveCount(0);
+  await page.goto(`/plot/${P}`);
+  await edit();
+  await manager().getByRole('list', { name: 'Icons waiting for review' }).getByRole('button', { name: 'Approve' }).click();
+  await expect(manager().getByRole('img', { name: "The shop's icon" })).toBeVisible();
+  await expect(manager().getByLabel('Replace icon')).toBeAttached();
+
+  await page.goto('/');
+  const icon = row.locator('img.plot-table__icon');
+  await expect(icon).toBeVisible();
+  expect(await icon.evaluate((img) => [img.naturalWidth, img.naturalHeight])).toEqual([128, 128]);
+  // Shops without one keep the space, so the names line up.
+  const [mine, other] = await Promise.all([
+    row.locator('.plot-table__open').boundingBox(),
+    page.getByRole('row').filter({ has: page.locator('[data-plot-id="corridors-1"]') }).locator('.plot-table__open').boundingBox(),
+  ]);
+  expect(Math.abs(mine.x - other.x)).toBeLessThan(1);
+  await expectNoProblems(page);
+
+  // And deleting it, after a confirm.
+  await page.goto(`/plot/${P}`);
+  await edit();
+  await manager().getByRole('button', { name: 'Delete icon' }).click();
+  await manager().getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Icon deleted.' })).toBeAttached();
+  await expect(manager().getByLabel('Add icon')).toBeAttached();
   await page.context().close();
 });

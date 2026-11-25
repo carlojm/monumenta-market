@@ -1,6 +1,6 @@
 // Shop images (3.11): uploads re-encoded to WebP; the owner, maintainers and
 // staff upload; a moderator approves the owner's and maintainers' uploads;
-// the icon, the cover and the limits. Files go to the test server's own
+// the icon and the limits. Files go to the test server's own
 // folder (lib/imageStore.js), never to real storage.
 
 import assert from 'node:assert/strict';
@@ -148,6 +148,7 @@ test('icons: square, one per shop, shown in the plot list', async () => {
   assert.equal((await as('ModTester').post(`/api/images/${b.body.id}/approve`)).status, 200);
   assert.equal((await detail(null)).icon, b.body.url);
   assert.equal((await fetchFile(second.body.url)).status, 404, 'approving replaces the old icon too');
+  assert.equal((await detail(null)).icon_id, b.body.id);
   assert.equal((await upload('ShopOwner', 'icon', await picture(40, 40))).status, 400, 'at least 64 by 64');
 });
 

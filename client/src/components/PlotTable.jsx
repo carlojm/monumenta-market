@@ -25,6 +25,8 @@ function Snippet({ snippet }) {
 // `starred`: the starred plot ids; each shop's row has a star button.
 function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onSelectPlot }) {
   const third = searchResults ? 'match' : tagFiltering ? 'about' : 'zone';
+  // Icons get a column once any shop listed has one; the others keep its space.
+  const icons = rows.some((plot) => plot.shop?.icon);
   return (
     <table className="plot-table">
       <thead>
@@ -61,6 +63,9 @@ function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onS
                   {plot.shop
                     ? <StarButton plotId={plot.id} name={displayName(plot.shop)} starred={starred.has(plot.id)} />
                     : <span className="plot-table__no-star" />}
+                  {icons && (plot.shop?.icon
+                    ? <img className="plot-table__icon" src={plot.shop.icon} alt="" width={24} height={24} loading="lazy" />
+                    : <span className="plot-table__icon" />)}
                   <button type="button" className="plot-table__open" data-plot-id={plot.id}
                     onClick={(e) => { e.stopPropagation(); onSelectPlot(plot); }}>
                     {displayName(plot.shop)}
