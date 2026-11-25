@@ -89,6 +89,38 @@
   border-radius: var(--radius-sm);
 }
 
+/* Who added the screenshot: on hover, or after a tap on phones. It's only
+   hidden from sight, so screen readers always read it. */
+.plot-detail__carousel figcaption {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--text);
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+@media (hover: hover) {
+  .plot-detail__carousel:hover figcaption {
+    opacity: 1;
+  }
+}
+
+.plot-detail__carousel:focus-within figcaption,
+.plot-detail__carousel--captioned figcaption {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plot-detail__carousel figcaption {
+    transition: none;
+  }
+}
+
 .plot-detail__meta {
   display: grid;
   grid-template-columns: auto 1fr;

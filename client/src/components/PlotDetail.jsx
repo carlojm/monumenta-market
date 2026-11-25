@@ -9,6 +9,7 @@ import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
+import ShopGallery from './ShopGallery';
 import ShopImages from './ShopImages';
 import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
@@ -651,16 +652,20 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         )}
 
         {editing ? (
-          <ShopEditForm plot={plot} plots={plots} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
-            onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
+          <>
+            <ShopEditForm plot={plot} plots={plots} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
+              onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
+            {/* Adding and deleting screenshots: owners, maintainers and staff. */}
+            {shop && (
+              <ShopImages plotId={plot.id} shop={shop} account={account}
+                onChanged={(message) => { setAnnouncement(message); reload(); }} />
+            )}
+          </>
         ) : (
           <>
 
           {/* Screenshots first. Once the full page is here: it has the images. */}
-          {detail && shop && (
-            <ShopImages plotId={plot.id} shop={shop} account={account}
-              onChanged={(message) => { setAnnouncement(message); reload(); }} />
-          )}
+          {detail && shop && <ShopGallery images={shop.images ?? []} />}
 
           <dl className="plot-detail__meta">
             {shop && (

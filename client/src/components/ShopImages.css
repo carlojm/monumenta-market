@@ -1,6 +1,13 @@
-/* The card's screenshots (ShopImages.jsx). */
+/* Managing the card's screenshots, in the edit view (ShopImages.jsx): its
+   own section under the form, since it saves at once, not with Save. */
 .shop-images {
-  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.shop-images h3 {
+  margin: 0 0 0.75rem;
 }
 
 .shop-images h3:focus {
@@ -9,18 +16,6 @@
 
 .shop-images__muted {
   color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-/* Under the current screenshot: who added it, and the manage buttons. */
-.shop-images__about {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
 }
 
 .shop-images__actions {
@@ -36,8 +31,9 @@
   font-size: 0.875rem;
 }
 
-/* Waiting for review: a small preview beside what it is. */
-.shop-images__pending {
+/* The screenshots on the card, and those waiting: a small preview beside
+   what it is and its buttons. */
+.shop-images__list {
   list-style: none;
   margin: 0 0 1rem;
   padding: 0;
@@ -45,13 +41,13 @@
   gap: 0.75rem;
 }
 
-.shop-images__pending li {
+.shop-images__list li {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
 }
 
-.shop-images__pending img {
+.shop-images__list img {
   inline-size: 6rem;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -59,26 +55,17 @@
   flex-shrink: 0;
 }
 
-.shop-images__pending img.shop-images__icon {
+.shop-images__list img.shop-images__icon {
   inline-size: 3rem;
   aspect-ratio: 1;
 }
 
-.shop-images__pending p {
+.shop-images__list p {
   margin: 0 0 0.25rem;
   font-size: 0.875rem;
 }
 
-.shop-images__add {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
-  font-size: 0.875rem;
-}
-
 .shop-images__form {
-  margin-top: 0.75rem;
   padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-control);
@@ -125,7 +112,6 @@
 
 @media (pointer: coarse) {
   .shop-images__actions button,
-  .shop-images__add,
   .shop-images__file {
     min-block-size: 2.25rem;
   }
