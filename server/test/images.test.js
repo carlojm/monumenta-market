@@ -151,35 +151,11 @@ test('icons: square, one per shop, shown in the plot list', async () => {
   assert.equal((await upload('ShopOwner', 'icon', await picture(40, 40))).status, 400, 'at least 64 by 64');
 });
 
-test('the cover: picked from the gallery by the owner, with a crop', async () => {
-  const crop = { x: 0, y: 0.25, w: 1, h: 0.4 };
-  assert.equal((await as('Tester').put(`/api/plots/${P}/cover`, { image_id: pendingId, crop })).status, 403);
-  const r = await as('ShopOwner').put(`/api/plots/${P}/cover`, { image_id: pendingId, crop });
-  assert.equal(r.status, 200, show(r));
-  assert.deepEqual((await detail(null)).cover, { image_id: pendingId, crop });
-
-  const bad = [{ x: 0.5, y: 0, w: 0.6, h: 0.5 }, { x: 0, y: 0, w: 0, h: 0.5 }, { x: '0', y: 0, w: 1, h: 1 }, null];
-  for (const c of bad) assert.equal((await as('ShopOwner').put(`/api/plots/${P}/cover`, { image_id: pendingId, crop: c })).status, 400, JSON.stringify(c));
-  const theirs = await upload('ModTester', 'gallery', null, OTHER);
-  assert.equal((await as('ModTester').put(`/api/plots/${P}/cover`, { image_id: theirs.body.id, crop })).status, 400, "another shop's image");
-  const waiting = await upload('ShopOwner');
-  assert.equal((await as('ShopOwner').put(`/api/plots/${P}/cover`, { image_id: waiting.body.id, crop })).status, 400, 'not approved yet');
-
-  // Deleting the cover image leaves the card without one.
-  assert.equal((await as('ShopOwner').delete(`/api/images/${pendingId}`)).status, 200);
-  assert.equal((await detail(null)).cover, null);
-  const again = (await detail(null)).images[0].id;
-  await as('ShopOwner').put(`/api/plots/${P}/cover`, { image_id: again, crop });
-  assert.equal((await as('ShopOwner').put(`/api/plots/${P}/cover`, { image_id: null })).status, 200);
-  assert.equal((await detail(null)).cover, null, 'and it can be removed');
-  assert.ok(modLog('image.cover').length >= 3);
-});
-
 test('limits: 10 screenshots a shop, 20 uploads a day, 10 waiting', async () => {
   const db = writeDb(server);
   const shop = (plot) => db.prepare('SELECT id FROM shops WHERE plot_id = ? AND closed_at IS NULL').pluck().get(plot);
   const add = db.prepare('INSERT INTO images (shop_id, kind, status, url, account_id, created_at) VALUES (?, ?, ?, ?, ?, ?)');
-  for (let i = 0; i < 9; i++) add.run(shop(OTHER), 'gallery', 'approved', '/x', null, '2026-01-01 00:00:00'); // with ModTester's: 10
+  for (let i = 0; i < 10; i++) add.run(shop(OTHER), 'gallery', 'approved', '/x', null, '2026-01-01 00:00:00');
   db.close();
   const full = await upload('ModTester', 'gallery', null, OTHER);
   assert.equal(full.status, 409, show(full));

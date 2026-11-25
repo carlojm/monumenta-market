@@ -67,7 +67,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes); // admin-only account management
 app.use('/api/admin', adminTagRoutes); // tag management (moderators and admins)
 app.use('/api', revisionRoutes); // page revisions: suggest, review, publish
-app.use('/api', imageRoutes); // shop images: upload, review, cover
+app.use('/api', imageRoutes); // shop images: upload and review
 // The tests' stand-in for the image host (lib/imageStore.js).
 if (TEST_MODE) app.use('/test-uploads', express.static(TEST_UPLOADS));
 

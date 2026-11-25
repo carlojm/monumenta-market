@@ -248,10 +248,6 @@ export function createSchema() {
   addColumnIfMissing('images', 'reviewed_at', 'TEXT');
   db.exec('CREATE INDEX IF NOT EXISTS images_shop ON images(shop_id)');
   db.exec('CREATE INDEX IF NOT EXISTS images_account ON images(account_id)');
-  // The card's cover: one of the shop's gallery images, and the part of it
-  // shown, as JSON {x, y, w, h} in fractions of the image (0 to 1).
-  addColumnIfMissing('shops', 'cover_image_id', 'INTEGER REFERENCES images(id)');
-  addColumnIfMissing('shops', 'cover_crop', 'TEXT');
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

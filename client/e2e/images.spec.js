@@ -1,16 +1,12 @@
 // Shop images on the card (3.11): only the owner, maintainers and staff add
 // screenshots; the owner's wait for a moderator, who approves them on the card
-// or in the admin queue; the owner picks the cover with the crop box.
+// or in the admin queue. The screenshots sit at the top of the card.
 
 import { expect, test } from '@playwright/test';
-import { DESKTOP, PHONE, expectNoProblems, pageAs, readDb, serverForFile } from './helpers.js';
+import { DESKTOP, PHONE, expectNoProblems, pageAs, serverForFile } from './helpers.js';
 
 const server = serverForFile();
 const P = 'corridors-2'; // ShopOwner's
-const cover = () => {
-  const db = readDb(server);
-  try { return db.prepare('SELECT cover_image_id, cover_crop FROM shops WHERE plot_id = ? AND closed_at IS NULL').get(P); } finally { db.close(); }
-};
 
 // A PNG drawn by the page's canvas, as a file for an <input type="file">.
 async function png(page, name, width = 1280, height = 720, color = '#4a7') {
@@ -41,7 +37,6 @@ test('other players see no way to add screenshots', async ({ browser }) => {
 test('the owner adds a screenshot: the guidelines, then it waits for a moderator', async ({ browser }) => {
   page = await pageAs(browser, server, 'ShopOwner', PHONE);
   await page.goto(`/plot/${P}`);
-  await expect(section().getByText('No screenshots yet.')).toBeVisible();
   const add = section().getByRole('button', { name: 'Add screenshots' });
   await add.click();
   await expect(add).toHaveAttribute('aria-expanded', 'true');
@@ -68,7 +63,7 @@ test('a moderator approves it on the card, and it shows in the carousel', async 
   page = await pageAs(browser, server, 'ModTester', DESKTOP);
   await page.goto(`/plot/${P}`);
   await section().getByRole('button', { name: 'Approve' }).click();
-  await expect(section().getByRole('img', { name: 'Screenshot 1 of 1, full size' })).toBeVisible();
+  await expect(section().getByRole('img', { name: 'Screenshot 1 of 1' })).toBeVisible();
   await expect(section()).toContainText('By ShopOwner');
   await expect(section().getByRole('list', { name: 'Waiting for review' })).toHaveCount(0);
   await expectNoProblems(page);
@@ -76,50 +71,11 @@ test('a moderator approves it on the card, and it shows in the carousel', async 
 
   page = await pageAs(browser, server, 'Tester', PHONE);
   await page.goto(`/plot/${P}`);
-  await expect(section().getByRole('img', { name: 'Screenshot 1 of 1, full size' }), 'players see it').toBeVisible();
+  await expect(section().getByRole('img', { name: 'Screenshot 1 of 1' }), 'players see it').toBeVisible();
   await expect(section().getByRole('button'), 'but no buttons to change anything').toHaveCount(0);
-  await page.context().close();
-  page = await pageAs(browser, server, 'ShopOwner', DESKTOP);
-  await page.goto(`/plot/${P}`);
-});
-
-test('the owner picks the cover and drags the crop box', async () => {
-  await section().getByRole('button', { name: 'Use as cover' }).click();
-  const box = section().locator('.cover-picker__box');
-  await expect(box).toBeVisible();
-  const start = await box.boundingBox();
-  const frame = await section().locator('.cover-picker__frame').boundingBox();
-  // A 16:9 picture: the biggest banner is full width, in the middle.
-  expect(Math.round(start.width)).toBe(Math.round(frame.width));
-  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2 + 500, { steps: 5 });
-  await page.mouse.up();
-  const moved = await box.boundingBox();
-  expect(Math.round(moved.y + moved.height), 'dragged to the bottom edge, no further').toBe(Math.round(frame.y + frame.height));
-  // Shrink it by its corner, then nudge it up with the keyboard.
-  const corner = section().locator('.cover-picker__corner');
-  const c = await corner.boundingBox();
-  await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(c.x - 100, c.y, { steps: 5 });
-  await page.mouse.up();
-  expect((await box.boundingBox()).width).toBeLessThan(moved.width - 50);
-  await box.focus();
-  await page.keyboard.press('ArrowUp');
-  await expect(section().locator('.cover-image'), 'a live preview').toBeVisible();
-  await section().getByRole('button', { name: 'Save cover' }).click();
-
-  await expect(page.locator('.plot-detail__sheet > .cover-image, .cover-image').first()).toBeVisible();
-  await expect(section().locator('.shop-images__credit')).toContainText('Cover');
-  const saved = cover();
-  const crop = JSON.parse(saved.cover_crop);
-  // Dragged down: its top at 1 - 0.71 (a full-width banner of a 16:9
-  // picture is 0.71 of its height), then up by one arrow step (0.02).
-  // Resizing keeps the top-left corner where it is.
-  expect(crop.y).toBeCloseTo(0.289 - 0.02, 2);
-  expect(crop.w).toBeLessThan(0.9);
-  await expectNoProblems(page);
+  // At the top: before the owner, plot and status details.
+  const [pictures, details] = await Promise.all([section().boundingBox(), page.locator('.plot-detail__meta').boundingBox()]);
+  expect(pictures.y).toBeLessThan(details.y);
   await page.context().close();
 });
 
@@ -142,6 +98,27 @@ test('the admin queue lists waiting images; approving one removes it', async ({ 
   await expect(tab).toHaveText('Needs review (0)');
   await page.goto(`/plot/${P}`);
   await expect(section().locator('.plot-detail__carousel-count')).toHaveText('1 / 2');
+  await expectNoProblems(page);
+  await page.context().close();
+});
+
+test('screenshots of different shapes: the frame keeps its size, and a tap opens nothing', async ({ browser }) => {
+  page = await pageAs(browser, server, 'ModTester', PHONE);
+  await page.goto(`/plot/${P}`);
+  await section().getByRole('button', { name: 'Add screenshots' }).click();
+  await section().getByLabel('Choose screenshots').setInputFiles(await png(page, 'square.png', 900, 900, '#a47'));
+  const count = section().locator('.plot-detail__carousel-count');
+  await expect(count).toHaveText('1 / 3');
+  const frame = section().locator('.plot-detail__carousel');
+  const heights = [];
+  for (let i = 0; i < 3; i++) {
+    heights.push(Math.round((await frame.boundingBox()).height));
+    await section().getByRole('button', { name: 'Next screenshot' }).click();
+  }
+  expect(new Set(heights).size, `the same height every time: ${heights}`).toBe(1);
+  const { width } = await frame.boundingBox();
+  expect(Math.abs(heights[0] - (width * 9) / 16), '16:9, whatever the screenshots are').toBeLessThan(1.5);
+  await expect(frame.locator('a'), 'no link').toHaveCount(0);
   await expectNoProblems(page);
   await page.context().close();
 });

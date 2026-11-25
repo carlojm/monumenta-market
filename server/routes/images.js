@@ -8,8 +8,6 @@
 //   POST   /images/:id/approve      staff
 //   POST   /images/:id/reject       staff; deletes it
 //   DELETE /images/:id              the owner, maintainers or staff
-//   PUT    /plots/:id/cover {image_id, crop}   the owner, maintainers or staff pick the
-//          card's cover from the gallery; image_id null removes it
 // Every change is recorded in the Mod log.
 
 import express from 'express';
@@ -20,8 +18,8 @@ import { logModAction } from '../lib/modlog.js';
 import { getCurrentShop, getShop } from '../lib/shops.js';
 import { imageType } from '../lib/imageType.js';
 import {
-  ImageError, KINDS, MAX_UPLOAD_MB, addImage, approveImage, cleanCrop, deleteImage, getImage, managesImages, publicImage,
-  reviewsImages, setCover, uploadBlocked,
+  ImageError, KINDS, MAX_UPLOAD_MB, addImage, approveImage, deleteImage, getImage, managesImages, publicImage,
+  reviewsImages, uploadBlocked,
 } from '../lib/images.js';
 
 const router = express.Router();
@@ -137,29 +135,6 @@ router.delete('/images/:id', needAccount, async (req, res) => {
   logModAction(req, withdrawn ? 'image.withdraw' : 'image.delete', `plot:${shop.plot_id}`,
     `${withdrawn ? 'Withdrew' : 'Deleted'} ${kindLabel(image.kind)} for ${shopLabel(shop)}`);
   res.json({ deleted: true });
-});
-
-router.put('/plots/:id/cover', needAccount, (req, res) => {
-  const shop = getCurrentShop.get(req.params.id);
-  if (!shop) return res.status(409).json({ error: 'This plot has no shop.' });
-  if (!managesImages(req.account, shop)) {
-    return res.status(403).json({ error: "Only the shop's owner, its maintainers or a moderator can pick the cover." });
-  }
-  const imageId = req.body?.image_id ?? null;
-  if (imageId === null) {
-    setCover(shop, null, null);
-    logModAction(req, 'image.cover', `plot:${shop.plot_id}`, `Removed the cover of ${shopLabel(shop)}`);
-    return res.json({ cover: null });
-  }
-  const image = getImage.get(imageId);
-  if (!image || image.shop_id !== shop.id || image.kind !== 'gallery' || image.status !== 'approved') {
-    return res.status(400).json({ error: "The cover must be one of this shop's screenshots." });
-  }
-  const crop = cleanCrop(req.body?.crop);
-  if (!crop) return res.status(400).json({ error: 'The crop must be a rectangle inside the image.' });
-  setCover(shop, image.id, crop);
-  logModAction(req, 'image.cover', `plot:${shop.plot_id}`, `Changed the cover of ${shopLabel(shop)}`, { data: { image_id: image.id, crop } });
-  res.json({ cover: { image_id: image.id, crop } });
 });
 
 export default router;

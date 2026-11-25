@@ -10,7 +10,6 @@ import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
 import ShopImages from './ShopImages';
-import CoverImage from './CoverImage';
 import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
@@ -423,8 +422,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   if (!plot) return null;
 
   const shop = detail ? detail.shop : plot.shop;
-  // The cover, if one is picked and still in the gallery.
-  const cover = shop?.cover ? (shop.images ?? []).find((i) => i.id === shop.cover.image_id) : null;
   const comments = [...myComments, ...(shop?.comments || [])].filter((c) => !deletedIds.includes(c.id));
   const reports = [...myReports, ...(detail?.reports || [])];
   // The server's latest_report already fills in a missing part from earlier
@@ -659,7 +656,11 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         ) : (
           <>
 
-          {cover && <CoverImage image={cover} crop={shop.cover.crop} />}
+          {/* Screenshots first. Once the full page is here: it has the images. */}
+          {detail && shop && (
+            <ShopImages plotId={plot.id} shop={shop} account={account}
+              onChanged={(message) => { setAnnouncement(message); reload(); }} />
+          )}
 
           <dl className="plot-detail__meta">
             {shop && (
@@ -721,12 +722,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
           </dl>
 
           {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
-
-          {/* Once the full page is here: it has the uploads waiting for review. */}
-          {detail && shop && (
-            <ShopImages plotId={plot.id} shop={shop} account={account}
-              onChanged={(message) => { setAnnouncement(message); reload(); }} />
-          )}
 
           {shop ? (
             <>

@@ -1,9 +1,7 @@
 // server/lib/images.js
 //
 // Shop images (3.10/3.11). Two kinds:
-//   gallery  screenshots of the shop, shown in the card's carousel. One can be
-//            the card's cover, cropped to a banner (shops.cover_image_id and
-//            cover_crop, set with PUT /plots/:id/cover).
+//   gallery  screenshots of the shop, shown in the card's carousel.
 //   icon     one small square picture that stands for the shop, shown in the
 //            table. A new approved icon replaces the old one.
 // The shop's owner and maintainers, and staff, can upload. Staff uploads show
@@ -30,7 +28,7 @@ export const MAX_PENDING = 10; // waiting for review, per account
 export const PENDING_DAYS = 30; // unreviewed uploads are deleted after this
 const MIN_SIZE = { gallery: [640, 360], icon: [64, 64] };
 const FULL_SIZE = 1920; // longest side, for the full-size viewer
-const CARD_WIDTH = 960; // the card's carousel and cover (twice its width, for sharp screens)
+const CARD_WIDTH = 960; // the card's carousel (twice its width, for sharp screens)
 const ICON_SIZE = 128;
 
 // The files that make up an image, by its storage key (images made before
@@ -78,7 +76,7 @@ async function encodeImage(buffer, kind) {
 
 // --- Who may do what (always checked here, never only in the browser) ---
 
-// Uploading, deleting the shop's images, and choosing the cover.
+// Uploading, and deleting the shop's images.
 export const managesImages = (account, shop) => isStaff(account) || runsShop(account, shop);
 // Publishing without review, and approving or rejecting uploads.
 export const reviewsImages = (account) => isStaff(account);
@@ -103,16 +101,12 @@ export const publicImage = (i) => ({
   width: i.width, height: i.height, uploader: i.uploader ?? null, created_at: i.created_at,
 });
 
-// A shop's images for its page: the approved gallery, the icon, the cover,
-// and, for the people who run the shop and staff, the uploads waiting for review.
+// A shop's images for its page: the approved gallery, the icon, and, for the people who run the shop and staff, the uploads waiting for review.
 export function imagesForShop(shop, account) {
   const pending = managesImages(account, shop) ? pendingForShop.all(shop.id) : [];
-  const crop = shop.cover_crop ? JSON.parse(shop.cover_crop) : null;
-  const cover = shop.cover_image_id && crop ? { image_id: shop.cover_image_id, crop } : null;
   return {
     images: approvedGallery.all(shop.id).map(publicImage),
     icon: approvedIcon.get(shop.id)?.url ?? null,
-    cover,
     pending_images: pending.map(publicImage),
   };
 }
@@ -135,7 +129,6 @@ const insertImage = db.prepare(`
     CURRENT_TIMESTAMP, @reviewer_id, CASE WHEN @reviewer_id IS NULL THEN NULL ELSE CURRENT_TIMESTAMP END)
 `);
 const deleteRow = db.prepare('DELETE FROM images WHERE id = ?');
-const clearCover = db.prepare('UPDATE shops SET cover_image_id = NULL, cover_crop = NULL WHERE cover_image_id = ?');
 const otherIcons = db.prepare("SELECT * FROM images WHERE shop_id = ? AND kind = 'icon' AND status = 'approved' AND id != ?");
 
 // Why this account can't upload this kind of image to this shop now, or null.
@@ -196,33 +189,10 @@ export async function approveImage(image, account) {
   await removeFiles(old.flatMap(filesOf));
 }
 
-// Rejecting and deleting both remove the image and its files. A deleted
-// cover leaves the card without one.
+// Rejecting and deleting both remove the image and its files.
 export async function deleteImage(image) {
-  db.transaction(() => {
-    clearCover.run(image.id);
-    deleteRow.run(image.id);
-  })();
+  deleteRow.run(image.id);
   await removeFiles(filesOf(image));
-}
-
-// --- The cover ---
-
-const setCoverRow = db.prepare('UPDATE shops SET cover_image_id = ?, cover_crop = ? WHERE id = ?');
-
-// `crop` is {x, y, w, h} in fractions of the image. Returns the cleaned crop,
-// or null if it doesn't fit inside the image.
-export function cleanCrop(crop) {
-  if (!crop || typeof crop !== 'object') return null;
-  const values = ['x', 'y', 'w', 'h'].map((k) => crop[k]);
-  if (!values.every((v) => typeof v === 'number' && Number.isFinite(v))) return null;
-  const [x, y, w, h] = values.map((v) => Math.round(v * 10000) / 10000);
-  const fits = x >= 0 && y >= 0 && w > 0.01 && h > 0.01 && x + w <= 1.0001 && y + h <= 1.0001;
-  return fits ? { x, y, w, h } : null;
-}
-
-export function setCover(shop, imageId, crop) {
-  setCoverRow.run(imageId, imageId ? JSON.stringify(crop) : null, shop.id);
 }
 
 // --- Clean-up: uploads nobody reviewed in PENDING_DAYS are deleted ---

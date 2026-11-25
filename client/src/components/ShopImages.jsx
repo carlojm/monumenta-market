@@ -1,16 +1,16 @@
 import { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ImagePlus } from 'lucide-react';
 import { MAX_UPLOAD_MB, approveImage, deleteImage, isStaff, managesImages, rejectImage, uploadImage } from '../lib/images';
-import CoverPicker from './CoverPicker';
 import './ShopImages.css';
 
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif';
 const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-// The card's Screenshots section (3.11): the approved screenshots in a
-// carousel. The shop's owner, maintainers and staff also add more, see the
-// ones waiting for a moderator, delete and pick the cover (CoverPicker);
-// moderators approve and reject.
+// The card's screenshots (3.11), at the top of the card: the approved ones in
+// a carousel. The shop's owner, maintainers and staff also add more, see the
+// ones waiting for a moderator and delete; moderators approve and reject.
+// The heading is for screen readers (and focus after an action); on screen
+// the pictures speak for themselves.
 // `onChanged(message)` reloads the card and announces what happened.
 function ShopImages({ plotId, shop, account, onChanged }) {
   const images = shop.images ?? [];
@@ -18,7 +18,6 @@ function ShopImages({ plotId, shop, account, onChanged }) {
   const manages = managesImages(account, shop);
   const reviews = isStaff(account);
   const [index, setIndex] = useState(0);
-  const [picking, setPicking] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -29,7 +28,6 @@ function ShopImages({ plotId, shop, account, onChanged }) {
 
   const at = Math.min(index, images.length - 1);
   const current = images[at];
-  const isCover = current && shop.cover?.image_id === current.id;
 
   // Runs an action; a failure shows here, success reloads the card. Focus
   // goes to the heading, since the button pressed is often gone afterwards.
@@ -74,29 +72,15 @@ function ShopImages({ plotId, shop, account, onChanged }) {
     }
   };
 
-  if (picking) {
-    return (
-      <section className="shop-images" aria-labelledby="shop-images-heading">
-        <h3 id="shop-images-heading" ref={headingRef} tabIndex={-1}>Screenshots</h3>
-        <CoverPicker plotId={plotId} image={current} initial={isCover ? shop.cover.crop : null}
-          onSaved={() => { setPicking(false); onChanged('Cover saved.'); }}
-          onCancel={() => setPicking(false)} />
-      </section>
-    );
-  }
-
   return (
     <section className="shop-images" aria-labelledby="shop-images-heading">
-      <h3 id="shop-images-heading" ref={headingRef} tabIndex={-1}>Screenshots</h3>
+      <h3 id="shop-images-heading" className="visually-hidden" ref={headingRef} tabIndex={-1}>Screenshots</h3>
 
-      {current ? (
+      {current && (
         <>
           <div className="plot-detail__carousel">
-            {/* Opens the full-size image. */}
-            <a href={current.url} target="_blank" rel="noreferrer">
-              <img src={current.card_url} alt={`Screenshot ${at + 1} of ${images.length}, full size`}
-                width={current.width ?? undefined} height={current.height ?? undefined} />
-            </a>
+            <img src={current.card_url} alt={`Screenshot ${at + 1} of ${images.length}`}
+              width={current.width ?? undefined} height={current.height ?? undefined} />
             {images.length > 1 && (
               <>
                 <button type="button" className="plot-detail__carousel-nav plot-detail__carousel-nav--prev"
@@ -114,15 +98,9 @@ function ShopImages({ plotId, shop, account, onChanged }) {
             )}
           </div>
           <div className="shop-images__about">
-            <span className="shop-images__credit">
-              {current.uploader && <span className="shop-images__muted">By {current.uploader}</span>}
-              {isCover && <span className="tag-chip tag-chip--plain">Cover</span>}
-            </span>
+            <span className="shop-images__muted">{current.uploader && `By ${current.uploader}`}</span>
             {manages && !confirmingDelete && (
               <span className="shop-images__actions">
-                <button type="button" onClick={() => setPicking(true)} disabled={busy}>
-                  {isCover ? 'Change cover crop' : 'Use as cover'}
-                </button>
                 <button type="button" onClick={() => setConfirmingDelete(true)} disabled={busy}>Delete</button>
               </span>
             )}
@@ -137,8 +115,6 @@ function ShopImages({ plotId, shop, account, onChanged }) {
             )}
           </div>
         </>
-      ) : (
-        <p className="shop-images__muted">No screenshots yet.</p>
       )}
 
       {pending.length > 0 && (
@@ -178,7 +154,7 @@ function ShopImages({ plotId, shop, account, onChanged }) {
           {adding && (
             <div className="shop-images__form">
               <ul>
-                <li>Images are displayed in a gallery on this card. After upload, one can be chosen as a cover photo</li>
+                <li>Images are displayed in a gallery on this card</li>
                 <li>ONLY in-game screenshots or in-game screenshots with extra info/text edited onto them</li>
                 {/* A moderator's own uploads show at once. */}
                 {!reviews && <li>Images must be approved by a moderator before being shown</li>}

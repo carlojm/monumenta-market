@@ -1,6 +1,6 @@
-/* The card's Screenshots section (ShopImages.jsx) and the cover. */
+/* The card's screenshots (ShopImages.jsx). */
 .shop-images {
-  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .shop-images h3:focus {
@@ -21,12 +21,6 @@
   gap: 0.5rem;
   margin-top: -0.5rem;
   margin-bottom: 1rem;
-}
-
-.shop-images__credit {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .shop-images__actions {
@@ -135,85 +129,4 @@
   .shop-images__file {
     min-block-size: 2.25rem;
   }
-}
-
-/* --- The cover: a banner showing the chosen part of a screenshot --- */
-.cover-image {
-  position: relative;
-  aspect-ratio: 5 / 2; /* COVER_ASPECT in lib/images.js */
-  overflow: hidden;
-  border-radius: var(--radius-control);
-  margin: 0.25rem 0 1rem;
-  background: var(--code-bg);
-}
-
-.cover-image img {
-  position: absolute;
-  max-inline-size: none;
-}
-
-/* --- Choosing the cover (CoverPicker.jsx) --- */
-.cover-picker h4 {
-  margin: 0 0 0.25rem;
-}
-
-.cover-picker__hint {
-  margin: 0 0 0.5rem;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.cover-picker__frame {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
-  margin-bottom: 0.75rem;
-  user-select: none;
-}
-
-.cover-picker__frame img {
-  display: block;
-  inline-size: 100%;
-  block-size: auto;
-}
-
-/* The box: the outside dims (a huge shadow, clipped by the frame). */
-.cover-picker__box {
-  position: absolute;
-  box-sizing: border-box;
-  border: 2px solid var(--text);
-  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55);
-  cursor: move;
-  touch-action: none; /* a drag moves the box instead of scrolling the page */
-}
-
-.cover-picker__box:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.cover-picker__corner {
-  position: absolute;
-  right: 0.25rem; /* inside: the frame clips anything past its edges */
-  bottom: 0.25rem;
-  inline-size: 1.2rem;
-  block-size: 1.2rem;
-  border-radius: 50%;
-  background: var(--text);
-  border: 2px solid var(--sheet-bg);
-  cursor: nwse-resize;
-  touch-action: none;
-}
-
-@media (pointer: coarse) {
-  .cover-picker__corner {
-    inline-size: 1.8rem;
-    block-size: 1.8rem;
-  }
-}
-
-.cover-picker__actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
 }

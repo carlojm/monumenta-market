@@ -42,13 +42,20 @@
 .plot-detail__carousel {
   position: relative;
   margin: 0.5rem 0 1rem;
+  /* One frame for every screenshot, so moving between them never moves the
+     page. 16:9 is the usual screenshot shape; others fit inside with quiet
+     bars at the sides (object-fit: contain), never cropped. */
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--code-bg); /* the bars beside a screenshot of another shape */
 }
 
 .plot-detail__carousel img {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .plot-detail__carousel-nav {
