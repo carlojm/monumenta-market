@@ -5,7 +5,9 @@ export const SHOP_FIELDS = ['owner', 'maintainers', 'shop_name', 'guild_name', '
   'guild_color', 'primary_color', 'secondary_color'];
 
 // The fields players edit, in card order. Lengths match the server's limits.
-// The colors are left to the admin editor: the site doesn't show them (4.10).
+// The guild and secondary colors are left to the admin editor: the site
+// doesn't show them (4.10). The banner color (`banner`) shows in the form's
+// Images part, for the people who run the shop.
 export const FIELDS = [
   { key: 'maintainers', label: 'Maintainers', max: 400,
     hint: 'Minecraft names, separated by commas. They can edit this page without review.' },
@@ -14,12 +16,13 @@ export const FIELDS = [
   { key: 'description', label: 'About', max: 4000, multiline: true },
   { key: 'stock', label: 'Keywords', max: 4000, multiline: true, hint: 'What the shop sells. Search looks here.' },
   { key: 'palette', label: 'Palette', max: 200 },
+  { key: 'primary_color', label: 'Banner color', max: 40, banner: true },
 ];
 
 // Typed only for a new shop; an edit can't change the owner.
 export const OWNER = { key: 'owner', label: 'Owner', max: 32, hint: 'Player name, or the guild tag without brackets.' };
 
-const COLOR_LABELS = { guild_color: 'Guild color', primary_color: 'Primary color', secondary_color: 'Secondary color' };
+const COLOR_LABELS = { guild_color: 'Guild color', secondary_color: 'Secondary color' };
 
 export const labelOf = (key) => [OWNER, ...FIELDS].find((f) => f.key === key)?.label ?? COLOR_LABELS[key] ?? key;
 
@@ -31,11 +34,17 @@ export const tagNamer = (catalog, shopTags = []) => (id) =>
 // Maintainers (3.8) are kept as "Alice, Bob".
 export const maintainersOf = (shop) => (shop?.maintainers ? shop.maintainers.split(', ') : []);
 
+// Does a revision (or its preview) add or remove any pictures?
+export const hasImageChanges = ({ images, icon }) => !!(images?.added.length || images?.removed.length || icon);
+
 // What a revision changed, for a sentence: "About, Palette and tags". `d` has
-// `changes` ([{ field }]) and `tags` ({ added, removed }), as the server sends.
+// `changes` ([{ field }]), `tags` and `images` ({ added, removed }) and `icon`,
+// as the server sends.
 export function changedFields(d) {
   const parts = (d.changes ?? []).map((c) => labelOf(c.field));
   if (d.tags?.added.length || d.tags?.removed.length) parts.push('tags');
+  if (d.images?.added.length || d.images?.removed.length) parts.push('screenshots');
+  if (d.icon) parts.push('icon');
   if (parts.length < 2) return parts[0] ?? null;
   return `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`;
 }

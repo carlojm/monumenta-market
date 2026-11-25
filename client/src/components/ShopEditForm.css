@@ -42,6 +42,15 @@
   font: inherit;
 }
 
+/* Phones: iOS zooms into a text field whose text is under 16px when it's
+   tapped, so the fields are 16px there. */
+@media (pointer: coarse) {
+  .shop-edit__field input,
+  .shop-edit__field textarea {
+    font-size: 1rem;
+  }
+}
+
 .shop-edit textarea {
   min-height: 4rem;
   /* Grows with the text, up to a point (where supported; elsewhere it scrolls). */

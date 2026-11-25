@@ -1,0 +1,31 @@
+/* An edit's pictures (ImageChanges.jsx): "Added" or "Removed", then small
+   previews. Removed ones are faded, like struck-out text. */
+.image-changes__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block: 0.25rem;
+}
+
+.image-changes__verb {
+  min-inline-size: 4.5rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.image-changes__row img {
+  inline-size: 6rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.image-changes__row img.image-changes__icon {
+  inline-size: 2.5rem;
+  aspect-ratio: 1;
+}
+
+.image-changes__row--removed img {
+  opacity: 0.5;
+}

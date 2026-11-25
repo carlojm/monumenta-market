@@ -21,17 +21,20 @@ function Snippet({ snippet }) {
 // snippet, if any, comes first instead.
 // The third column depends on what's narrowing the list: searching shows
 // where the text matched; a tag filter alone (any kind, "has none of" too)
-// shows what each shop says it is (About, cut to 3 lines); otherwise, the zone.
-// `starred`: the starred plot ids; each shop's row has a star button.
+// shows what each shop says it is (About, cut to 3 lines); otherwise, the zone
+// (not on phones: name and status only).
+// `starred`: the starred plot ids. Only starred rows show a star (to unstar);
+// shops are starred from their card. The star and the icon take room only
+// when they're there, so names don't line up, but the columns do.
 function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onSelectPlot }) {
   const third = searchResults ? 'match' : tagFiltering ? 'about' : 'zone';
   return (
-    <table className="plot-table">
+    <table className={`plot-table plot-table--${third}`}>
       <thead>
         <tr>
           <th className="plot-table__shop">Shop</th>
-          {third === 'zone' && <th>Zone</th>}
-          <th>Status</th>
+          {third === 'zone' && <th className="plot-table__zone">Zone</th>}
+          <th className="plot-table__status">Status</th>
           {third === 'match' && <th>Match</th>}
           {third === 'about' && <th>About</th>}
         </tr>
@@ -57,17 +60,21 @@ function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onS
                   readers) open it. data-plot-id lets the page return focus here. */}
               <td className="plot-table__shop">
                 <div className="plot-table__shop-cell">
-                  {/* Stars in one column; a vacant plot keeps the space, so names line up. */}
-                  {plot.shop
-                    ? <StarButton plotId={plot.id} name={displayName(plot.shop)} starred={starred.has(plot.id)} />
-                    : <span className="plot-table__no-star" />}
+                  {/* Unstarring removes the star, so focus goes to the name. */}
+                  {plot.shop && starred.has(plot.id) && (
+                    <StarButton plotId={plot.id} name={displayName(plot.shop)} starred
+                      onToggle={(e) => e.currentTarget.parentElement.querySelector('.plot-table__open').focus()} />
+                  )}
+                  {plot.shop?.icon && (
+                    <img className="plot-table__icon" src={plot.shop.icon} alt="" width={24} height={24} loading="lazy" />
+                  )}
                   <button type="button" className="plot-table__open" data-plot-id={plot.id}
                     onClick={(e) => { e.stopPropagation(); onSelectPlot(plot); }}>
                     {displayName(plot.shop)}
                   </button>
                 </div>
               </td>
-              {third === 'zone' && <td>{plot.zone}</td>}
+              {third === 'zone' && <td className="plot-table__zone">{plot.zone}</td>}
               <td>
                 {!plot.shop ? 'Vacant' : report ? (
                   <>

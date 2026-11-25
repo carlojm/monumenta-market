@@ -157,7 +157,7 @@ function EditItem({ edit: e, onWithdrawn }) {
       {e.summary && <Note by="You" text={e.summary} />}
       {e.review_note && <Note by={e.reviewer ?? 'Reviewer'} text={e.review_note} />}
       {error && <p className="account-form__error" role="alert">{error}</p>}
-      <RevisionChanges d={{ changes: e.changes, tags: e.tags, edited: e.adjusted }} fixedLabel="changed when approved" />
+      <RevisionChanges d={{ changes: e.changes, tags: e.tags, images: e.images, icon: e.icon, edited: e.adjusted }} fixedLabel="changed when approved" />
       {e.status === 'pending' && (
         <div className="account-edit__actions">
           <button type="button" disabled={busy} onClick={withdraw}>{busy ? 'Withdrawing…' : 'Withdraw'}</button>

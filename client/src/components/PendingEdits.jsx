@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import DiffText from './DiffText';
 import ReviewActions from './ReviewActions';
-import { FIELDS, OWNER, labelOf, tagNamer } from '../lib/shopFields';
+import ImageChanges from './ImageChanges';
+import { FIELDS, OWNER, hasImageChanges, labelOf, tagNamer } from '../lib/shopFields';
 import { timeAgo } from '../lib/reports';
 import './PendingEdits.css';
 
 const TITLES = { edit: 'Edit', open: 'A new shop is here', vacate: 'The plot is now empty' };
 
 // What one suggestion would change. For an edit, the server has already
-// worked out what approving it now would do (`changes`, `tags`, `conflicts`).
+// worked out what approving it now would do (`changes`, `tags`, `images`,
+// `icon`, `conflicts`).
 function PendingChanges({ edit, tagName }) {
   if (edit.stale) return <p className="pending-edits__muted">Made for an earlier shop on this plot.</p>;
   if (edit.action === 'vacate') return null;
@@ -38,7 +40,7 @@ function PendingChanges({ edit, tagName }) {
     );
   }
   const { changes, tags, conflicts } = edit;
-  if (!changes.length && !tags.added.length && !tags.removed.length && !conflicts.length) {
+  if (!changes.length && !tags.added.length && !tags.removed.length && !hasImageChanges(edit) && !conflicts.length) {
     return <p className="pending-edits__muted">Nothing left to change: the page already has this.</p>;
   }
   return (
@@ -56,6 +58,7 @@ function PendingChanges({ edit, tagName }) {
           {tags.removed.length > 0 && <p className="diff-text">Removed <del>{tags.removed.map(tagName).join(', ')}</del></p>}
         </div>
       )}
+      <ImageChanges images={edit.images} icon={edit.icon} fieldClass="pending-edits__field" labelClass="pending-edits__label" />
       {/* Someone else changed the same field since; shown against the page as it is now. */}
       {conflicts.map((c) => (
         <div className="pending-edits__field" key={c.field}>

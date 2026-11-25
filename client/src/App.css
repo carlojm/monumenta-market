@@ -400,17 +400,6 @@
   flex-basis: 100%;
 }
 
-.admin-editor__images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.admin-editor__image img {
-  width: 120px;
-  display: block;
-}
-
 .admin-comments > input {
   width: 100%;
   margin-bottom: 0.75rem;

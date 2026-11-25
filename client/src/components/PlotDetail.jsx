@@ -9,7 +9,9 @@ import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
+import ShopGallery from './ShopGallery';
 import { useFavorites } from '../lib/favorites';
+import { ZONE_COLORS } from '../lib/zones';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -343,6 +345,10 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     if (!dialog) return undefined;
     const opener = document.activeElement;
     dialog.showModal();
+    // Focus on the card itself, not its first button: on a phone that button
+    // would show a focus ring until the next tap. Screen readers still hear
+    // the card's name, and Tab goes on to the first button.
+    dialog.focus();
     return () => {
       if (dialog.open) dialog.close();
       if (opener?.isConnected) opener.focus({ preventScroll: true });
@@ -377,14 +383,14 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // Read out by screen readers (visually hidden): "Report sent", etc.
   const [announcement, setAnnouncement] = useState('');
   const [error, setError] = useState(null);
-  const [imageIndex, setImageIndex] = useState(0);
   const { account } = useAccount();
   // Editing the shop (ShopEditForm). `editDirty`: it has unsaved changes, so
-  // closing the card asks first (`confirmingClose`). `notice`: what happened to
-  // the last edit, shown at the top of the card.
+  // closing the card or leaving the form asks first (`confirmingClose`: what
+  // Discard then does, 'close' or 'stop'). `notice`: what happened to the last
+  // edit, shown at the top of the card.
   const [editing, setEditing] = useState(false);
   const [editDirty, setEditDirty] = useState(false);
-  const [confirmingClose, setConfirmingClose] = useState(false);
+  const [confirmingClose, setConfirmingClose] = useState(null);
   const [notice, setNotice] = useState(null);
   const [showLinkPrompt, setShowLinkPrompt] = useState(false);
   const editButtonRef = useRef(null);
@@ -393,7 +399,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const handleDialogCancel = (e) => {
     if (!(editing && editDirty)) return;
     e.preventDefault();
-    setConfirmingClose(true);
+    setConfirmingClose('close');
   };
   // A close event arrives a moment after the close. If the dialog has been
   // opened again since (React mounts it twice in development), it's stale.
@@ -422,7 +428,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   if (!plot) return null;
 
   const shop = detail ? detail.shop : plot.shop;
-  const images = shop?.images || [];
   const comments = [...myComments, ...(shop?.comments || [])].filter((c) => !deletedIds.includes(c.id));
   const reports = [...myReports, ...(detail?.reports || [])];
   // The server's latest_report already fills in a missing part from earlier
@@ -440,7 +445,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const categoryTags = (shop?.tags ?? []).filter((t) => t.kind === 'category');
   const stockTags = (shop?.tags ?? []).filter((t) => t.kind === 'stock');
   // Closing with unsaved edits asks first.
-  const requestClose = () => (editing && editDirty ? setConfirmingClose(true) : onClose());
+  const requestClose = () => (editing && editDirty ? setConfirmingClose('close') : onClose());
 
   // Logged-out visitors get a prompt to link their account instead.
   const startEditing = () => {
@@ -452,13 +457,15 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   const stopEditing = () => {
     setEditing(false);
     setEditDirty(false);
-    setConfirmingClose(false);
+    setConfirmingClose(null);
   };
 
   const handleEditCancelled = () => {
     refocusEdit.current = true;
     stopEditing();
   };
+  // The header's back arrow: like the form's Cancel.
+  const requestStop = () => (editDirty ? setConfirmingClose('stop') : handleEditCancelled());
 
   // Loads the page again after a change. Comments and reports added here
   // come back with it. The plot list is refreshed too, so search sees it.
@@ -561,26 +568,44 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) requestClose();
   };
 
-  // `inline` (desktop): the card sits in the page's right column with a back
-  // button. Otherwise (phones): a bottom sheet dialog over the page.
+  // The banner's color: the shop's own, when it's a real color (some are
+  // still words from the old notes), or else its zone's.
+  const bannerColor = [shop?.primary_color, shop?.guild_color].find((c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c ?? ''))
+    ?? ZONE_COLORS[plot.zone] ?? null;
+
+  // `inline` (desktop): the card sits in the page's right column. Otherwise
+  // (phones): a bottom sheet dialog over the page.
   const content = (
       <>
-        {inline && (
-          <button className="plot-detail__back" onClick={requestClose}>
-            <ArrowLeft size={16} aria-hidden="true" /> Back to list
-          </button>
+        {/* Notion-style: a banner edge to edge at the top (the screenshots, or
+            the shop's color), the shop's icon overlapping its bottom edge, the
+            name below. Until the full page loads, the list's count keeps the
+            screenshots' space, so nothing jumps. The edit view lists them itself. */}
+        {!editing && (
+          <ShopGallery images={detail || !shop ? shop?.images ?? [] : null} expected={plot.shop?.image_count ?? 0}
+            color={bannerColor} />
+        )}
+        {!editing && shop?.icon && (
+          <img className="plot-detail__shop-icon" src={shop.icon} alt="" width={64} height={64} />
         )}
 
         {/* The name, then its buttons in one row of same-size icons: star,
-            edit, and close on phones. */}
-        <div className="plot-detail__header">
+            edit and close. They float over the banner, top right, as round
+            buttons; while editing (no banner), they sit beside the name. */}
+        <div className={`plot-detail__header${editing ? '' : ' plot-detail__header--over'}`}>
           <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
           <div className="plot-detail__actions">
             {shop && <StarButton plotId={plot.id} name={displayName(shop)} starred={starred.has(plot.id)} />}
             {/* Shown once the full page has loaded: an edit starts from it.
                 A vacant plot's form starts at "A new shop is here"; it's the
-                only button there, so it keeps its words. */}
-            {detail && account !== undefined && !editing && (shop ? (
+                only button there, so it keeps its words. While editing, a back
+                arrow in its place leaves the form, like its Cancel. */}
+            {detail && account !== undefined && (editing ? (
+              <button type="button" className="plot-detail__icon-button" ref={editButtonMounted} onClick={requestStop}
+                aria-label="Cancel edit" title="Cancel edit">
+                <ArrowLeft size={16} aria-hidden="true" />
+              </button>
+            ) : shop ? (
               <button type="button" className="plot-detail__icon-button" ref={editButtonMounted} onClick={startEditing}
                 aria-label="Edit" title="Edit">
                 <Pencil size={16} aria-hidden="true" />
@@ -590,11 +615,9 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
                 <Plus size={14} aria-hidden="true" /> Add shop
               </button>
             ))}
-            {!inline && (
-              <button type="button" className="plot-detail__icon-button" onClick={requestClose} aria-label="Close" title="Close">
-                <X size={18} aria-hidden="true" />
-              </button>
-            )}
+            <button type="button" className="plot-detail__icon-button" onClick={requestClose} aria-label="Close" title="Close">
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
         </div>
         <p className="visually-hidden" role="status">{announcement}</p>
@@ -609,9 +632,9 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
           <div className="plot-detail__notice">
             <span>Discard your unsaved edit?</span>
             <div className="plot-detail__notice-actions">
-              <button type="button" onClick={onClose}>Discard</button>
+              <button type="button" onClick={confirmingClose === 'close' ? onClose : handleEditCancelled}>Discard</button>
               {/* Focus starts on the safe choice. */}
-              <button type="button" autoFocus onClick={() => setConfirmingClose(false)}>Keep editing</button>
+              <button type="button" autoFocus onClick={() => setConfirmingClose(null)}>Keep editing</button>
             </div>
           </div>
         )}
@@ -656,33 +679,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
             onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
         ) : (
           <>
-
-          {images.length > 0 && (
-            <div className="plot-detail__carousel">
-              <img src={images[imageIndex].url} alt={`${displayName(shop)} photo ${imageIndex + 1}`} />
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="plot-detail__carousel-nav plot-detail__carousel-nav--prev"
-                    onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
-                    aria-label="Previous image"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    className="plot-detail__carousel-nav plot-detail__carousel-nav--next"
-                    onClick={() => setImageIndex((i) => (i + 1) % images.length)}
-                    aria-label="Next image"
-                  >
-                    ›
-                  </button>
-                  <div className="plot-detail__carousel-count">
-                    {imageIndex + 1} / {images.length}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
 
           <dl className="plot-detail__meta">
             {shop && (
@@ -741,6 +737,12 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
               {shop && <ReportForm plotId={plot.id} onReported={handleReported} />}
             </dd>
             {shop && <ShopText shop={shop} tags={stockTags} />}
+            {shop?.last_edit_at && (
+              <>
+                <dt>Last edit</dt>
+                <dd className="plot-detail__muted">{timeAgo(shop.last_edit_at)}</dd>
+              </>
+            )}
           </dl>
 
           {(error || loadError) && <p className="plot-detail__error" role="alert">{error || loadError}</p>}
@@ -825,7 +827,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     );
   }
   return (
-    <dialog ref={dialogMounted} className="plot-detail__sheet plot-detail__dialog" aria-labelledby="plot-detail-title"
+    <dialog ref={dialogMounted} className="plot-detail__sheet plot-detail__dialog" tabIndex={-1} aria-labelledby="plot-detail-title"
       closedby="any" onClick={handleBackdropClick} onCancel={handleDialogCancel} onClose={handleDialogClose}>
       {content}
     </dialog>

@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:summary": "node scripts/failures.mjs"
   },
   "dependencies": {
     "fuse.js": "^7.5.0",

@@ -1,5 +1,6 @@
 import DiffText from './DiffText';
-import { SHOP_FIELDS, labelOf } from '../lib/shopFields';
+import ImageChanges from './ImageChanges';
+import { SHOP_FIELDS, hasImageChanges, labelOf } from '../lib/shopFields';
 import './RevisionChanges.css';
 
 // How a clash in a field was settled. 'mine' is the edit's own version.
@@ -19,7 +20,7 @@ function RevisionChanges({ kind, d, fixedLabel = 'fixed while approving' }) {
   const changes = d.changes ?? [];
   const fields = SHOP_FIELDS.filter((f) => [changes, d.resolved ?? [], d.edited ?? []].some((list) => list.some((x) => x.field === f)));
   const tags = d.tags && (d.tags.added.length > 0 || d.tags.removed.length > 0) ? d.tags : null;
-  if (!fields.length && !tags) return null;
+  if (!fields.length && !tags && !hasImageChanges(d)) return null;
   return (
     <details className="revision-changes">
       <summary>Show changes</summary>
@@ -50,6 +51,7 @@ function RevisionChanges({ kind, d, fixedLabel = 'fixed while approving' }) {
             {tags.removed.length > 0 && <p className="diff-text">Removed <del>{tags.removed.join(', ')}</del></p>}
           </div>
         )}
+        <ImageChanges images={d.images} icon={d.icon} fieldClass="revision-changes__field" labelClass="revision-changes__label" />
       </div>
     </details>
   );

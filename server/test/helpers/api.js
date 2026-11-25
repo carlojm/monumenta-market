@@ -7,6 +7,7 @@
 //   const r = await as('Tester').post('/api/plots/corridors-2/revisions', body);
 //   r.status, r.body
 //   await as(null).get('/api/plots')        // logged out
+//   await as('Tester').upload('/api/plots/corridors-2/images', { kind: 'icon' }, pngBuffer)
 //
 // Tests never import server code (lib/, db/): that would open the database
 // DB_PATH names, and in the test process that's the real market.db. They read
@@ -29,10 +30,12 @@ export function apiFor(server) {
       const res = await send(name, 'POST', '/api/auth/login', { name, password: PASSWORD });
       if (res.status !== 200) throw new Error(`Couldn't log in as ${name}: ${res.status}`);
     }
+    // A form (an upload) sets its own Content-Type, with the boundary between its parts.
+    const form = data instanceof FormData;
     const res = await fetch(`${server.url}${url}`, {
       method,
-      headers: { 'Content-Type': 'application/json', ...(cookies.get(name) ? { cookie: cookies.get(name) } : {}), ...headers },
-      body: data === undefined ? undefined : JSON.stringify(data),
+      headers: { ...(form ? {} : { 'Content-Type': 'application/json' }), ...(cookies.get(name) ? { cookie: cookies.get(name) } : {}), ...headers },
+      body: data === undefined ? undefined : form ? data : JSON.stringify(data),
     });
     const cookie = res.headers.get('set-cookie');
     if (cookie && name) cookies.set(name, cookie.split(';')[0]);
@@ -44,6 +47,13 @@ export function apiFor(server) {
     post: (url, data, headers) => send(name, 'POST', url, data, headers),
     put: (url, data, headers) => send(name, 'PUT', url, data, headers),
     delete: (url, data) => send(name, 'DELETE', url, data),
+    // A multipart upload: text `fields` plus `file` (a Buffer) as "image".
+    upload: (url, fields, file, filename = 'shot.png') => {
+      const form = new FormData();
+      for (const [k, v] of Object.entries(fields)) form.append(k, v);
+      if (file) form.append('image', new Blob([file]), filename);
+      return send(name, 'POST', url, form);
+    },
   });
 }
 
@@ -54,7 +64,10 @@ export const show = (r) => `${r.status} ${JSON.stringify(r.body)?.slice(0, 300)}
 export async function snapshot(as, plot) {
   const { shop } = (await as(null).get(`/api/plots/${plot}`)).body;
   if (!shop) return null;
-  return { ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])), tag_ids: shop.tags.map((t) => t.id) };
+  return {
+    ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])), tag_ids: shop.tags.map((t) => t.id),
+    image_ids: shop.images.map((i) => i.id), icon_id: shop.icon_id,
+  };
 }
 
 // An edit to a plot's shop, from the page as it is now.

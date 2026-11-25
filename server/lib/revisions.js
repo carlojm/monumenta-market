@@ -1,8 +1,9 @@
 // server/lib/revisions.js
 //
 // Page revisions (Phase 3): the rules shared by every way of editing a shop.
-// A snapshot is a plain object with every SHOP_FIELDS value plus `tag_ids`.
-// See the revisions table in db/init.js for what each snapshot column means.
+// A snapshot is a plain object with every SHOP_FIELDS value plus `tag_ids`,
+// `image_ids` (the screenshots, in order) and `icon_id` (3.11). See the
+// revisions table in db/init.js for what each snapshot column means.
 //
 // Merging, per field, between base (what the author saw), proposed (what they
 // asked for) and now (the live shop):
@@ -10,14 +11,21 @@
 //   author changed it, nobody else   -> proposed (a clean change)
 //   both changed it to the same      -> nothing to do
 //   both changed it differently      -> a conflict for a person to resolve
-// Tags merge as a set (the author's additions and removals are applied to the
-// current tags), so they never conflict.
+// Tags and screenshots merge as sets (the author's additions and removals are
+// applied to the current ones), so they never conflict; a changed icon wins.
+//
+// Images are part of edits (decided 11/24). An image row's status:
+//   draft     uploaded in the edit form, not sent yet (deleted after a day)
+//   pending   part of a suggestion waiting for review
+//   approved  on the card
+//   removed   taken off by an edit; kept, so undo and history still have it
 
 import db from '../db/init.js';
 import { roleOf } from './auth.js';
 import { addLogEntry } from './shopLog.js';
 import { SHOP_FIELDS, closeShop, openShop, reopenShop } from './shops.js';
 import { checkTagIds, setShopTags } from './tags.js';
+import { removeImageFiles } from './imageStore.js';
 
 export const ACTIONS = ['edit', 'open', 'vacate'];
 export const MAX_PENDING_PER_ACCOUNT = 10;
@@ -27,7 +35,11 @@ const FIELD_LIMITS = {
   palette: 200, guild_color: 40, primary_color: 40, secondary_color: 40,
 };
 const LABELS = { maintainers: 'maintainers', shop_name: 'shop name', guild_name: 'guild name', guild_color: 'guild color',
-  primary_color: 'primary color', secondary_color: 'secondary color' };
+  primary_color: 'banner color', secondary_color: 'secondary color' };
+// The banner color (the card's top when it has no screenshots) is a real
+// color; older colors may still be words, and stay as they are until changed.
+const HEX_COLOR = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+export const MAX_SCREENSHOTS = 10;
 const label = (f) => LABELS[f] ?? f;
 
 // Maintainers (3.8): Minecraft names, kept as "Alice, Bob". Commas or spaces
@@ -48,6 +60,14 @@ export const maintainersOf = (shop) => (shop?.maintainers ? shop.maintainers.spl
 const tagIdsOf = db.prepare('SELECT tag_id FROM shop_tags WHERE shop_id = ? ORDER BY tag_id');
 const sorted = (ids) => [...ids].sort((a, b) => a - b);
 const sameTags = (a, b) => a.length === b.length && sorted(a).every((id, i) => id === sorted(b)[i]);
+const sameList = (a, b) => (a ?? []).length === (b ?? []).length && (a ?? []).every((id, i) => id === b[i]);
+
+const liveImageIds = db.prepare(
+  "SELECT id FROM images WHERE shop_id = ? AND kind = 'gallery' AND status = 'approved' ORDER BY sort_order, id",
+).pluck();
+const liveIconId = db.prepare(
+  "SELECT id FROM images WHERE shop_id = ? AND kind = 'icon' AND status = 'approved' ORDER BY id DESC LIMIT 1",
+).pluck();
 
 // One shop per owner (3.12), guild tags included: the owner's current shop
 // on any plot other than `plotIds`, or null. Names match ignoring case, like
@@ -65,8 +85,13 @@ export function snapshotOf(shop) {
   return {
     ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])),
     tag_ids: tagIdsOf.all(shop.id).map((r) => r.tag_id),
+    image_ids: liveImageIds.all(shop.id),
+    icon_id: liveIconId.get(shop.id) ?? null,
   };
 }
+
+// A list of ids from a request, or null if it isn't one.
+const idList = (v) => (Array.isArray(v) && v.every((id) => Number.isInteger(Number(id))) ? [...new Set(v.map(Number))] : null);
 
 // Checks shop values from a request. `fallback` fills in anything the request
 // leaves out, so a partial request never blanks a field by accident. Blank
@@ -87,6 +112,9 @@ export function cleanSnapshot(input, fallback) {
     if (text && text.length > FIELD_LIMITS[f]) {
       return { error: `The ${label(f)} can be at most ${FIELD_LIMITS[f]} characters.` };
     }
+    if (f === 'primary_color' && text && text !== fallback?.[f] && !HEX_COLOR.test(text)) {
+      return { error: 'The banner color must be a color like #3a7bd5.' };
+    }
     if (f === 'maintainers' && text) {
       const cleaned = cleanMaintainers(text);
       if (cleaned.error) return cleaned;
@@ -105,6 +133,12 @@ export function cleanSnapshot(input, fallback) {
     if (checked.error) return { error: checked.error };
     snapshot.tag_ids = sorted(ids);
   }
+  // Images: only their shape here; checkImages says whether they may be used.
+  snapshot.image_ids = 'image_ids' in input ? idList(input.image_ids) : fallback?.image_ids ?? [];
+  if (!snapshot.image_ids) return { error: 'image_ids must be a list' };
+  const icon = 'icon_id' in input ? input.icon_id : fallback?.icon_id ?? null;
+  if (icon !== null && !Number.isInteger(Number(icon))) return { error: 'icon_id must be an image id' };
+  snapshot.icon_id = icon === null ? null : Number(icon);
   return { snapshot };
 }
 
@@ -114,6 +148,8 @@ export function cleanBase(input) {
   if (input === null || typeof input !== 'object' || Array.isArray(input)) return { error: 'base is missing.' };
   const base = Object.fromEntries(SHOP_FIELDS.map((f) => [f, typeof input[f] === 'string' ? input[f].trim() || null : null]));
   base.tag_ids = Array.isArray(input.tag_ids) ? sorted([...new Set(input.tag_ids.map(Number).filter(Number.isInteger))]) : [];
+  base.image_ids = idList(input.image_ids) ?? [];
+  base.icon_id = Number.isInteger(input.icon_id) ? input.icon_id : null;
   return { base };
 }
 
@@ -122,12 +158,70 @@ export const cleanNote = (text) => (typeof text === 'string' ? text.trim().slice
 // Are two snapshots (or two nulls, for an empty plot) the same page?
 export function sameSnapshot(a, b) {
   if (!a || !b) return !a && !b;
-  return SHOP_FIELDS.every((f) => (a[f] ?? null) === (b[f] ?? null)) && sameTags(a.tag_ids, b.tag_ids);
+  return SHOP_FIELDS.every((f) => (a[f] ?? null) === (b[f] ?? null)) && sameTags(a.tag_ids, b.tag_ids)
+    && !changesImages(a, b);
 }
 
 // Did the author change anything at all?
 export function authorChanged(base, proposed) {
-  return SHOP_FIELDS.some((f) => base[f] !== proposed[f]) || !sameTags(base.tag_ids, proposed.tag_ids);
+  return SHOP_FIELDS.some((f) => base[f] !== proposed[f]) || !sameTags(base.tag_ids, proposed.tag_ids)
+    || changesImages(base, proposed);
+}
+
+// --- Images in an edit ---
+
+// Snapshots from before 3.11 have no images, which counts as none.
+const imageIdsOf = (s) => [...(s?.image_ids ?? []), ...(s?.icon_id ? [s.icon_id] : [])];
+export const changesImages = (a, b) => !sameList(a?.image_ids, b?.image_ids) || (a?.icon_id ?? null) !== (b?.icon_id ?? null);
+const getImageRow = db.prepare('SELECT * FROM images WHERE id = ?');
+
+// Does going from `base` to `proposed` show an image no moderator has seen?
+// (A draft or a suggestion's; bringing back a removed one, say by undo, doesn't.)
+export function addsNewImages(base, proposed) {
+  const had = imageIdsOf(base);
+  return imageIdsOf(proposed).some((id) => !had.includes(id) && ['draft', 'pending'].includes(getImageRow.get(id)?.status));
+}
+
+// Why an edit's images can't be used, or null. Only the people who run the
+// shop and staff change them; an added image must be this shop's, of the
+// right kind, and the author's own upload (or one the shop had before).
+export function checkImages(base, proposed, shop, account) {
+  if (!changesImages(base, proposed)) return null;
+  if (!isStaff(account) && !runsShop(account, shop)) {
+    return { status: 403, error: "Only the shop's owner, its maintainers or a moderator can change its images." };
+  }
+  if (proposed.image_ids.length > MAX_SCREENSHOTS) {
+    return { status: 400, error: `A shop can have at most ${MAX_SCREENSHOTS} screenshots.` };
+  }
+  const had = imageIdsOf(base);
+  for (const id of imageIdsOf(proposed).filter((i) => !had.includes(i))) {
+    const image = getImageRow.get(id);
+    const usable = image && image.shop_id === shop.id && image.kind === (id === proposed.icon_id ? 'icon' : 'gallery')
+      && (image.status === 'draft' ? image.account_id === account.id : ['approved', 'removed'].includes(image.status));
+    if (!usable) return { status: 400, error: 'One of the images is no longer there. Please add it again.' };
+  }
+  return null;
+}
+
+// A suggestion's images go from draft to pending: no longer deleted as unsent.
+const markPending = db.prepare("UPDATE images SET status = 'pending' WHERE id = ? AND status = 'draft'");
+export const holdImages = (proposed) => imageIdsOf(proposed).forEach((id) => markPending.run(id));
+
+// A suggestion that won't be applied (rejected, withdrawn, replaced): its new
+// images go, rows now and files after. `keep`: ids still used (a replacing
+// suggestion's).
+const deleteImageRow = db.prepare('DELETE FROM images WHERE id = ?');
+export function discardImages(proposed, keep = []) {
+  const gone = imageIdsOf(proposed).filter((id) => !keep.includes(id)).map((id) => getImageRow.get(id))
+    .filter((image) => image?.status === 'pending');
+  for (const image of gone) deleteImageRow.run(image.id);
+  removeImageFiles(gone);
+}
+
+// What the browser needs to show an image in an edit (null if it's gone).
+export function imageInfo(id) {
+  const image = id && getImageRow.get(id);
+  return image ? { id: image.id, kind: image.kind, url: image.url, card_url: image.card_url ?? image.url } : null;
 }
 
 // Merges an edit onto the live shop. Returns { values, conflicts }: `values`
@@ -144,6 +238,14 @@ export function mergeEdit(base, proposed, now) {
   const added = proposed.tag_ids.filter((id) => !base.tag_ids.includes(id));
   const removed = base.tag_ids.filter((id) => !proposed.tag_ids.includes(id));
   values.tag_ids = sorted([...new Set([...now.tag_ids, ...added])].filter((id) => !removed.includes(id)));
+  // Screenshots: the author's additions after the current ones, minus their
+  // removals. Edits from before 3.11 have none, so leave them as they are.
+  if (base.image_ids && proposed.image_ids) {
+    const addedImages = proposed.image_ids.filter((id) => !base.image_ids.includes(id));
+    const removedImages = base.image_ids.filter((id) => !proposed.image_ids.includes(id));
+    values.image_ids = [...new Set([...now.image_ids, ...addedImages])].filter((id) => !removedImages.includes(id));
+  }
+  if ((base.icon_id ?? null) !== (proposed.icon_id ?? null)) values.icon_id = proposed.icon_id ?? null;
   return { values, conflicts };
 }
 
@@ -163,10 +265,13 @@ export const changesMaintainers = (a, b) => (a?.maintainers ?? null) !== (b?.mai
 // changes who the maintainers are (3.8). A new owner or an empty plot needs staff.
 export const canPublish = (account, action, shop, maintainersChange = false) => isStaff(account)
   || (action === 'edit' && (isOwner(account, shop) || (!maintainersChange && isMaintainer(account, shop))));
+// New images (11/24) always need staff: a moderator checks every picture.
+export const canPublishEdit = (account, action, shop, base, proposed) =>
+  canPublish(account, action, shop, changesMaintainers(base, proposed)) && (isStaff(account) || !addsNewImages(base, proposed));
 // You can approve an edit exactly when you could have published it yourself,
 // including your own (a mod who queued an edit to double-check it later).
 export const canReview = (account, revision, shop) => !!account
-  && canPublish(account, revision.action, shop, changesMaintainers(parse(revision.base), parse(revision.proposed)));
+  && canPublishEdit(account, revision.action, shop, parse(revision.base), parse(revision.proposed));
 
 // Is the plot still in the state the revision was made for? An edit or vacate
 // needs the same shop; an open needs the same shop (or still none) it replaces.
@@ -201,7 +306,19 @@ export function preview(revision, shop) {
   const changes = SHOP_FIELDS.filter((f) => values[f] !== now[f]).map((f) => ({ field: f, from: now[f], to: values[f] }));
   const added = values.tag_ids.filter((id) => !now.tag_ids.includes(id));
   const removed = now.tag_ids.filter((id) => !values.tag_ids.includes(id));
-  return { stale: false, changes, tags: { added, removed }, conflicts };
+  return { stale: false, changes, tags: { added, removed }, ...imageChanges(now, values), conflicts };
+}
+
+// The images going from one snapshot to the other, for showing an edit:
+// `images` { added, removed } and `icon` { from, to } (null if unchanged),
+// each image as imageInfo.
+export function imageChanges(before, after) {
+  const was = before?.image_ids ?? [];
+  const now = after?.image_ids ?? [];
+  const info = (ids) => ids.map(imageInfo).filter(Boolean);
+  const icon = (before?.icon_id ?? null) !== (after?.icon_id ?? null)
+    ? { from: imageInfo(before?.icon_id), to: imageInfo(after?.icon_id) } : null;
+  return { images: { added: info(now.filter((id) => !was.includes(id))), removed: info(was.filter((id) => !now.includes(id))) }, icon };
 }
 
 // A plot's suggestions waiting for review, oldest first, for its card (3.6).
@@ -262,6 +379,31 @@ export function recordMove({ moved, partOf, toPlot, account, reopen = false }) {
   return id;
 }
 
+// The shop's images to match `values` (an edit's final snapshot): its
+// screenshots approved in their order, ones it dropped removed, and the same
+// for the icon. Returns what changed, for applyRevision.
+const approveImage = db.prepare("UPDATE images SET status = 'approved', sort_order = ? WHERE id = ?");
+const removeImage = db.prepare("UPDATE images SET status = 'removed' WHERE id = ?");
+function applyImages(shopId, old, values, author, credit) {
+  const changed = [];
+  const added = values.image_ids.filter((id) => !old.image_ids.includes(id));
+  const removed = old.image_ids.filter((id) => !values.image_ids.includes(id));
+  values.image_ids.forEach((id, i) => approveImage.run(i, id));
+  for (const id of removed) removeImage.run(id);
+  if (added.length || removed.length) {
+    const count = (n, verb) => n && `${verb} ${n} screenshot${n === 1 ? '' : 's'}`;
+    addLogEntry(shopId, author, `${[count(added.length, 'added'), count(removed.length, 'removed')].filter(Boolean).join(', ')}${credit}`);
+    changed.push('screenshots');
+  }
+  if ((values.icon_id ?? null) !== old.icon_id) {
+    if (old.icon_id) removeImage.run(old.icon_id);
+    if (values.icon_id) approveImage.run(0, values.icon_id);
+    addLogEntry(shopId, author, `icon ${values.icon_id ? (old.icon_id ? 'replaced' : 'added') : 'removed'}${credit}`);
+    changed.push('icon');
+  }
+  return changed;
+}
+
 const updateShop = (shopId, values, fields) => db.prepare(
   `UPDATE shops SET ${[...fields.map((f) => `${f} = @${f}`), 'updated_at = CURRENT_TIMESTAMP'].join(', ')} WHERE id = @id`,
 ).run({ ...Object.fromEntries(fields.map((f) => [f, values[f]])), id: shopId });
@@ -307,9 +449,11 @@ export function applyRevision({ action, plotId, shop, values, author, credit = '
     const parts = [added.length && `added ${added.join(', ')}`, removed.length && `removed ${removed.join(', ')}`];
     addLogEntry(shop.id, author, `tags updated: ${parts.filter(Boolean).join('; ')}${credit}`);
   }
-  // Tag-only edits still count as an update to the page.
-  if (fields.length || added.length || removed.length) updateShop(shop.id, values, fields);
-  const changed = [...fields, ...(added.length || removed.length ? ['tags'] : [])];
+  // The admin editor sends no images: those stay as they are.
+  const imagesChanged = 'image_ids' in values ? applyImages(shop.id, old, values, author, credit) : [];
+  // Tag- and image-only edits still count as an update to the page.
+  if (fields.length || added.length || removed.length || imagesChanged.length) updateShop(shop.id, values, fields);
+  const changed = [...fields, ...(added.length || removed.length ? ['tags'] : []), ...imagesChanged];
   return { old_values: old, new_values: snapshotOf({ ...values, id: shop.id }), changed };
 }
 

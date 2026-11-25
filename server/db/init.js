@@ -232,6 +232,31 @@ export function createSchema() {
 
   // Nov 2026: shops list the players who help run them (3.8).
   addColumnIfMissing('shops', 'maintainers', 'TEXT');
+
+  // Nov 2026: players upload images (3.11). Older images were added by staff,
+  // so they count as approved gallery images. `storage_key` is the file name
+  // in storage without its ending (lib/images.js); old images have none.
+  addColumnIfMissing('images', 'kind', "TEXT NOT NULL DEFAULT 'gallery'"); // gallery | icon
+  addColumnIfMissing('images', 'status', "TEXT NOT NULL DEFAULT 'approved'"); // draft | pending | approved | removed (lib/revisions.js)
+  addColumnIfMissing('images', 'account_id', 'INTEGER REFERENCES accounts(id)');
+  addColumnIfMissing('images', 'storage_key', 'TEXT');
+  addColumnIfMissing('images', 'card_url', 'TEXT');
+  addColumnIfMissing('images', 'width', 'INTEGER');
+  addColumnIfMissing('images', 'height', 'INTEGER');
+  addColumnIfMissing('images', 'created_at', 'TEXT');
+  addColumnIfMissing('images', 'reviewer_id', 'INTEGER REFERENCES accounts(id)');
+  addColumnIfMissing('images', 'reviewed_at', 'TEXT');
+  db.exec('CREATE INDEX IF NOT EXISTS images_shop ON images(shop_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS images_account ON images(account_id)');
+  // 11/24: images became part of edits. A pending image belongs to a pending
+  // edit; one no pending edit mentions (from before, or orphaned) becomes a
+  // draft, which the hourly clean-up deletes.
+  db.exec(`
+    UPDATE images SET status = 'draft' WHERE status = 'pending' AND NOT EXISTS (
+      SELECT 1 FROM revisions r WHERE r.status = 'pending' AND (
+        json_extract(r.proposed, '$.icon_id') = images.id
+        OR EXISTS (SELECT 1 FROM json_each(r.proposed, '$.image_ids') j WHERE j.value = images.id)))
+  `);
 }
 
 // CREATE TABLE IF NOT EXISTS never changes an existing table, so new columns

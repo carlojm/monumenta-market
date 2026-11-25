@@ -5,9 +5,10 @@ import { displayName } from '../lib/plots';
 import { tagNamer } from '../lib/shopFields';
 
 // Admin → Needs review: every suggestion waiting for review, oldest first,
-// with Approve / Reject. `promise` is loadReview(), started by AdminPage, read
-// here with use() (React shows the Suspense fallback until it's ready).
-// `reviewed` lists the ids reviewed here, which drop out of the list.
+// with Approve / Reject (new images come inside edits, 3.11). `promise` is
+// loadReview(), started by AdminPage, read here with use() (React shows the
+// Suspense fallback until it's ready). `reviewed` lists the ids reviewed
+// here, which drop out of the list.
 function AdminReview({ promise, reviewed, onReviewed, onRefresh }) {
   const data = use(promise);
   const [status, setStatus] = useState('');

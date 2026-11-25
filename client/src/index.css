@@ -27,6 +27,13 @@
   font-display: swap;
 }
 
+/* Text keeps its size when a phone turns: iOS Safari otherwise enlarges it
+   in landscape and doesn't always shrink it back. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 :root {
   --bg: #13150f;
   --text: #d8d6c9;

@@ -1,0 +1,107 @@
+/* The shop's icon and screenshots, in the edit form (ShopImages.jsx). Its
+   parts are fields of the form, spaced like the others. */
+.shop-images {
+  display: contents;
+}
+
+.shop-images__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.shop-images__actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* The edit's screenshots: a small preview beside its Remove. */
+.shop-images__list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.shop-images__list li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.shop-images__list img {
+  inline-size: 6rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.shop-images__form {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+}
+
+.shop-images__form ul {
+  margin: 0 0 0.75rem;
+  padding-inline-start: 1.25rem;
+}
+
+.shop-images__form li + li {
+  margin-top: 0.25rem;
+}
+
+/* A real file input, hidden inside a label that looks like a button. */
+.shop-images__file {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  cursor: pointer;
+}
+
+.shop-images__file input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.shop-images__file:focus-within {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.shop-images__file:has(input:disabled) {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (pointer: coarse) {
+  .shop-images__actions button,
+  .shop-images__file {
+    min-block-size: 2.25rem;
+  }
+}
+
+/* The icon as it is now, beside its Delete. */
+.shop-images__current {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.shop-images__icon {
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: var(--radius-sm);
+}
