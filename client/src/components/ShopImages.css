@@ -1,21 +1,7 @@
-/* Managing the card's screenshots, in the edit view (ShopImages.jsx): its
-   own section under the form, since it saves at once, not with Save. */
+/* The shop's icon and screenshots, in the edit form (ShopImages.jsx). Its
+   parts are fields of the form, spaced like the others. */
 .shop-images {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.shop-images h3 {
-  margin: 0 0 0.75rem;
-}
-
-.shop-images h3:focus {
-  outline: none; /* focused by script after an action, to keep the place */
-}
-
-.shop-images__muted {
-  color: var(--text-muted);
+  display: contents;
 }
 
 .shop-images__actions {
@@ -31,8 +17,7 @@
   font-size: 0.875rem;
 }
 
-/* The screenshots on the card, and those waiting: a small preview beside
-   what it is and its buttons. */
+/* The edit's screenshots: a small preview beside its Remove. */
 .shop-images__list {
   list-style: none;
   margin: 0 0 1rem;
@@ -44,7 +29,7 @@
 .shop-images__list li {
   display: flex;
   gap: 0.75rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .shop-images__list img {
@@ -53,16 +38,6 @@
   object-fit: cover;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
-}
-
-.shop-images__list img.shop-images__icon {
-  inline-size: 3rem;
-  aspect-ratio: 1;
-}
-
-.shop-images__list p {
-  margin: 0 0 0.25rem;
-  font-size: 0.875rem;
 }
 
 .shop-images__form {
@@ -115,15 +90,6 @@
   .shop-images__file {
     min-block-size: 2.25rem;
   }
-}
-
-.shop-images h4 {
-  margin: 1rem 0 0.5rem;
-  font-size: 0.95rem;
-}
-
-.shop-images h3 + h4 {
-  margin-top: 0;
 }
 
 /* The icon as it is now, beside its Delete. */

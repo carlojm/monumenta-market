@@ -18,7 +18,7 @@ const FIELDS = [
   { key: 'stock', label: 'Stock (search keywords)', multiline: true },
   { key: 'palette', label: 'Block palette' },
   { key: 'guild_color', label: 'Guild color', color: true },
-  { key: 'primary_color', label: 'Primary color', color: true },
+  { key: 'primary_color', label: 'Banner color', color: true }, // the card's top without screenshots
   { key: 'secondary_color', label: 'Secondary color', color: true },
 ];
 
@@ -120,27 +120,6 @@ function AdminPlotEditor() {
     if (!res.ok) return setMessage('Vacate failed.');
     await Promise.all([loadPlots(), loadPlot(selectedId)]);
     setMessage('Plot is now vacant. The old shop was archived.');
-  };
-
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const body = new FormData();
-    body.append('image', file);
-    const res = await adminFetch(`/api/plots/${selectedId}/images`, { method: 'POST', body });
-    if (res.ok) {
-      const image = await res.json();
-      setShop((s) => ({ ...s, images: [...s.images, image] }));
-    } else {
-      const data = await res.json().catch(() => ({}));
-      setMessage(`Upload failed. ${data.error ?? ''}`.trim());
-    }
-    e.target.value = '';
-  };
-
-  const handleDeleteImage = async (id) => {
-    await adminFetch(`/api/images/${id}`, { method: 'DELETE' });
-    setShop((s) => ({ ...s, images: s.images.filter((img) => img.id !== id) }));
   };
 
   const q = filter.trim().toLowerCase();
@@ -246,20 +225,6 @@ function AdminPlotEditor() {
           )}
           {message && <p>{message}</p>}
 
-          {shop && (
-            <>
-              <h3>Images</h3>
-              <div className="admin-editor__images">
-                {shop.images.map((img) => (
-                  <div key={img.id} className="admin-editor__image">
-                    <img src={img.url} alt="" />
-                    <button onClick={() => handleDeleteImage(img.id)}>Remove</button>
-                  </div>
-                ))}
-              </div>
-              <input type="file" accept="image/*" onChange={handleUpload} />
-            </>
-          )}
         </div>
       )}
     </div>

@@ -10,7 +10,6 @@ import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
 import StarButton from './StarButton';
 import ShopGallery from './ShopGallery';
-import ShopImages from './ShopImages';
 import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
@@ -661,15 +660,8 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
         )}
 
         {editing ? (
-          <>
-            <ShopEditForm plot={plot} plots={plots} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
-              onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
-            {/* Adding and deleting screenshots: owners, maintainers and staff. */}
-            {shop && (
-              <ShopImages plotId={plot.id} shop={shop} account={account}
-                onChanged={(message) => { setAnnouncement(message); reload(); }} />
-            )}
-          </>
+          <ShopEditForm plot={plot} plots={plots} shop={shop} account={account} catalog={catalog} onDone={handleEditDone}
+            onCancel={handleEditCancelled} onDirtyChange={setEditDirty} />
         ) : (
           <>
 

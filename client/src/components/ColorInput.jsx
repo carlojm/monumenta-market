@@ -9,7 +9,8 @@ const toSixDigitHex = (v) => {
   return hex.length === 4 ? `#${[...hex.slice(1)].map((c) => c + c).join('')}` : hex;
 };
 
-function ColorInput({ value, onChange }) {
+// `id` goes on the text box, for a <label htmlFor>.
+function ColorInput({ id, value, onChange }) {
   const valid = isHexColor(value);
   return (
     <>
@@ -18,7 +19,7 @@ function ColorInput({ value, onChange }) {
         <input type="color" aria-label="Pick a color" value={valid ? toSixDigitHex(value) : '#000000'}
           className={valid ? undefined : 'admin-editor__color-empty'}
           onChange={(e) => onChange(e.target.value)} />
-        <input type="text" placeholder="#rrggbb" value={value} onChange={(e) => onChange(e.target.value)} />
+        <input id={id} type="text" placeholder="#rrggbb" value={value} onChange={(e) => onChange(e.target.value)} />
       </span>
       {value.trim() && !valid && (
         <span className="admin-editor__hint admin-editor__hint--warn">

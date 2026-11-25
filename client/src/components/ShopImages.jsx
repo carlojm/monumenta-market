@@ -1,177 +1,114 @@
-import { useRef, useState } from 'react';
-import { MAX_UPLOAD_MB, approveImage, deleteImage, isStaff, managesImages, rejectImage, uploadImage } from '../lib/images';
+import { useState } from 'react';
+import { MAX_UPLOAD_MB, uploadImage } from '../lib/images';
 import './ShopImages.css';
 
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif';
 const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-// Managing the shop's icon and the card's screenshots (3.11), in the edit view
-// under the form. The shop's owner, maintainers and staff add and delete, and
-// see the ones waiting for a moderator; moderators approve and reject. Each change saves
-// at once: the form's Save is for the shop's details only.
-// `onChanged(message)` reloads the card and announces what happened.
-function ShopImages({ plotId, shop, account, onChanged }) {
-  const images = shop.images ?? [];
-  const pending = shop.pending_images ?? [];
-  const reviews = isStaff(account);
-  const [confirmingDelete, setConfirmingDelete] = useState(null); // the screenshot's id
+// The shop's icon and screenshots (3.11), as part of the edit form
+// (ShopEditForm.jsx), for the shop's owner, maintainers and staff. A chosen
+// file uploads at once as the uploader's draft, so its preview and any
+// problem show right away; it reaches the card only when the edit is sent.
+// `images` and `icon` are the edit's (image objects); `onAdd(kind, images)`
+// (all of one pick's uploads, once they're done) and `onRemove(kind, image)`
+// change them. `iconLabel` and `screenshotsLabel`
+// are the form's label rows (with "Edited" and undo); `children` (the banner
+// color) shows while there are no screenshots, as the card then shows it.
+function ShopImages({ plotId, images, icon, staff, onAdd, onRemove, iconLabel, screenshotsLabel, children }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const headingRef = useRef(null);
+  const [status, setStatus] = useState('');
 
-  if (!managesImages(account, shop)) return null;
-
-  // Runs an action; a failure shows here, success reloads the card. Focus
-  // goes to the heading, since the button pressed is often gone afterwards.
-  const run = async (action, message) => {
-    setBusy(true);
-    setError('');
-    try {
-      await action();
-      onChanged(message);
-    } catch (err) {
-      setError(err.message);
-    }
-    setBusy(false);
-    setConfirmingDelete(null);
-    headingRef.current?.focus();
-  };
-
-  // `kind`: 'gallery' or 'icon'. A new icon replaces the old one.
+  // `kind`: 'gallery' or 'icon'.
   const upload = (kind) => async (e) => {
     const files = [...e.target.files];
     e.target.value = '';
     if (!files.length) return;
-    const what = (n) => (kind === 'icon' ? 'Icon' : count(n, 'screenshot'));
     setBusy(true);
     setError('');
-    let live = 0;
-    let waiting = 0;
     const failed = [];
+    const added = [];
     for (const file of files) {
       try {
-        const image = await uploadImage(plotId, file, kind);
-        if (image.status === 'pending') waiting++;
-        else live++;
+        added.push(await uploadImage(plotId, file, kind));
       } catch (err) {
         failed.push(`${file.name}: ${err.message}`);
       }
     }
     setBusy(false);
-    if (failed.length) setError(failed.join(' '));
-    if (live || waiting) {
-      onChanged([live && `${what(live)} added.`, waiting && `${what(waiting)} sent for review.`]
-        .filter(Boolean).join(' '));
-    }
+    setError(failed.join(' '));
+    if (!added.length) return;
+    onAdd(kind, added);
+    setStatus(kind === 'icon' ? 'Icon added to your edit.' : `${count(added.length, 'screenshot')} added to your edit.`);
   };
 
-  // The uploads of one kind still waiting for a moderator.
-  const waitingList = (kind) => {
-    const waiting = pending.filter((image) => image.kind === kind);
-    if (!waiting.length) return null;
-    const word = kind === 'icon' ? 'Icon' : 'Screenshot';
-    return (
-      <ul className="shop-images__list" aria-label={`${word}s waiting for review`}>
-        {waiting.map((image) => (
-          <li key={image.id}>
-            <img src={image.card_url} alt="" className={kind === 'icon' ? 'shop-images__icon' : undefined} />
-            <div>
-              <p>
-                {word}
-                {image.uploader ? ` from ${image.uploader}` : ''}, waiting for review
-              </p>
-              <span className="shop-images__actions">
-                {reviews ? (
-                  <>
-                    <button type="button" disabled={busy}
-                      onClick={() => run(() => approveImage(image.id), 'Approved.')}>Approve</button>
-                    <button type="button" disabled={busy}
-                      onClick={() => run(() => rejectImage(image.id), 'Rejected.')}>Reject</button>
-                  </>
-                ) : image.uploader === account?.name && (
-                  <button type="button" disabled={busy}
-                    onClick={() => run(() => deleteImage(image.id), 'Withdrawn.')}>Withdraw</button>
-                )}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
-    );
+  const remove = (kind, image, label) => {
+    onRemove(kind, image);
+    setStatus(`${label} removed from your edit.`);
   };
 
-  // Delete, then a confirm in its place.
-  const deleteButton = (id, what, label) => (confirmingDelete === id ? (
-    <span className="shop-images__actions">
-      Delete this {what}?
-      <button type="button" onClick={() => run(() => deleteImage(id), `${what[0].toUpperCase()}${what.slice(1)} deleted.`)}
-        disabled={busy}>
-        Delete
-      </button>
-      <button type="button" autoFocus onClick={() => setConfirmingDelete(null)}>Keep</button>
-    </span>
-  ) : (
-    <span className="shop-images__actions">
-      <button type="button" onClick={() => setConfirmingDelete(id)} disabled={busy} aria-label={label}>Delete</button>
-    </span>
-  ));
+  const reviewNote = !staff && <li>Images must be approved by a moderator before being shown</li>;
 
   return (
-    <section className="shop-images" aria-labelledby="shop-images-heading">
-      <h3 id="shop-images-heading" ref={headingRef} tabIndex={-1}>Images</h3>
-
-      <h4>Icon</h4>
-      {shop.icon && (
-        <div className="shop-images__current">
-          <img src={shop.icon} alt="The shop's icon" className="shop-images__icon" />
-          {deleteButton(shop.icon_id, 'icon', 'Delete icon')}
+    <div className="shop-images">
+      <div className="shop-edit__field" role="group" aria-labelledby="shop-images-icon-label">
+        {iconLabel}
+        {icon && (
+          <div className="shop-images__current">
+            <img src={icon.card_url ?? icon.url} alt="The shop's icon" className="shop-images__icon" />
+            <span className="shop-images__actions">
+              <button type="button" onClick={() => remove('icon', icon, 'Icon')} disabled={busy}>Remove</button>
+            </span>
+          </div>
+        )}
+        <div className="shop-images__form">
+          <ul>
+            <li>Shown next to the shop&apos;s name in the list</li>
+            <li>Must be some kind of icon representing your shop</li>
+            {reviewNote}
+            <li>PNG, JPEG, WebP or GIF, at least 64 × 64. Other shapes are cut to a square from the middle</li>
+          </ul>
+          <label className="shop-images__file">
+            {busy ? 'Uploading…' : icon ? 'Replace icon' : 'Add icon'}
+            <input type="file" accept={ACCEPT} onChange={upload('icon')} disabled={busy} />
+          </label>
         </div>
-      )}
-      {waitingList('icon')}
-      <div className="shop-images__form">
-        <ul>
-          <li>Shown next to the shop&apos;s name in the list</li>
-          <li>Must be some kind of icon representing your shop</li>
-          {!reviews && <li>Images must be approved by a moderator before being shown</li>}
-          <li>PNG, JPEG, WebP or GIF, at least 64 × 64. Other shapes are cut to a square from the middle</li>
-        </ul>
-        <label className="shop-images__file">
-          {busy ? 'Uploading…' : shop.icon ? 'Replace icon' : 'Add icon'}
-          <input type="file" accept={ACCEPT} onChange={upload('icon')} disabled={busy} />
-        </label>
       </div>
 
-      <h4>Screenshots</h4>
-      {images.length > 0 && (
-        <ul className="shop-images__list" aria-label="On the card">
-          {images.map((image, i) => (
-            <li key={image.id}>
-              <img src={image.card_url} alt={`Screenshot ${i + 1}`} />
-              <div>
-                {image.uploader && <p className="shop-images__muted">By {image.uploader}</p>}
-                {deleteButton(image.id, 'screenshot', `Delete screenshot ${i + 1}`)}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      {waitingList('gallery')}
-      <div className="shop-images__form">
-        <ul>
-          <li>Images are displayed in a gallery on this card</li>
-          <li>ONLY in-game screenshots or in-game screenshots with extra info/text edited onto them</li>
-          {/* A moderator's own uploads show at once. */}
-          {!reviews && <li>Images must be approved by a moderator before being shown</li>}
-          <li>PNG, JPEG, WebP or GIF. Up to {MAX_UPLOAD_MB} MB and at least 640 × 360 (1920 × 1080 looks best)</li>
-        </ul>
-        <label className="shop-images__file">
-          {busy ? 'Uploading…' : 'Add screenshots'}
-          <input type="file" accept={ACCEPT} multiple onChange={upload('gallery')} disabled={busy} />
-        </label>
+      <div className="shop-edit__field" role="group" aria-labelledby="shop-images-screenshots-label">
+        {screenshotsLabel}
+        {images.length > 0 && (
+          <ul className="shop-images__list" aria-label="Screenshots in your edit">
+            {images.map((image, i) => (
+              <li key={image.id}>
+                <img src={image.card_url} alt={`Screenshot ${i + 1}`} />
+                <span className="shop-images__actions">
+                  <button type="button" onClick={() => remove('gallery', image, `Screenshot ${i + 1}`)} disabled={busy}
+                    aria-label={`Remove screenshot ${i + 1}`}>Remove</button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="shop-images__form">
+          <ul>
+            <li>Images are displayed in a gallery on this card</li>
+            <li>ONLY in-game screenshots or in-game screenshots with extra info/text edited onto them</li>
+            {reviewNote}
+            <li>PNG, JPEG, WebP or GIF. Up to {MAX_UPLOAD_MB} MB and at least 640 × 360 (1920 × 1080 looks best)</li>
+          </ul>
+          <label className="shop-images__file">
+            {busy ? 'Uploading…' : 'Add screenshots'}
+            <input type="file" accept={ACCEPT} multiple onChange={upload('gallery')} disabled={busy} />
+          </label>
+        </div>
       </div>
 
-      {error && <p className="plot-detail__error" role="alert">{error}</p>}
-    </section>
+      {images.length === 0 && children}
+
+      <p className="visually-hidden" aria-live="polite">{status}</p>
+      {error && <p className="shop-edit__error" role="alert">{error}</p>}
+    </div>
   );
 }
 

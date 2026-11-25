@@ -3,14 +3,21 @@ import { RotateCcw } from 'lucide-react';
 import TagEditor from './TagEditor';
 import DiffText from './DiffText';
 import VersionChoice from './VersionChoice';
+import ColorInput from './ColorInput';
+import ShopImages from './ShopImages';
+import ImageChanges from './ImageChanges';
 import { FIELDS, OWNER, SHOP_FIELDS, maintainersOf, tagNamer } from '../lib/shopFields';
+import { deleteDraft, managesImages } from '../lib/images';
 import { displayName } from '../lib/plots';
 import './ShopEditForm.css';
 
 // A plot with no shop, as a snapshot (a new shop is compared against it).
-const EMPTY = { ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, null])), tag_ids: [] };
+const EMPTY = { ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, null])), tag_ids: [], image_ids: [], icon_id: null };
 
 const sameIds = (a, b) => a.length === b.length && a.every((id) => b.includes(id));
+const sameList = (a, b) => a.length === b.length && a.every((id, i) => id === b[i]);
+// The images an edit adds or drops, by id.
+const addedIds = (from, to) => to.filter((id) => !from.includes(id));
 const formValues = (snapshot) => Object.fromEntries([OWNER, ...FIELDS].map((f) => [f.key, snapshot[f.key] ?? '']));
 
 // Closing or reloading the tab with unsaved edits asks the browser to confirm.
@@ -48,7 +55,8 @@ function FieldLabel({ htmlFor, labelId, label, edited, onReset }) {
 }
 
 // "Show changes": only the changed fields, with their changes marked.
-function ChangesView({ changes, addedTags, removedTags }) {
+// `imageChanges` is { images, icon } for ImageChanges.
+function ChangesView({ changes, addedTags, removedTags, imageChanges }) {
   return (
     <div className="shop-edit__changes">
       {changes.map((f) => (
@@ -64,6 +72,7 @@ function ChangesView({ changes, addedTags, removedTags }) {
           {removedTags.length > 0 && <p className="diff-text">Removed <del>{removedTags.join(', ')}</del></p>}
         </div>
       )}
+      <ImageChanges {...imageChanges} fieldClass="shop-edit__field" labelClass="shop-edit__label-row" />
     </div>
   );
 }
@@ -91,7 +100,9 @@ function ConflictView({ conflicts, choices, onChoose }) {
 //   vacate  "The plot is now empty": the current shop closes
 // A vacant plot starts in `open`. Owners can "Force edit" (publish at once,
 // skipping review) their own shop's details; staff can for everything. The
-// rest is a suggestion for review. `catalog` is GET /api/tags (App loads it).
+// rest is a suggestion for review. An edit adding an image (3.11) is always a
+// suggestion, unless a moderator makes it: a moderator checks every picture.
+// `catalog` is GET /api/tags (App loads it).
 // `onDone(result)` gets the server's answer ({ status: 'pending' | 'approved', ... }).
 // `plots` is the map's list, for spotting a new owner who has a shop elsewhere.
 function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCancel, onDirtyChange }) {
@@ -101,13 +112,18 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
   const [base, setBase] = useState(() => (shop ? {
     ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, shop[f] ?? null])),
     tag_ids: (shop.tags ?? []).map((t) => t.id),
+    image_ids: (shop.images ?? []).map((i) => i.id),
+    icon_id: shop.icon_id ?? null,
   } : EMPTY));
   const [mode, setMode] = useState(shop ? 'edit' : 'open');
   // Each mode keeps its own draft, so switching back and forth loses nothing.
+  // Only an edit changes images: a new shop starts without.
   const [drafts, setDrafts] = useState(() => ({
-    edit: { values: formValues(base), tagIds: base.tag_ids },
+    edit: { values: formValues(base), tagIds: base.tag_ids, imageIds: base.image_ids, iconId: base.icon_id },
     open: { values: formValues(EMPTY), tagIds: [] },
   }));
+  // Images uploaded in this form (drafts), to show them.
+  const [uploaded, setUploaded] = useState([]);
   const [summary, setSummary] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
@@ -129,20 +145,29 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
   const baseFor = (m, b = base) => (m === 'edit' ? b : EMPTY);
   // Blank space at the ends doesn't count: the server trims it off anyway.
   const isEdited = (m, vals, key, b = base) => vals[key].trim() !== (baseFor(m, b)[key] ?? '');
+  const screenshotsEdited = (d, b = base) => !sameList(d.edit.imageIds, b.image_ids);
+  const iconEdited = (d, b = base) => d.edit.iconId !== b.icon_id;
   // "Empty" has nothing to fill in, so nothing to lose.
   const isDirty = (m, d, b = base) => m !== 'vacate'
-    && (fieldsFor(m).some((f) => isEdited(m, d[m].values, f.key, b)) || !sameIds(d[m].tagIds, baseFor(m, b).tag_ids));
+    && (fieldsFor(m).some((f) => isEdited(m, d[m].values, f.key, b)) || !sameIds(d[m].tagIds, baseFor(m, b).tag_ids)
+      || (m === 'edit' && (screenshotsEdited(d, b) || iconEdited(d, b))));
 
   const fields = fieldsFor(mode);
-  const { values, tagIds } = drafts[mode] ?? { values: {}, tagIds: [] };
+  const { values, tagIds, imageIds = [], iconId = null } = drafts[mode] ?? { values: {}, tagIds: [] };
   const edited = (key) => isEdited(mode, values, key);
   const tagsEdited = mode !== 'vacate' && !sameIds(tagIds, baseFor(mode).tag_ids);
   const dirty = isDirty(mode, drafts);
+  // Pictures, by id: the shop's own, and ones uploaded here.
+  const imageOf = (id) => [...(shop?.images ?? []), ...uploaded].find((i) => i.id === id) ?? null;
+  const iconOf = (id) => (!id ? null : id === shop?.icon_id ? { id, kind: 'icon', url: shop.icon, card_url: shop.icon }
+    : uploaded.find((i) => i.id === id) ?? null);
+  const addsImages = mode === 'edit' && (addedIds(base.image_ids, imageIds).length > 0 || (!!iconId && iconId !== base.icon_id));
   // Matches the server (canPublish in lib/revisions.js): the owner and
   // maintainers publish edits to their own shop, but only the owner changes
   // who the maintainers are. A new owner or an empty plot needs a moderator.
+  // New images need a moderator (canPublishEdit there).
   const changingMaintainers = mode === 'edit' && edited('maintainers');
-  const canPublish = isStaff || (mode === 'edit' && (isOwner || (isMaintainer && !changingMaintainers)));
+  const canPublish = isStaff || (mode === 'edit' && !addsImages && (isOwner || (isMaintainer && !changingMaintainers)));
   const maintainersNote = changingMaintainers && isMaintainer && !isOwner && !isStaff;
   // One shop per owner (3.12): a new owner with a shop elsewhere moves here,
   // and that shop closes. Names match ignoring case, like on the server.
@@ -157,15 +182,34 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
     onDirtyChange(nextDirty);
     leaveWarning(nextDirty);
   };
-  const change = (nextValues, nextTagIds) => {
-    const next = { ...drafts, [mode]: { values: nextValues, tagIds: nextTagIds } };
+  // `patch`: some of the mode's draft (values, tagIds, imageIds, iconId).
+  const change = (patch) => {
+    const next = { ...drafts, [mode]: { ...drafts[mode], ...patch } };
     setDrafts(next);
     setError(null); // an error about the last send no longer applies
     report(mode, next);
   };
-  const set = (key) => (e) => change({ ...values, [key]: e.target.value }, tagIds);
-  const reset = (key) => () => change({ ...values, [key]: base[key] ?? '' }, tagIds);
-  const setTags = (ids) => change(values, ids);
+  const setValue = (key, value) => change({ values: { ...values, [key]: value } });
+  const set = (key) => (e) => setValue(key, e.target.value);
+  const reset = (key) => () => setValue(key, base[key] ?? '');
+  const setTags = (ids) => change({ tagIds: ids });
+
+  // Uploads finish after a wait, maybe with other changes made meanwhile, so
+  // they're added to the draft as it is by then. A new image always makes
+  // the edit differ from the page.
+  const addImages = (kind, images) => {
+    setUploaded((list) => [...list, ...images]);
+    setDrafts((d) => ({ ...d, edit: kind === 'icon' ? { ...d.edit, iconId: images.at(-1).id }
+      : { ...d.edit, imageIds: [...d.edit.imageIds, ...images.map((i) => i.id)] } }));
+    setError(null);
+    onDirtyChange(true);
+    leaveWarning(true);
+  };
+  // A draft taken back out is deleted; the shop's own stay until the edit is saved.
+  const removeImage = (kind, image) => {
+    if (image.status === 'draft') deleteDraft(image.id).catch(() => {}); // it expires anyway
+    change(kind === 'icon' ? { iconId: null } : { imageIds: imageIds.filter((id) => id !== image.id) });
+  };
 
   const switchMode = (m) => {
     setMode(m);
@@ -209,7 +253,7 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
     if (mode !== 'vacate' && !dirty) return setError("You haven't changed anything yet.");
     if (mode === 'open' && !values.owner.trim()) return setError('A new shop needs an owner.');
     send(mode === 'edit'
-      ? { action: 'edit', base, proposed: { ...base, ...values, tag_ids: tagIds } }
+      ? { action: 'edit', base, proposed: { ...base, ...values, tag_ids: tagIds, image_ids: imageIds, icon_id: iconId } }
       : mode === 'open'
         ? { action: 'open', proposed: { ...values, tag_ids: tagIds } }
         : { action: 'vacate' }, requestReview);
@@ -231,7 +275,11 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
     const added = tagIds.filter((id) => !base.tag_ids.includes(id));
     const removed = base.tag_ids.filter((id) => !tagIds.includes(id));
     const nextTagIds = [...new Set([...current.tag_ids, ...added])].filter((id) => !removed.includes(id));
-    const next = { ...drafts, edit: { values: nextValues, tagIds: nextTagIds } };
+    // Images the same way; a changed icon stays yours.
+    const dropped = addedIds(imageIds, base.image_ids);
+    const nextImageIds = [...new Set([...current.image_ids, ...addedIds(base.image_ids, imageIds)])].filter((id) => !dropped.includes(id));
+    const nextIconId = iconId !== base.icon_id ? iconId : current.icon_id;
+    const next = { ...drafts, edit: { values: nextValues, tagIds: nextTagIds, imageIds: nextImageIds, iconId: nextIconId } };
     setBase(current);
     setDrafts(next);
     setConflict(null);
@@ -239,7 +287,8 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
     if (!isDirty('edit', next, current)) {
       return setError('Nothing left to save: the page already has these changes.');
     }
-    send({ action: 'edit', base: current, proposed: { ...current, ...nextValues, tag_ids: nextTagIds } }, requestReview, nextResolved);
+    send({ action: 'edit', base: current,
+      proposed: { ...current, ...nextValues, tag_ids: nextTagIds, image_ids: nextImageIds, icon_id: nextIconId } }, requestReview, nextResolved);
   };
 
   const choose = (field, value) => {
@@ -257,9 +306,14 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
     : [];
   const addedTags = showingChanges ? tagIds.filter((id) => !modeBase.tag_ids.includes(id)).map(tagName) : [];
   const removedTags = showingChanges ? modeBase.tag_ids.filter((id) => !tagIds.includes(id)).map(tagName) : [];
+  const imageChanges = showingChanges && mode === 'edit' ? {
+    images: { added: addedIds(base.image_ids, imageIds).map(imageOf).filter(Boolean),
+      removed: addedIds(imageIds, base.image_ids).map(imageOf).filter(Boolean) },
+    icon: iconId !== base.icon_id ? { from: iconOf(base.icon_id), to: iconOf(iconId) } : null,
+  } : {};
 
   const title = { edit: canPublish ? 'Editing' : 'Suggesting an edit', open: 'A new shop is here', vacate: 'The plot is now empty' }[mode];
-  const reviewer = mode === 'edit' ? 'The owner or a moderator' : 'A moderator';
+  const reviewer = mode === 'edit' && !(addsImages && !isStaff) ? 'The owner or a moderator' : 'A moderator';
 
   return (
     // Buttons send the edit, not the Enter key: Enter in a one-line field
@@ -298,7 +352,7 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
       {conflict ? (
         <ConflictView conflicts={conflict.conflicts} choices={conflict.choices} onChoose={choose} />
       ) : mode === 'vacate' ? null : showingChanges ? (
-        <ChangesView changes={changes} addedTags={addedTags} removedTags={removedTags} />
+        <ChangesView changes={changes} addedTags={addedTags} removedTags={removedTags} imageChanges={imageChanges} />
       ) : (
         <>
           {mode === 'edit' && (
@@ -308,7 +362,8 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
             </div>
           )}
 
-          {fields.map((f) => {
+          {/* The banner color is with the images, below. */}
+          {fields.filter((f) => !f.banner).map((f) => {
             const id = `shop-edit-${f.key}`;
             const Input = f.multiline ? 'textarea' : 'input';
             // A new shop starts empty, so "Edited" would be on everything.
@@ -341,6 +396,23 @@ function ShopEditForm({ plot, plots = [], shop, account, catalog, onDone, onCanc
             <TagEditor catalog={catalog} plotId={plot.id} value={tagIds} onChange={setTags}
               text={`${values.description}\n${values.stock}`} />
           </div>
+
+          {mode === 'edit' && managesImages(account, shop) && (
+            <ShopImages plotId={plot.id} images={imageIds.map(imageOf).filter(Boolean)} icon={iconOf(iconId)} staff={isStaff}
+              onAdd={addImages} onRemove={removeImage}
+              iconLabel={<FieldLabel labelId="shop-images-icon-label" label="Icon" edited={iconEdited(drafts)}
+                onReset={() => change({ iconId: base.icon_id })} />}
+              screenshotsLabel={<FieldLabel labelId="shop-images-screenshots-label" label="Screenshots"
+                edited={screenshotsEdited(drafts)} onReset={() => change({ imageIds: base.image_ids })} />}>
+              <div className="shop-edit__field">
+                <FieldLabel htmlFor="shop-edit-primary_color" label="Banner color" edited={edited('primary_color')}
+                  onReset={reset('primary_color')} />
+                <ColorInput id="shop-edit-primary_color" value={values.primary_color}
+                  onChange={(v) => setValue('primary_color', v)} />
+                <p className="shop-edit__muted">Shown at the top of the card while it has no screenshots.</p>
+              </div>
+            </ShopImages>
+          )}
         </>
       )}
 

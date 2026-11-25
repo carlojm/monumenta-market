@@ -14,9 +14,7 @@ import { loadReview } from '../lib/review';
 function ReviewCount({ promise, reviewed }) {
   const data = use(promise);
   if (data.error) return null;
-  const edits = data.list.filter((e) => e.can_review && !reviewed.includes(e.id)).length;
-  const images = data.images.filter((i) => !reviewed.includes(`image-${i.id}`)).length;
-  return ` (${edits + images})`;
+  return ` (${data.list.filter((e) => e.can_review && !reviewed.includes(e.id)).length})`;
 }
 
 // The tabs, for staff. Needs review comes first and opens by default: it's

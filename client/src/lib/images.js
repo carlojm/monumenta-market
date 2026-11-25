@@ -7,8 +7,8 @@ export const MAX_UPLOAD_MB = 10;
 
 export const isStaff = (account) => account?.role === 'moderator' || account?.role === 'admin';
 
-// The owner, maintainers and staff upload and delete. Staff
-// also approve, and their uploads skip review.
+// The owner, maintainers and staff change a shop's images (in an edit; one
+// adding an image waits for a moderator unless a moderator made it).
 export function managesImages(account, shop) {
   if (!account || !shop) return false;
   if (isStaff(account)) return true;
@@ -23,6 +23,7 @@ async function send(url, options) {
   return body;
 }
 
+// Uploads one file as your draft; it's used when the edit is sent.
 export function uploadImage(plotId, file, kind = 'gallery') {
   const form = new FormData();
   form.append('kind', kind);
@@ -30,7 +31,5 @@ export function uploadImage(plotId, file, kind = 'gallery') {
   return send(`/api/plots/${plotId}/images`, { method: 'POST', body: form });
 }
 
-const json = (method, body) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body ?? {}) });
-export const approveImage = (id) => send(`/api/images/${id}/approve`, json('POST'));
-export const rejectImage = (id) => send(`/api/images/${id}/reject`, json('POST'));
-export const deleteImage = (id) => send(`/api/images/${id}`, json('DELETE'));
+// Deletes a draft of yours, taken back out of the edit before sending.
+export const deleteDraft = (id) => send(`/api/images/${id}`, { method: 'DELETE' });
