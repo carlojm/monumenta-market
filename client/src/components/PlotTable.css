@@ -1,5 +1,8 @@
 .plot-table {
   width: 100%;
+  /* Columns get the widths set here, whatever is in them: a long name
+     wraps instead of widening its column. */
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
@@ -33,6 +36,11 @@
   width: 30%;
 }
 
+/* Searching: the matched text gets the most room. */
+.plot-table--match .plot-table__status {
+  width: 25%;
+}
+
 /* Looks like the plain shop name; keeps the site's keyboard focus outline. */
 .plot-table__open {
   background: none;
@@ -41,6 +49,14 @@
   font: inherit;
   color: inherit;
   text-align: left;
+  /* A long name: two lines, then "…". The card has it in full. */
+  min-width: 0; /* in the flex row, it may get narrower than its longest word */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .plot-table__match {
@@ -74,6 +90,27 @@
 }
 
 @media (max-width: 480px) {
+  .plot-table__zone {
+    display: none;
+  }
+
+  .plot-table--zone .plot-table__shop {
+    width: 55%;
+  }
+
+  /* Searching or filtering by tag: the star and icon take a fixed share of
+     the name's column, so it gets a little more room here; the status wraps
+     ("Active, / unlocked") and the rest goes to Match or About. */
+  .plot-table--match .plot-table__shop,
+  .plot-table--about .plot-table__shop {
+    width: 38%;
+  }
+
+  .plot-table--match .plot-table__status,
+  .plot-table--about .plot-table__status {
+    width: 22%;
+  }
+
   .plot-table th,
   .plot-table td {
     padding: 0.65rem 0.5rem;

@@ -24,7 +24,8 @@ async function png(page, name, width = 1280, height = 720, color = '#4a7') {
 
 let page;
 // On the card: the screenshots. In the edit view: adding and deleting them.
-const gallery = () => page.locator('.plot-detail__carousel');
+const gallery = () => page.locator('.plot-detail__gallery > .plot-detail__carousel'); // the banner, not the viewer
+const viewer = () => page.getByRole('dialog', { name: 'Screenshot, full size' });
 const manager = () => page.locator('.shop-images');
 const edit = () => page.getByRole('button', { name: 'Edit', exact: true }).click();
 const stopEditing = () => page.locator('.shop-edit').getByRole('button', { name: 'Cancel' }).click();
@@ -34,6 +35,10 @@ test('other players see no way to add screenshots, even in the edit view', async
   await page.goto(`/plot/${P}`);
   await expect(page.locator('.plot-detail__meta')).toBeVisible();
   await expect(gallery(), 'no screenshots yet').toHaveCount(0);
+  // A plain banner instead, with the card's buttons over it, like a card with screenshots.
+  const [banner, close] = await Promise.all([page.locator('.plot-detail__banner').boundingBox(),
+    page.getByRole('button', { name: 'Close' }).boundingBox()]);
+  expect(close.y + close.height).toBeLessThan(banner.y + banner.height);
   await edit();
   await expect(page.locator('.shop-edit')).toBeVisible();
   await expect(manager()).toHaveCount(0);
@@ -77,21 +82,29 @@ test('a moderator approves it in the edit view; players see it, with who added i
   await expect(live.getByRole('button', { name: 'Delete screenshot 1' })).toBeVisible();
   await expect(manager().getByRole('list', { name: 'Screenshots waiting for review' })).toHaveCount(0);
   await stopEditing();
-  await expect(gallery().getByRole('img', { name: 'Screenshot 1 of 1' })).toBeVisible();
+  await expect(gallery().getByRole('button', { name: 'Screenshot 1 of 1, open full size' })).toBeVisible();
+  const box = await gallery().boundingBox();
+  expect(Math.abs(box.width / box.height - 2), 'desktop: a shorter 2:1 banner').toBeLessThan(0.02);
   await expectNoProblems(page);
   await page.context().close();
 
   page = await pageAs(browser, server, 'Tester', PHONE);
   await page.goto(`/plot/${P}`);
-  const picture = gallery().getByRole('img', { name: 'Screenshot 1 of 1' });
+  const picture = gallery().getByRole('button', { name: 'Screenshot 1 of 1, open full size' });
   await expect(picture, 'players see it').toBeVisible();
-  await expect(gallery().getByRole('button'), 'no buttons with one screenshot').toHaveCount(0);
-  // The caption is there for screen readers, and shows on a tap.
-  const caption = gallery().locator('figcaption');
-  await expect(caption).toHaveText('By ShopOwner');
-  await expect(caption).toHaveCSS('opacity', '0');
+  await expect(gallery().getByRole('button'), 'no arrows with one screenshot').toHaveCount(1);
+  // The caption is there for screen readers; on screen, on hover and in the viewer.
+  await expect(gallery().locator('figcaption')).toHaveText('By ShopOwner');
+  await expect(gallery().locator('.plot-detail__carousel-by')).toHaveCSS('opacity', '0');
   await picture.click();
-  await expect(caption).toHaveCSS('opacity', '1');
+  await expect(viewer().getByRole('img', { name: 'Screenshot 1 of 1' })).toBeVisible();
+  await expect(viewer().locator('.plot-detail__carousel-by')).toHaveCSS('opacity', '1');
+  await viewer().getByRole('button', { name: 'Close screenshot' }).click();
+  await expect(viewer()).toBeHidden();
+  // The card's buttons float over it, top right.
+  const [frame, close] = await Promise.all([gallery().boundingBox(), page.getByRole('button', { name: 'Close' }).boundingBox()]);
+  expect(close.y).toBeLessThan(frame.y + frame.height / 3);
+  expect(close.x).toBeGreaterThan(frame.x + frame.width / 2);
   // At the top: before the owner, plot and status details.
   const [pictures, details] = await Promise.all([gallery().boundingBox(), page.locator('.plot-detail__meta').boundingBox()]);
   expect(pictures.y).toBeLessThan(details.y);
@@ -121,7 +134,7 @@ test('the admin queue lists waiting images; approving one removes it', async ({ 
   await page.context().close();
 });
 
-test('screenshots of different shapes: the frame keeps its size, and a tap opens nothing', async ({ browser }) => {
+test('screenshots of different shapes: the banner keeps its size; the viewer shows them whole', async ({ browser }) => {
   page = await pageAs(browser, server, 'ModTester', PHONE);
   await page.goto(`/plot/${P}`);
   await edit();
@@ -139,6 +152,19 @@ test('screenshots of different shapes: the frame keeps its size, and a tap opens
   const { width } = await gallery().boundingBox();
   expect(Math.abs(heights[0] - (width * 9) / 16), '16:9, whatever the screenshots are').toBeLessThan(1.5);
   await expect(gallery().locator('a'), 'no link').toHaveCount(0);
+
+  // The square one (the newest, third), whole in the viewer; Escape closes
+  // the viewer only, not the card.
+  await gallery().getByRole('button', { name: 'Previous screenshot' }).click();
+  await gallery().getByRole('button', { name: 'Screenshot 3 of 3, open full size' }).click();
+  const whole = viewer().getByRole('img', { name: 'Screenshot 3 of 3' });
+  await expect(whole).toBeVisible();
+  await expect.poll(async () => { const b = await whole.boundingBox(); return Math.round((b.width / b.height) * 10); }).toBe(10);
+  await page.keyboard.press('ArrowRight');
+  await expect(viewer().getByRole('img', { name: 'Screenshot 1 of 3' }), 'arrow keys move').toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(viewer()).toBeHidden();
+  await expect(page.locator('.plot-detail__meta'), 'the card stays open').toBeVisible();
   await expectNoProblems(page);
   await page.context().close();
 });

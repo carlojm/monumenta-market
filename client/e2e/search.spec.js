@@ -3,7 +3,7 @@
 // matching tags are offered.
 
 import { expect, test } from '@playwright/test';
-import { DESKTOP, edit, expectNoProblems, pageAs, serverForFile } from './helpers.js';
+import { DESKTOP, PHONE, edit, expectNoProblems, pageAs, serverForFile } from './helpers.js';
 
 const server = serverForFile();
 
@@ -105,5 +105,19 @@ test('"Last page edit" sorts by the shop page\'s last change', async ({ browser 
   await expect(first).toHaveAttribute('data-plot-id', 'corridors-3');
   await page.getByRole('button', { name: 'Oldest first' }).click();
   await expect(first).not.toHaveAttribute('data-plot-id', 'corridors-3');
+  await expectNoProblems(page);
+});
+
+test('phones: name and status only; searching, the matched text gets the most room', async ({ browser }) => {
+  const page = await pageAs(browser, server, null, PHONE);
+  await page.goto('/');
+  const headers = page.locator('.plot-table th');
+  await expect(headers.filter({ visible: true })).toHaveText(['Shop', 'Status']);
+  await page.getByPlaceholder('Search shops, owners, comments...').fill('slime');
+  await expect(headers.filter({ visible: true })).toHaveText(['Shop', 'Status', 'Match']);
+  const [shop, status, match, table] = await Promise.all([headers.nth(0).boundingBox(), headers.nth(1).boundingBox(),
+    headers.nth(2).boundingBox(), page.locator('.plot-table').boundingBox()]);
+  expect(shop.width / table.width, 'the name no longer takes half').toBeLessThan(0.42);
+  expect(match.width).toBeGreaterThan(status.width);
   await expectNoProblems(page);
 });

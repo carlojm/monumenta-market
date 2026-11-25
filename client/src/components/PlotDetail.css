@@ -39,38 +39,104 @@
   overscroll-behavior: contain;
 }
 
-/* The screenshots, edge to edge at the top of the card: out over the card's
-   padding, with its rounded corners. On desktop, under "Back to list", they
-   only reach the sides. */
+/* The banner, edge to edge at the top of the card: out over the card's
+   padding, with its rounded corners. */
 .plot-detail__gallery {
   margin: -1rem -1.25rem 1rem;
 }
 
-.plot-detail__back + .plot-detail__gallery {
-  margin-top: 0;
+/* No screenshots: a plain band in the shop's color, room for the buttons. */
+.plot-detail__banner {
+  block-size: 6rem;
+  background: var(--banner, var(--code-bg));
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .plot-detail__carousel {
   position: relative;
   margin: 0;
   /* One frame for every screenshot, so moving between them never moves the
-     page. 16:9 is the usual screenshot shape; others fit inside with quiet
-     bars at the sides (object-fit: contain), never cropped. */
+     page. The picture fills it (object-fit: cover), trimmed at the edges if
+     it's another shape; the viewer shows it whole. */
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-card) var(--radius-card) 0 0;
   overflow: hidden;
   background: var(--code-bg); /* the bars beside a screenshot of another shape */
 }
 
-.plot-detail__back + .plot-detail__gallery .plot-detail__carousel {
-  border-radius: 0;
+/* Desktop: the card is wider, so a shorter banner. */
+.plot-detail__sheet--inline .plot-detail__gallery .plot-detail__carousel {
+  aspect-ratio: 2 / 1;
 }
 
 .plot-detail__carousel img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+/* The whole banner picture is the button that opens the viewer. */
+.plot-detail__carousel-open {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.plot-detail__carousel-open:focus-visible {
+  outline-offset: -3px;
+}
+
+/* The viewer: the screenshot whole, as big as the window allows. */
+.shop-viewer {
+  max-inline-size: min(100vw - 2rem, 1920px);
+  max-block-size: calc(100svh - 2rem);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-card);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.shop-viewer::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* (Stronger than the desktop banner's 2:1: the viewer is inside the banner.) */
+.shop-viewer .shop-viewer__frame.plot-detail__carousel {
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.shop-viewer__frame img {
+  inline-size: auto;
+  block-size: auto;
+  max-inline-size: 100%;
+  max-block-size: calc(100svh - 2rem);
   object-fit: contain;
+}
+
+.shop-viewer .plot-detail__carousel-by {
+  opacity: 1;
+}
+
+/* (.shop-viewer first: stronger than the plain icon button's look.) */
+.shop-viewer .shop-viewer__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text);
+}
+
+.shop-viewer .shop-viewer__close:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .plot-detail__carousel-nav {
@@ -93,45 +159,42 @@
 .plot-detail__carousel-nav--prev { left: 0.5rem; }
 .plot-detail__carousel-nav--next { right: 0.5rem; }
 
-.plot-detail__carousel-count {
+
+/* Bottom right: who added it (on hover in the banner, always in the viewer;
+   it's only hidden from sight, so screen readers always read it), then "1 / 3". */
+.plot-detail__carousel figcaption {
   position: absolute;
   bottom: 0.5rem;
   right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.plot-detail__carousel figcaption span {
   background: rgba(0, 0, 0, 0.7);
   color: var(--text);
-  font-size: 0.75rem;
   padding: 0.125rem 0.5rem;
   border-radius: var(--radius-sm);
 }
 
-/* Who added the screenshot: on hover, or after a tap on phones. It's only
-   hidden from sight, so screen readers always read it. */
-.plot-detail__carousel figcaption {
-  position: absolute;
-  bottom: 0.5rem;
-  left: 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: var(--text);
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-sm);
+.plot-detail__carousel-by {
   opacity: 0;
   transition: opacity 0.15s;
 }
 
 @media (hover: hover) {
-  .plot-detail__carousel:hover figcaption {
+  .plot-detail__carousel:hover .plot-detail__carousel-by {
     opacity: 1;
   }
 }
 
-.plot-detail__carousel:focus-within figcaption,
-.plot-detail__carousel--captioned figcaption {
+.plot-detail__carousel:focus-within .plot-detail__carousel-by {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .plot-detail__carousel figcaption {
+  .plot-detail__carousel-by {
     transition: none;
   }
 }
@@ -230,6 +293,35 @@
 .plot-detail__actions .star-button svg {
   inline-size: 16px;
   block-size: 16px;
+}
+
+/* Over the screenshots: the buttons float top right, round, on a dark
+   backing so they show on any picture. (The card is their positioned box.) */
+.plot-detail__header--over .plot-detail__actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  margin: 0;
+  gap: 0.375rem;
+}
+
+.plot-detail__header--over .plot-detail__actions .star-button,
+.plot-detail__header--over .plot-detail__icon-button {
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text);
+}
+
+.plot-detail__header--over .plot-detail__add-shop {
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text);
+}
+
+.plot-detail__header--over .plot-detail__icon-button:hover,
+.plot-detail__header--over .plot-detail__actions .star-button:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .plot-detail__add-shop {
@@ -371,22 +463,6 @@
   max-height: none;
   overflow: visible;
   padding: 1rem 1.25rem 1.5rem;
-}
-
-.plot-detail__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-bottom: 0.75rem;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.plot-detail__back:hover {
-  color: var(--text);
 }
 
 @media (min-width: 700px) {
@@ -536,7 +612,6 @@
 .plot-detail__chips button,
 .plot-detail__comment-actions button,
 .plot-detail__sheet .tag-chip--add,
-.plot-detail__back,
 .plot-detail__notice button {
   min-block-size: 1.5rem;
   min-inline-size: 1.5rem;

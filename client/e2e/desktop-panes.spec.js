@@ -69,8 +69,8 @@ test('a long card scrolls in its own pane; the left column scrolls as one', asyn
   const column = await page.locator('.app-main__map').boundingBox();
   expect(Math.abs(search.y - column.y), 'the search sticks to the top of the column').toBeLessThan(2);
 
-  // Back to the list: the table is where it was, with focus on the row.
-  await page.getByRole('button', { name: /Back to list/ }).click();
+  // Closing the card: the table is where it was, with focus on the row.
+  await page.getByRole('button', { name: 'Close' }).click();
   await expect(page.locator('.app-main__list .plot-table__open[data-plot-id="corridors-1"]')).toBeFocused();
   await expectNoProblems(page);
 });

@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Pencil, Plus, X } from 'lucide-react';
+import { Pencil, Plus, X } from 'lucide-react';
 import './PlotDetail.css';
 import { useAccount } from '../lib/account';
 import { plotDetailResource, useResource } from '../lib/resource';
@@ -561,30 +561,30 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) requestClose();
   };
 
-  // `inline` (desktop): the card sits in the page's right column with a back
-  // button. Otherwise (phones): a bottom sheet dialog over the page.
+  // The banner's color: the shop's own, when it's a real color (some are
+  // still words from the old notes).
+  const bannerColor = [shop?.primary_color, shop?.guild_color].find((c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c ?? '')) ?? null;
+
+  // `inline` (desktop): the card sits in the page's right column. Otherwise
+  // (phones): a bottom sheet dialog over the page.
   const content = (
       <>
-        {inline && (
-          <button className="plot-detail__back" onClick={requestClose}>
-            <ArrowLeft size={16} aria-hidden="true" /> Back to list
-          </button>
-        )}
-
-        {/* Notion-style: the screenshots edge to edge at the top, the shop's
-            icon overlapping their bottom edge, the name below. Until the
-            full page loads, the list's count keeps their space, so nothing
-            jumps. The edit view lists them itself. */}
-        {!editing && shop && (
-          <ShopGallery images={detail ? shop.images ?? [] : null} expected={plot.shop?.image_count ?? 0} />
+        {/* Notion-style: a banner edge to edge at the top (the screenshots, or
+            the shop's color), the shop's icon overlapping its bottom edge, the
+            name below. Until the full page loads, the list's count keeps the
+            screenshots' space, so nothing jumps. The edit view lists them itself. */}
+        {!editing && (
+          <ShopGallery images={detail || !shop ? shop?.images ?? [] : null} expected={plot.shop?.image_count ?? 0}
+            color={bannerColor} />
         )}
         {!editing && shop?.icon && (
           <img className="plot-detail__shop-icon" src={shop.icon} alt="" width={64} height={64} />
         )}
 
         {/* The name, then its buttons in one row of same-size icons: star,
-            edit, and close on phones. */}
-        <div className="plot-detail__header">
+            edit and close. They float over the banner, top right, as round
+            buttons; while editing (no banner), they sit beside the name. */}
+        <div className={`plot-detail__header${editing ? '' : ' plot-detail__header--over'}`}>
           <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
           <div className="plot-detail__actions">
             {shop && <StarButton plotId={plot.id} name={displayName(shop)} starred={starred.has(plot.id)} />}
@@ -601,11 +601,9 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
                 <Plus size={14} aria-hidden="true" /> Add shop
               </button>
             ))}
-            {!inline && (
-              <button type="button" className="plot-detail__icon-button" onClick={requestClose} aria-label="Close" title="Close">
-                <X size={18} aria-hidden="true" />
-              </button>
-            )}
+            <button type="button" className="plot-detail__icon-button" onClick={requestClose} aria-label="Close" title="Close">
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
         </div>
         <p className="visually-hidden" role="status">{announcement}</p>

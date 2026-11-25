@@ -133,9 +133,9 @@ test('desktop: an inline card, with focus handled', async ({ browser }) => {
   await expect(d.getByRole('heading', { level: 2 })).toBeVisible();
   expect((await focusedInfo(d)).tag, 'focus on the title').toBe('H2');
   await expect(d.locator('dialog'), 'not a dialog').toHaveCount(0);
-  await d.getByRole('button', { name: /Back to list/ }).focus();
+  await d.getByRole('button', { name: 'Close' }).focus();
   await d.keyboard.press('Enter');
-  await expect.poll(async () => (await focusedInfo(d)).plotId, 'Back to list returns focus to the row').toBe(rowId);
+  await expect.poll(async () => (await focusedInfo(d)).plotId, 'Close returns focus to the row').toBe(rowId);
   await d.locator('.plot-table__open').nth(5).click();
   await expect(d.getByRole('heading', { level: 2 })).toBeVisible();
   expect(await d.evaluate(() => document.activeElement.matches(':focus-visible')), 'no focus ring after a mouse click').toBe(false);

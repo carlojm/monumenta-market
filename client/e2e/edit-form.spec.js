@@ -192,7 +192,7 @@ test('the owner publishes on desktop', async ({ browser }) => {
   await expect(oform.getByRole('button', { name: 'Suggest edit' })).toBeVisible();
   const fresh = 'Fresh new description from the owner.';
   await textbox(oform, 'About').fill(fresh);
-  await card.getByRole('button', { name: 'Back to list' }).click();
+  await card.getByRole('button', { name: 'Close' }).click();
   await expect(card.getByText('Discard your unsaved edit?')).toBeVisible();
   await card.locator('.plot-detail__notice').getByRole('button', { name: 'Keep editing' }).click();
   await oform.getByRole('button', { name: 'Force edit' }).click();

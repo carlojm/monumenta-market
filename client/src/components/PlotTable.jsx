@@ -21,19 +21,20 @@ function Snippet({ snippet }) {
 // snippet, if any, comes first instead.
 // The third column depends on what's narrowing the list: searching shows
 // where the text matched; a tag filter alone (any kind, "has none of" too)
-// shows what each shop says it is (About, cut to 3 lines); otherwise, the zone.
+// shows what each shop says it is (About, cut to 3 lines); otherwise, the zone
+// (not on phones: name and status only).
 // `starred`: the starred plot ids; each shop's row has a star button.
 function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onSelectPlot }) {
   const third = searchResults ? 'match' : tagFiltering ? 'about' : 'zone';
   // Icons get a column once any shop listed has one; the others keep its space.
   const icons = rows.some((plot) => plot.shop?.icon);
   return (
-    <table className="plot-table">
+    <table className={`plot-table plot-table--${third}`}>
       <thead>
         <tr>
           <th className="plot-table__shop">Shop</th>
-          {third === 'zone' && <th>Zone</th>}
-          <th>Status</th>
+          {third === 'zone' && <th className="plot-table__zone">Zone</th>}
+          <th className="plot-table__status">Status</th>
           {third === 'match' && <th>Match</th>}
           {third === 'about' && <th>About</th>}
         </tr>
@@ -72,7 +73,7 @@ function PlotTable({ rows, searchResults, tagMatches, tagFiltering, starred, onS
                   </button>
                 </div>
               </td>
-              {third === 'zone' && <td>{plot.zone}</td>}
+              {third === 'zone' && <td className="plot-table__zone">{plot.zone}</td>}
               <td>
                 {!plot.shop ? 'Vacant' : report ? (
                   <>
