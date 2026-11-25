@@ -29,6 +29,12 @@
 
 /* Scrolling inside the sheet, or over the dimmed page, never scrolls the page
    behind it. The backdrop must be a scroll container for this to work. */
+/* Focused by script when it opens (PlotDetail.jsx), so no ring. (dialog
+   first: stronger than index.css's ring for script-focused elements.) */
+dialog.plot-detail__dialog:focus {
+  outline: none;
+}
+
 .plot-detail__dialog:modal {
   overscroll-behavior: contain;
 }

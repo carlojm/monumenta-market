@@ -257,3 +257,32 @@ test("a moderator publishes someone else's shop", async ({ browser }) => {
   expect(lastRevision()).toMatchObject({ direct: 1, status: 'approved' });
   await expectNoProblems(mod);
 });
+
+test('the back arrow in place of Edit leaves the form like Cancel; phone fields are 16px', async ({ browser }) => {
+  const p = await pageAs(browser, server, 'Tester', PHONE);
+  await p.goto('/plot/corridors-1');
+  const d = p.locator('dialog');
+  await d.getByRole('button', { name: 'Edit', exact: true }).click();
+  const f = d.locator('.shop-edit');
+  // iOS zooms into a text field whose text is under 16px.
+  const sizes = await f.locator('input[type="text"], textarea').evaluateAll((els) => els.map((el) => getComputedStyle(el).fontSize));
+  expect(new Set(sizes), `every field 16px: ${sizes}`).toEqual(new Set(['16px']));
+
+  // Nothing changed: it leaves at once, and focus goes back to Edit.
+  const back = d.getByRole('button', { name: 'Cancel edit' });
+  await expect(d.getByRole('button', { name: 'Close' }), 'still beside Close').toBeVisible();
+  await back.click();
+  await expect(f).toHaveCount(0);
+  await expect(d.getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+
+  // With a change: it asks first; Discard leaves the form, the card stays.
+  await d.getByRole('button', { name: 'Edit', exact: true }).click();
+  await f.getByRole('textbox', { name: 'Palette', exact: true }).fill('Something new');
+  await back.click();
+  await expect(d.getByText('Discard your unsaved edit?')).toBeVisible();
+  await d.locator('.plot-detail__notice').getByRole('button', { name: 'Discard' }).click();
+  await expect(f).toHaveCount(0);
+  await expect(d, 'the card stays open').toBeVisible();
+  await expectNoProblems(p);
+  await p.context().close();
+});

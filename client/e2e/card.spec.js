@@ -25,6 +25,8 @@ test('phone: the card is a modal dialog that keeps focus inside', async ({ brows
   await expect(dialog).toBeVisible();
   expect(await page.evaluate(() => document.querySelector('dialog').matches(':modal')), 'modal').toBe(true);
   expect((await focusedInfo(page)).inDialog, 'focus moved inside').toBe(true);
+  expect(await page.evaluate(() => document.activeElement === document.querySelector('dialog')),
+    'on the card itself, not a button that would show a focus ring').toBe(true);
   // Past the last button, Tab goes to the browser's own toolbar (activeElement
   // = body); it must never land on the page behind.
   let leaked = null;
