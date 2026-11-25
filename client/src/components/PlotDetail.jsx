@@ -571,6 +571,17 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
           </button>
         )}
 
+        {/* Notion-style: the screenshots edge to edge at the top, the shop's
+            icon overlapping their bottom edge, the name below. Until the
+            full page loads, the list's count keeps their space, so nothing
+            jumps. The edit view lists them itself. */}
+        {!editing && shop && (
+          <ShopGallery images={detail ? shop.images ?? [] : null} expected={plot.shop?.image_count ?? 0} />
+        )}
+        {!editing && shop?.icon && (
+          <img className="plot-detail__shop-icon" src={shop.icon} alt="" width={64} height={64} />
+        )}
+
         {/* The name, then its buttons in one row of same-size icons: star,
             edit, and close on phones. */}
         <div className="plot-detail__header">
@@ -663,9 +674,6 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
           </>
         ) : (
           <>
-
-          {/* Screenshots first. Once the full page is here: it has the images. */}
-          {detail && shop && <ShopGallery images={shop.images ?? []} />}
 
           <dl className="plot-detail__meta">
             {shop && (

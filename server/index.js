@@ -135,6 +135,7 @@ app.get('/api/plots', (req, res) => {
       s.guild_color, s.primary_color, s.secondary_color, s.updated_at,
       (SELECT url FROM images i WHERE i.shop_id = s.id AND i.kind = 'icon' AND i.status = 'approved'
        ORDER BY i.id DESC LIMIT 1) AS icon,
+      (SELECT COUNT(*) FROM images i WHERE i.shop_id = s.id AND i.kind = 'gallery' AND i.status = 'approved') AS image_count,
       (SELECT GROUP_CONCAT(body, ' ') FROM comments c
        WHERE c.shop_id = s.id AND c.status = 'approved' AND c.is_system = 0
          AND ${NOT_OUTDATED}) AS comment_text
@@ -155,6 +156,7 @@ app.get('/api/plots', (req, res) => {
       ...Object.fromEntries(SHOP_FIELDS.map((f) => [f, r[f]])),
       updated_at: r.updated_at,
       icon: r.icon,
+      image_count: r.image_count, // so the card keeps the screenshots' space while they load
       comment_text: r.comment_text,
       tags: shopTags.get(r.shop_id) ?? [],
     } : null,

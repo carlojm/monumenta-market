@@ -5,16 +5,21 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 // added each one is its caption: it shows on hover, or a tap on phones, so it
 // takes no room under the picture. Screen readers always read it. Adding and
 // deleting are in the edit view (ShopImages.jsx).
-function ShopGallery({ images }) {
+// `images` is null while the card's full page loads; `expected` (the list's
+// count) then keeps an empty frame in their place.
+function ShopGallery({ images, expected }) {
   const [index, setIndex] = useState(0);
   const [captioned, setCaptioned] = useState(false);
 
+  if (!images) {
+    return expected > 0 ? <div className="plot-detail__gallery"><div className="plot-detail__carousel" /></div> : null;
+  }
   if (images.length === 0) return null;
   const at = Math.min(index, images.length - 1);
   const current = images[at];
 
   return (
-    <section aria-label="Screenshots">
+    <section className="plot-detail__gallery" aria-label="Screenshots">
       <figure className={`plot-detail__carousel${captioned ? ' plot-detail__carousel--captioned' : ''}`}>
         <img src={current.card_url} alt={`Screenshot ${at + 1} of ${images.length}`}
           width={current.width ?? undefined} height={current.height ?? undefined}

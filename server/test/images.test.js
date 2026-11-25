@@ -83,6 +83,8 @@ test('only staff approve', async () => {
   const r = await as('ModTester').post(`/api/images/${pendingId}/approve`);
   assert.equal(r.status, 200, show(r));
   assert.deepEqual((await detail(null)).images.map((i) => [i.id, i.uploader]), [[pendingId, 'ShopOwner']]);
+  const listed = (await as(null).get('/api/plots')).body.find((p) => p.id === P);
+  assert.equal(listed.shop.image_count, 1, 'the list counts it');
   assert.equal((await as('ModTester').post(`/api/images/${pendingId}/approve`)).status, 409, 'already reviewed');
 });
 

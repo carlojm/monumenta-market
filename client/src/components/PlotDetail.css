@@ -39,16 +39,31 @@
   overscroll-behavior: contain;
 }
 
+/* The screenshots, edge to edge at the top of the card: out over the card's
+   padding, with its rounded corners. On desktop, under "Back to list", they
+   only reach the sides. */
+.plot-detail__gallery {
+  margin: -1rem -1.25rem 1rem;
+}
+
+.plot-detail__back + .plot-detail__gallery {
+  margin-top: 0;
+}
+
 .plot-detail__carousel {
   position: relative;
-  margin: 0.5rem 0 1rem;
+  margin: 0;
   /* One frame for every screenshot, so moving between them never moves the
      page. 16:9 is the usual screenshot shape; others fit inside with quiet
      bars at the sides (object-fit: contain), never cropped. */
   aspect-ratio: 16 / 9;
-  border-radius: 4px;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
   overflow: hidden;
   background: var(--code-bg); /* the bars beside a screenshot of another shape */
+}
+
+.plot-detail__back + .plot-detail__gallery .plot-detail__carousel {
+  border-radius: 0;
 }
 
 .plot-detail__carousel img {
@@ -119,6 +134,23 @@
   .plot-detail__carousel figcaption {
     transition: none;
   }
+}
+
+/* The shop's icon, over the screenshots' bottom edge, with a ring of the
+   card's color to set it apart. Without screenshots, it sits above the name. */
+.plot-detail__shop-icon {
+  position: relative; /* over the screenshots */
+  display: block;
+  inline-size: 4rem;
+  block-size: 4rem;
+  margin: 0 0 0.5rem -3px; /* the picture, not its ring, lines up with the name */
+  border: 3px solid var(--sheet-bg);
+  border-radius: var(--radius-control);
+  background: var(--sheet-bg);
+}
+
+.plot-detail__gallery + .plot-detail__shop-icon {
+  margin-top: -3rem;
 }
 
 .plot-detail__meta {
