@@ -24,7 +24,7 @@ export const KINDS = ['gallery', 'icon'];
 export const MAX_UPLOAD_MB = 10;
 export const MAX_PER_DAY = 20; // uploads per account, staff excepted
 export const DRAFT_HOURS = 24; // uploads never sent in an edit are deleted after this
-const MIN_SIZE = { gallery: [640, 360], icon: [64, 64] };
+const MIN_SIZE = { gallery: [640, 360], icon: [16, 16] }; // 16: a Minecraft item's texture
 const FULL_SIZE = 1920; // longest side, for the full-size viewer
 const CARD_WIDTH = 960; // the card's carousel (twice its width, for sharp screens)
 const ICON_SIZE = 128;
@@ -57,8 +57,13 @@ async function encodeImage(buffer, kind) {
       : `Screenshots need to be at least ${minW} by ${minH} pixels.`);
   }
   if (kind === 'icon') {
-    // Square, cut from the middle if it isn't already.
-    const icon = await input().resize(ICON_SIZE, ICON_SIZE, { fit: 'cover' }).webp({ quality: 90 }).toBuffer();
+    // Square, cut from the middle if it isn't already. Pixel art smaller than
+    // the icon (an item's 16x16 texture) is enlarged by copying pixels
+    // ('nearest'), so its edges stay sharp instead of blurring; lossless, so
+    // compression doesn't smear them either.
+    const small = Math.min(width, height) < ICON_SIZE;
+    const icon = await input().resize(ICON_SIZE, ICON_SIZE, { fit: 'cover', kernel: small ? 'nearest' : 'lanczos3' })
+      .webp({ lossless: true }).toBuffer();
     return { files: [['', icon]], width: ICON_SIZE, height: ICON_SIZE };
   }
   const full = await input().resize(FULL_SIZE, FULL_SIZE, { fit: 'inside', withoutEnlargement: true })

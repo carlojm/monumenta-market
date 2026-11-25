@@ -66,7 +66,7 @@ function ShopImages({ plotId, images, icon, staff, onAdd, onRemove, iconLabel, s
             <li>Shown next to the shop&apos;s name in the list</li>
             <li>Must be some kind of icon representing your shop</li>
             {reviewNote}
-            <li>PNG, JPEG, WebP or GIF, at least 64 × 64. Other shapes are cut to a square from the middle</li>
+            <li>PNG, JPEG, WebP or GIF, at least 16 × 16 (an item&apos;s texture works). Other shapes are cut to a square from the middle</li>
           </ul>
           <label className="shop-images__file">
             {busy ? 'Uploading…' : icon ? 'Replace icon' : 'Add icon'}

@@ -166,6 +166,22 @@ test('icons: suggested by the owner, approved by a moderator, replaced later', a
   assert.equal((await detail(null)).icon, null);
 });
 
+test("a 16x16 item texture becomes a crisp 128x128 icon", async () => {
+  // Left half red, right half blue: after enlarging, the line between them
+  // is still one pixel sharp, with no blended colors.
+  const item = await sharp({ create: { width: 16, height: 16, channels: 3, background: '#ff0000' } })
+    .composite([{ input: { create: { width: 8, height: 16, channels: 3, background: '#0000ff' } }, left: 8, top: 0 }])
+    .png().toBuffer();
+  const r = await upload('ShopOwner', 'icon', item);
+  assert.equal(r.status, 201, show(r));
+  const { data, info } = await sharp(Buffer.from(await (await fetchFile(r.body.url)).arrayBuffer())).raw()
+    .toBuffer({ resolveWithObject: true });
+  assert.deepEqual([info.width, info.height], [128, 128]);
+  const at = (x) => [...data.subarray(x * info.channels, x * info.channels + 3)];
+  assert.deepEqual(at(63), [255, 0, 0]);
+  assert.deepEqual(at(64), [0, 0, 255]);
+});
+
 test('only real images of a usable size get in', async () => {
   const text = await as('ShopOwner').upload(`/api/plots/${P}/images`, { kind: 'gallery' }, Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'), 'x.svg');
   assert.equal(text.status, 400, show(text));
@@ -175,7 +191,7 @@ test('only real images of a usable size get in', async () => {
   assert.match(broken.body.error, /couldn't be read/);
   const small = await upload('ShopOwner', 'gallery', await picture(400, 300));
   assert.match(small.body.error, /at least 640 by 360/);
-  assert.match((await upload('ShopOwner', 'icon', await picture(40, 40))).body.error, /at least 64 by 64/);
+  assert.match((await upload('ShopOwner', 'icon', await picture(12, 12))).body.error, /at least 16 by 16/);
   const huge = await upload('ShopOwner', 'gallery', Buffer.alloc(11 * 1024 * 1024));
   assert.equal(huge.status, 413, show(huge));
   assert.equal((await upload('ShopOwner', 'banner')).status, 400);
