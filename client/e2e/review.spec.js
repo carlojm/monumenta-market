@@ -9,7 +9,11 @@ const query = (sql, ...args) => { const db = readDb(server); try { return db.pre
 const shopOn = (plot) => query('SELECT * FROM shops WHERE plot_id = ? AND closed_at IS NULL', plot);
 const revision = (id) => query('SELECT r.*, a.name AS reviewer FROM revisions r LEFT JOIN accounts a ON a.id = r.reviewer_id WHERE r.id = ?', id);
 const suggest = async (name, plot, changes, summary) => (await edit(server.as, name, plot, changes, { summary })).body.id;
-const focused = (page) => page.evaluate(() => document.activeElement?.textContent?.trim().slice(0, 40));
+// The focused element's name: its aria-label (icon buttons like Edit), or its text.
+const focused = (page) => page.evaluate(() => {
+  const a = document.activeElement;
+  return (a?.getAttribute('aria-label') ?? a?.textContent)?.trim().slice(0, 40);
+});
 async function openPending(page) {
   const pending = page.locator('.pending-edits');
   await pending.getByRole('button', { name: 'Show' }).click();

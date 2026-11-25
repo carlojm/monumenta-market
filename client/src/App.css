@@ -51,7 +51,7 @@
   }
 }
 
-/* Right side of the navbar: the Admin link (staff only) and the account button. */
+/* Right side of the navbar: the About and Admin (staff only) links, and the account button. */
 .navbar__right {
   display: flex;
   align-items: center;
@@ -60,14 +60,14 @@
   max-width: 65%;
 }
 
-.navbar__admin,
-.navbar__admin:visited {
+.navbar__link,
+.navbar__link:visited {
   color: var(--text-muted);
   font-size: 0.9rem;
   text-decoration: none;
 }
 
-.navbar__admin:hover {
+.navbar__link:hover {
   color: var(--text);
 }
 

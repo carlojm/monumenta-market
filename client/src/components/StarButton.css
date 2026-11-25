@@ -1,0 +1,31 @@
+/* The star toggle (StarButton.jsx): quiet until starred, then amber, the
+   site's color for things that stand out (like the move and close notes). */
+.star-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-chip);
+  background: none;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.star-button:hover {
+  color: var(--text);
+  background: var(--code-bg);
+}
+
+.star-button[aria-pressed='true'] {
+  color: #e0b87a;
+}
+
+@media (pointer: coarse) {
+  .star-button {
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+  }
+}

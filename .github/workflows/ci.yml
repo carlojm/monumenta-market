@@ -4,8 +4,9 @@
 # means one of them failed. For a browser test failure, the run's
 # "test-report" download has a snapshot and a trace of each failure.
 #
-# CD: after a push to main passes, the deploy job puts it live on Fly (the
-# same as `npm run deploy:full`). It uses the FLY_API_TOKEN secret of the
+# CD: after a push to main passes, the deploy job backs up the live database,
+# puts the new code live on Fly (the same as `npm run deploy:full`), then
+# checks the live site answers. It uses the FLY_API_TOKEN secret of the
 # "production" environment: a deploy token that can only deploy lofy. To stop
 # deploys, disable this workflow in the Actions tab; `npm run deploy:full`
 # still works by hand.
@@ -102,8 +103,30 @@ jobs:
         with:
           version: 0.5.6
 
+      # A backup of the live database just before the new code meets it,
+      # saved as market-<date>-predeploy-<commit>.db.gz beside the nightly
+      # one (restore it with `npm run restore -- <date>-predeploy-<commit>`).
+      # If it fails, nothing is deployed.
+      - name: Back up the live database
+        run: flyctl ssh console -a lofy -C "npm run backup -- predeploy-${GITHUB_SHA::7}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
       - name: Deploy to Fly
         working-directory: server
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # The live site answers with the plot list. A ✗ here means the new code
+      # is live but broken: roll back with `fly releases` + `fly deploy
+      # --image <the previous image>`, or push a fix.
+      - name: Check the live site
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+            --max-time 20 https://lofy.fly.dev/api/plots > plots.json
+          node -e "
+            const plots = JSON.parse(require('fs').readFileSync('plots.json', 'utf8'));
+            if (!Array.isArray(plots) || plots.length === 0) throw new Error('no plots in the answer');
+            console.log(plots.length + ' plots: the site is up');
+          "

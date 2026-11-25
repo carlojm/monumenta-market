@@ -40,29 +40,36 @@ export const backupClient = () => new S3Client({
 const today = () => new Date().toISOString().slice(0, 10);
 const daysOld = (date) => Math.round((Date.parse(today()) - Date.parse(date)) / 86_400_000);
 
-// Which backups to delete: anything past 30 days, except the 1st of a month
-// within the last year. Files that don't look like backups are left alone.
+// Which backups to delete: anything past 30 days, except the nightly one of
+// the 1st of a month within the last year (labelled ones, like the backup
+// before a deploy, go at 30 days). Files that don't look like backups are
+// left alone.
 export function expiredKeys(keys) {
   return keys.filter((key) => {
-    const date = key.match(/market-(\d{4}-\d{2}-\d{2})\.db\.gz$/)?.[1];
+    const [, date, label] = key.match(/market-(\d{4}-\d{2}-\d{2})(-[a-z0-9-]+)?\.db\.gz$/) ?? [];
     if (!date) return false;
     const age = daysOld(date);
     if (age < KEEP_DAILY) return false;
-    return !(date.endsWith('-01') && age < KEEP_MONTHLY_DAYS);
+    return !(!label && date.endsWith('-01') && age < KEEP_MONTHLY_DAYS);
   });
 }
+
+// A label names an extra backup (market-<date>-<label>.db.gz), so it doesn't
+// replace that day's nightly one.
+export const LABEL = /^[a-z0-9-]+$/;
 
 export const NOT_CONFIGURED = 'Backups need R2_BACKUP_BUCKET, R2_BACKUP_ACCESS_KEY_ID and R2_BACKUP_SECRET_ACCESS_KEY';
 
 // Back up `db` (the open database) now. Returns { key, bytes, deleted }.
-export async function runBackup(db) {
+export async function runBackup(db, label = null) {
   if (!backupsConfigured()) throw new Error(NOT_CONFIGURED);
+  if (label !== null && !LABEL.test(label)) throw new Error(`"${label}" isn't a label like predeploy-abc1234`);
   const s3 = backupClient();
   const tmp = path.join(os.tmpdir(), `market-backup-${process.pid}.db`);
   try {
     await db.backup(tmp);
     const body = zlib.gzipSync(fs.readFileSync(tmp));
-    const key = `${PREFIX}market-${today()}.db.gz`;
+    const key = `${PREFIX}market-${today()}${label ? `-${label}` : ''}.db.gz`;
     await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: body, ContentType: 'application/gzip' }));
 
     const listed = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix: PREFIX }));

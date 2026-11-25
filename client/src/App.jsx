@@ -7,7 +7,8 @@ import PlotTable from './components/PlotTable';
 import PlotDetail from './components/PlotDetail';
 import SortMenu from './components/SortMenu';
 import { FilterButton, FilterChips } from './components/Filters';
-import { filterMatches, filterPlots, isActive, newFilter } from './lib/filters';
+import { filterMatches, filterPlots, hasChoices, isActive, newFilter } from './lib/filters';
+import { useFavorites } from './lib/favorites';
 import { createSearchIndex, getSearchResults } from './lib/search';
 import { defaultSort, sortPlots } from './lib/sort';
 import { DESKTOP_QUERY, useMediaQuery } from './lib/useMediaQuery';
@@ -71,7 +72,7 @@ function App() {
   const addFilter = (type) => {
     const filter = newFilter(type);
     setFilters((list) => [...list, filter]);
-    if (type !== 'occupied') setOpenFilterId(filter.id); // nothing to choose for "hide vacant"
+    if (hasChoices(type)) setOpenFilterId(filter.id); // nothing to choose for "hide vacant" or "only starred"
   };
   // A tag picked from the search bar's suggestions joins the first "has any of"
   // tag filter (so picks are ORed), or starts one. The text that found it is
@@ -89,7 +90,9 @@ function App() {
   const updateFilter = (filter) => setFilters((list) => list.map((f) => (f.id === filter.id ? filter : f)));
   const removeFilter = useCallback((id) => setFilters((list) => list.filter((f) => f.id !== id)), []);
   const filtering = filters.some(isActive);
-  const filteredPlots = useMemo(() => filterPlots(plots, filters), [plots, filters]);
+  // Starred shops (this browser): pinned to the top, and the "Only starred" filter.
+  const starred = useFavorites();
+  const filteredPlots = useMemo(() => filterPlots(plots, filters, starred), [plots, filters, starred]);
 
   // Typing stays quick: the box shows each letter at once, and the search,
   // the table and the map follow with the deferred text, which React works on
@@ -107,8 +110,8 @@ function App() {
   const [pickedSort, setPickedSort] = useState(null);
   const searching = !!searchResults;
   const sort = pickedSort && (searching || pickedSort.key !== 'best') ? pickedSort : defaultSort(searching);
-  const rows = useMemo(() => sortPlots(filteredPlots, searchResults, { key: sort.key, reversed: sort.reversed }),
-    [filteredPlots, searchResults, sort.key, sort.reversed]);
+  const rows = useMemo(() => sortPlots(filteredPlots, searchResults, { key: sort.key, reversed: sort.reversed }, starred),
+    [filteredPlots, searchResults, sort.key, sort.reversed, starred]);
   const tagMatches = useMemo(() => filterMatches(filteredPlots, filters), [filteredPlots, filters]);
   // Any tag filter, "has none of" included (it has no matches to show).
   const tagFiltering = filters.some((f) => f.type === 'tags' && isActive(f));
@@ -132,7 +135,7 @@ function App() {
         {filtering && rows.length === 0 ? (
           <p className="app-main__empty">No shops match these filters.</p>
         ) : (
-          <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches} tagFiltering={tagFiltering}
+          <PlotTable rows={rows} searchResults={searchResults} tagMatches={tagMatches} tagFiltering={tagFiltering} starred={starred}
             onSelectPlot={openPlot} />
         )}
       </div>

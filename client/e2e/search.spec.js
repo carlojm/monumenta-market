@@ -80,3 +80,30 @@ test('desktop: the columns and the map keep their size and place when a card ope
   expect(mapNow).toEqual(map);
   expect([leftNow.x, leftNow.width, rightNow.x, rightNow.width]).toEqual([left.x, left.width, right.x, right.width]);
 });
+
+test('whole words rank first: "lime" puts the Lime plots before the Slime shop', async ({ browser }) => {
+  const page = await pageAs(browser, server, null, DESKTOP);
+  await page.goto('/');
+  await page.getByPlaceholder('Search shops, owners, comments...').fill('lime');
+  const rows = page.locator('.plot-table__open');
+  await expect(page.locator('.plot-table__row--dimmed').first()).toBeVisible();
+  const ids = await rows.evaluateAll((els) => els.map((el) => el.dataset.plotId));
+  expect(ids.indexOf('lime-1'), 'lime-1 matched').toBeGreaterThanOrEqual(0);
+  expect(ids.indexOf('lime-1'), 'before the slime shop').toBeLessThan(ids.indexOf('corridors-1'));
+  // The snippet shows the exact word, not a loose match.
+  await expect(page.locator('.plot-table__match mark').first()).toHaveText(/^lime$/i);
+  await expectNoProblems(page);
+});
+
+test('"Last page edit" sorts by the shop page\'s last change', async ({ browser }) => {
+  await edit(server.as, 'ModTester', 'corridors-3', { description: 'Just edited.' });
+  const page = await pageAs(browser, server, null, DESKTOP);
+  await page.goto('/');
+  await page.locator('.toolbar__menu-wrap .toolbar__button').last().click();
+  await page.getByRole('menuitemradio', { name: 'Last page edit' }).click();
+  const first = page.locator('.plot-table__open').first();
+  await expect(first).toHaveAttribute('data-plot-id', 'corridors-3');
+  await page.getByRole('button', { name: 'Oldest first' }).click();
+  await expect(first).not.toHaveAttribute('data-plot-id', 'corridors-3');
+  await expectNoProblems(page);
+});

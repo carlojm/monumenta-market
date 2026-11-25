@@ -8,6 +8,8 @@ import TagChips from './TagChips';
 import PendingEdits from './PendingEdits';
 import ShopEditForm from './ShopEditForm';
 import ShopHistory from './ShopHistory';
+import StarButton from './StarButton';
+import { useFavorites } from '../lib/favorites';
 import { canReport, recordReport, cooldownRemainingMinutes, timeAgo, formatDate } from '../lib/reports';
 import { ACTIVITIES, ACTIVITY_LABELS, LOCKS, displayName, ownerLabel, reportLabel } from '../lib/plots';
 
@@ -330,6 +332,7 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // (lib/resource.js). The phone card is mounted with no plot while closed.
   const detailResource = plot ? plotDetailResource(plot.id) : NO_DETAIL;
   const { data: detail, error: loadError } = useResource(detailResource);
+  const starred = useFavorites();
   // Phones: the card is a native modal dialog. The browser keeps focus inside
   // it, closes it on Esc (and on a tap outside, with closedby="any"), and
   // tells screen readers it opened. Closing it closes the card (onClose
@@ -562,25 +565,37 @@ function PlotDetail({ plot, plots = [], catalog = null, onClose, onReported, inl
   // button. Otherwise (phones): a bottom sheet dialog over the page.
   const content = (
       <>
-        {inline ? (
+        {inline && (
           <button className="plot-detail__back" onClick={requestClose}>
             <ArrowLeft size={16} aria-hidden="true" /> Back to list
           </button>
-        ) : (
-          <button className="plot-detail__close" onClick={requestClose} aria-label="Close">
-            <X size={20} aria-hidden="true" />
-          </button>
         )}
 
+        {/* The name, then its buttons in one row of same-size icons: star,
+            edit, and close on phones. */}
         <div className="plot-detail__header">
           <h2 id="plot-detail-title" ref={headingMounted} tabIndex={-1}>{displayName(shop)}</h2>
-          {/* Shown once the full page has loaded: an edit starts from it.
-              A vacant plot's form starts at "A new shop is here". */}
-          {detail && account !== undefined && !editing && (
-            <button type="button" className="plot-detail__edit" ref={editButtonMounted} onClick={startEditing}>
-              {shop ? <><Pencil size={14} aria-hidden="true" /> Edit</> : <><Plus size={14} aria-hidden="true" /> Add shop</>}
-            </button>
-          )}
+          <div className="plot-detail__actions">
+            {shop && <StarButton plotId={plot.id} name={displayName(shop)} starred={starred.has(plot.id)} />}
+            {/* Shown once the full page has loaded: an edit starts from it.
+                A vacant plot's form starts at "A new shop is here"; it's the
+                only button there, so it keeps its words. */}
+            {detail && account !== undefined && !editing && (shop ? (
+              <button type="button" className="plot-detail__icon-button" ref={editButtonMounted} onClick={startEditing}
+                aria-label="Edit" title="Edit">
+                <Pencil size={16} aria-hidden="true" />
+              </button>
+            ) : (
+              <button type="button" className="plot-detail__add-shop" ref={editButtonMounted} onClick={startEditing}>
+                <Plus size={14} aria-hidden="true" /> Add shop
+              </button>
+            ))}
+            {!inline && (
+              <button type="button" className="plot-detail__icon-button" onClick={requestClose} aria-label="Close" title="Close">
+                <X size={18} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
         <p className="visually-hidden" role="status">{announcement}</p>
 

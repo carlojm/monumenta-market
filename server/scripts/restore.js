@@ -6,6 +6,8 @@
 //
 // Usage (from server/): npm run restore                list the backups
 //                       npm run restore -- 2026-10-29  fetch that day's backup
+//                       npm run restore -- 2026-10-29-predeploy-abc1234
+//                                                      a labelled one (see the list)
 // On Fly:               fly ssh console -C "npm run restore -- 2026-10-29"
 //                       then: fly apps restart lofy
 //
@@ -19,6 +21,7 @@ import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { dbPath } from '../db/path.js';
 import { BUCKET, NOT_CONFIGURED, PREFIX, backupClient, backupsConfigured } from '../lib/backup.js';
 
+// A date, or a date and a label: the part of the name between market- and .db.gz.
 const date = process.argv[2];
 const target = `${dbPath}.restore`;
 const tmp = `${target}.download`;
@@ -47,7 +50,7 @@ try {
     console.log(keys.length ? `Backups in ${PREFIX}:\n  ${keys.join('\n  ')}` : `No backups in ${PREFIX}`);
     process.exit(0);
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(`"${date}" isn't a date like 2026-10-29`);
+  if (!/^\d{4}-\d{2}-\d{2}(-[a-z0-9-]+)?$/.test(date)) throw new Error(`"${date}" isn't a date like 2026-10-29`);
 
   const key = `${PREFIX}market-${date}.db.gz`;
   const obj = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: key }));

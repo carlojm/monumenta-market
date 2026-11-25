@@ -4,6 +4,7 @@
 //   { type: 'status', values }      map status (the legend's colors), any of
 //   { type: 'zone', values }        zone names, any of
 //   { type: 'occupied' }            hides vacant plots (no shop)
+//   { type: 'starred' }             only the shops starred in this browser
 // A filter with nothing chosen yet doesn't filter anything.
 
 import { MAP_CATEGORIES, mapCategory } from './plots';
@@ -32,22 +33,26 @@ let nextId = 1;
 export function newFilter(type) {
   const id = nextId++;
   if (type === 'tags') return { id, type, mode: 'any', tagIds: [] };
-  if (type === 'occupied') return { id, type };
+  if (!hasChoices(type)) return { id, type };
   return { id, type, values: [] };
 }
 
+// "Hide vacant" and "Only starred" are on as soon as they're added.
+export const hasChoices = (type) => type !== 'occupied' && type !== 'starred';
+
 export function isActive(filter) {
   if (filter.type === 'tags') return filter.tagIds.length > 0;
-  if (filter.type === 'occupied') return true;
+  if (!hasChoices(filter.type)) return true;
   return filter.values.length > 0;
 }
 
-function passes(plot, filter) {
+function passes(plot, filter, starred) {
   if (!isActive(filter)) return true;
   switch (filter.type) {
     case 'status': return filter.values.includes(mapCategory(plot));
     case 'zone': return filter.values.includes(plot.zone);
     case 'occupied': return !!plot.shop;
+    case 'starred': return starred.has(plot.id);
     default: {
       const has = new Set((plot.shop?.tags ?? []).map((t) => t.id));
       if (filter.mode === 'all') return filter.tagIds.every((id) => has.has(id));
@@ -57,9 +62,10 @@ function passes(plot, filter) {
   }
 }
 
-export function filterPlots(plots, filters) {
+// `starred`: the starred plot ids (lib/favorites.js), for "Only starred".
+export function filterPlots(plots, filters, starred = new Set()) {
   if (!filters.some(isActive)) return plots;
-  return plots.filter((plot) => filters.every((f) => passes(plot, f)));
+  return plots.filter((plot) => filters.every((f) => passes(plot, f, starred)));
 }
 
 // Fields checked for a matched tag's words, in order.
@@ -97,6 +103,7 @@ const listNames = (names) => names.slice(0, 2).join(', ') + (names.length > 2 ? 
 export function filterLabel(filter, catalog) {
   const { label } = FILTER_TYPES.find((t) => t.type === filter.type) ?? {};
   if (filter.type === 'occupied') return 'Vacant plots hidden';
+  if (filter.type === 'starred') return 'Only starred shops';
   if (!isActive(filter)) return `${label}: choose…`;
   if (filter.type === 'status') {
     return `Status: ${listNames(filter.values.map((v) => STATUS_OPTIONS.find((o) => o.key === v).label))}`;
